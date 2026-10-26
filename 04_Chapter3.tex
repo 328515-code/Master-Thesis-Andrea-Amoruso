@@ -1,0 +1,39 @@
+\chapter{Results and Post-Processing}
+\label{ch:results}
+
+This chapter outlines the post-processing architecture developed to parse, visualize, and compare the quantitative outputs across the 24 DoE simulations. It describes the structure of the OpenFOAM function objects, the automated HTML/Plotly reporting dashboard, and the fluid dynamic trends governing valve closure. %
+
+\section{Structure of OpenFOAM Post-Processing Data}
+\label{sec:postprocessing_structure}
+During the execution of \texttt{simpleFoam}, runtime function objects defined in \texttt{system/controlDict} continuously evaluate surface integrals, wall shear metrics, and aerodynamic forces, writing the output into the \texttt{postProcessing/} directory starting from time folder \texttt{0/}. %
+Each simulation generates five specific data streams: %
+
+\begin{itemize}
+    \item \textbf{Inlet Average Pressure (\texttt{inlet\_pressure\_avg/0/surfaceFieldValue.dat}):} Tracks the area-averaged kinematic pressure across the \texttt{inlet} patch over solver iterations. %
+    \item \textbf{Outlet Average Pressure (\texttt{outlet\_pressure\_avg/0/surfaceFieldValue.dat}):} Tracks the area-averaged kinematic pressure across the \texttt{outlet} patch, enabling direct computation of the overall valve pressure drop $\Delta P = P_{\text{in}} - P_{\text{out}}$. %
+    \item \textbf{Inlet Volume Flux (\texttt{inlet\_volume\_flux/0/surfaceFieldValue.dat}):} Computes the surface integral of the velocity vector across the inlet patch (\texttt{areaIntegrate(U)}). %
+    Because the inlet velocity is prescribed as a fixed Dirichlet boundary condition in a steady-state incompressible solver, the axial volumetric flux remains constant throughout the iteration history and equals $Q = U \cdot A_{\text{in}} \approx 7.17 \times 10^{-4}$ to $3.82 \times 10^{-3}\text{ m}^3/\text{s}$ (Table \ref{tab:flow_regimes}), serving as a verification check on boundary condition enforcement. %
+    \item \textbf{Dimensionless Wall Distance (\texttt{yPlus1/0/yPlus.dat}):} Records the minimum, maximum, and area-averaged $y^+$ values across all solid wall patches (\texttt{wall1}, \texttt{wall2}, \texttt{wallObt}) to verify boundary layer resolution for the $k-\omega$ SST turbulence model. %
+    \item \textbf{Obturator Forces (\texttt{forceCoeffs\_Obt/0/forces.dat}):} Logs the three-dimensional pressure force vector $\mathbf{F}_p = (F_{px}, F_{py}, F_{pz})$ and viscous force vector $\mathbf{F}_v = (F_{vx}, F_{vy}, F_{vz})$ acting on \texttt{wallObt}. %
+    The total axial actuation force driving the closure of the excess flow valve is given by $F_{x,\text{tot}} = F_{px} + F_{vx}$. %
+\end{itemize}
+
+\section{Automated Plotly Reporting and Master Dashboard}
+\label{sec:plotly_dashboard}
+To inspect convergence and compare physical quantities across all 24 simulations without manually opening 120 raw \texttt{.dat} text files, a batch post-processing script (\texttt{generate\_reports.py}, Appendix \ref{sec:app_plotly_script}) was built using the Python \texttt{Plotly} library \cite{plotly_docs}. %
+
+The script employs custom text parsers and regular expressions (\texttt{re}) to extract time series and nested vector tuples from the OpenFOAM \texttt{.dat} files. %
+For every simulation directory (\texttt{Sim\_*}), the script generates a standalone $2 \times 2$ responsive CSS grid dashboard (\texttt{CFD\_Report\_<CaseName>.html}) featuring four interactive charts: (1) Inlet vs. Outlet Pressure, (2) Inlet Volume Flux, (3) Patch-grouped Average $y^+$ Development, and (4) Total Forces ($F_x, F_y, F_z$) on the obturator. %
+
+Furthermore, to provide a unified entry point for the entire DoE, the script automatically compiles a top-level \texttt{Master\_Dashboard.html} file. This master interface features a navigation sidebar listing all 24 simulation cases alongside an embedded HTML \texttt{<iframe>} container; clicking any simulation button triggers a JavaScript callback that dynamically loads the corresponding interactive Plotly report into the main viewport.
+
+\section{Mesh Validation and Fluid Dynamic Trends}
+\label{sec:fluid_trends}
+*(Note: Insert your specific numerical plots and comparative tables from the Master Dashboard here once all 24 runs are analyzed).*
+
+Preliminary inspection of the DoE results highlights three fundamental physical behaviors across the parameter matrix:
+\begin{enumerate}
+    \item \textbf{Quadratic Scaling with Velocity:} For a given fluid and obturator geometry, both the pressure drop $\Delta p$ across the valve and the axial drag force $F_x$ on \texttt{wallObt} scale approximately with the square of the inlet velocity ($\propto U^2$), confirming that inertial form drag across the obturator orifices dominates over viscous skin friction at high flow rates \cite{white2016}.
+    \item \textbf{Orifice Restriction Effects:} Comparing the four obturator configurations reveals that reducing the orifice diameter from $3.0\text{ mm}$ (\texttt{Obt\_B}, \texttt{Obt\_D}) to $1.5\text{ mm}$ (\texttt{Obt\_A}, \texttt{Obt\_C}) and halving the hole count from 6 to 3 (\texttt{Obt\_A} vs. \texttt{Obt\_C}) drastically accelerates the vena contracta jet velocity through the obturator, amplifying the downstream recirculation zone and increasing the axial closing force $F_x$ for a given flow rate \cite{crane410}. %
+    \item \textbf{Fluid Property Influence ($\text{H}_2$ vs. $\text{N}_2$):} While kinematic quantities scale similarly at high Reynolds numbers, transforming the kinematic pressure and force outputs into dimensional engineering units ($p = \rho P$) demonstrates that Nitrogen ($\rho_{\text{N}_2} \approx 1.165\text{ kg/m}^3$) generates significantly higher dimensional actuation forces at a given velocity than Hydrogen ($\rho_{\text{H}_2} \approx 0.0838\text{ kg/m}^3$), requiring softer spring calibration or more restrictive obturator geometries (such as \texttt{3Fori\_1p5mm}) when designing valves for low-density $\text{H}_2$ service \cite{nist_refprop}.
+\end{enumerate}

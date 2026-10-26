@@ -1,0 +1,10 @@
+\chapter{Conclusions}
+\label{ch:conclusions}
+
+This thesis established an end-to-end, automated computational methodology for the fluid dynamic analysis, parametric optimization, and industrial selection of excess flow valves. By integrating OpenFOAM version 10 on the 52-core ARIES HPC cluster with custom Bash and Python workflows, a full-factorial Design of Experiments (DoE) comprising 24 simulations was successfully executed across two gases ($\text{H}_2$ and $\text{N}_2$), three velocity regimes ($15, 40,$ and $80\text{ m/s}$), and four obturator geometries. %
+
+From a numerical standpoint, the hybrid meshing pipeline (\texttt{blockMesh}, \texttt{surfaceFeatures}, and parallel \texttt{snappyHexMesh}) paired with \texttt{scotch} domain decomposition achieved an exceptional parallel load balance across 52 cores, limiting cell count deviation to just $1\%$ above the $32,500$-cell average. %
+Furthermore, identifying and resolving the 32-bit integer overflow in parallel streamline tracking ensured robust, uninterrupted batch execution across the entire DoE matrix. %
+
+From an engineering perspective, the automated \texttt{scp} data extraction and Plotly \texttt{Master\_Dashboard.html} architecture transformed gigabytes of raw HPC data into a lightweight, interactive visual database. %
+Coupling this database with a Streamlit selection tool demonstrates how high-fidelity CFD simulations can be packaged into a fast, intuitive decision-support system for non-expert users. Future developments may extend this framework to compressible high-Mach solvers (such as \texttt{rhoSimpleFoam}) for choked-flow rupture scenarios and incorporate fluid-structure interaction (FSI) dynamic meshes to model the transient closing motion of the obturator.

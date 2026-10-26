@@ -1,0 +1,22 @@
+\chapter*{Introduction}
+\addcontentsline{toc}{chapter}{Introduction}
+\label{ch:introduction}
+
+Excess flow valves represent a critical line of defense in industrial, energy, and aerospace fluid systems, particularly in pressurized storage tanks and distribution pipelines for gases such as Hydrogen ($\text{H}_2$) and Nitrogen ($\text{N}_2$) which are stored at high pressures. Designed to instantly isolate a pipeline in the event of a catastrophic failure, downstream rupture, or sudden depressurization, these mechanical components must operate with absolute reliability. However, the intricate fluid dynamic phenomena governing their actuation—characterized by high-velocity jet formation through narrow orifices, rapid flow separation, tendency to the sound barrier, and highly non-linear pressure gradients across the obturator—make their design optimization challenging \cite{white2016, crane410}. Traditional empirical testing is often prohibitively expensive and limited in its ability to capture three-dimensional internal flow structures, making Computational Fluid Dynamics (CFD) an indispensable tool for modern valve engineering \cite{moukalled2016}.
+
+This thesis presents a comprehensive, numerical investigation into the fluid dynamic performance of a specific set of excess flow valves, bridging the gap between numerical computing and practical industrial application. By the usage of  the open-source OpenFOAM10 framework deployed on the ARIES High-Performance Computing (HPC) cluster \cite{openfoam_user, hpc_aries}, this work establishes a  CFD methodology capable of resolving the internal flow fields, fluid forces and pressures acting on the valve obturator. %
+The computational approach utilizes a hybrid meshing strategy, combining structured background grids (\texttt{blockMesh}) with parallel surface-snapping and refinement (\texttt{snappyHexMesh}), and employs graph-based domain decomposition via the \texttt{scotch} algorithm to efficiently distribute the workload across 52-core computing nodes managed by SLURM \cite{pellegrini1996} in order to reduce the time needed to obtain results. %
+
+Building upon this validated numerical baseline, the core of the research expands into an automated, full-factorial Design of Experiments (DoE) comprising 24 distinct simulations. %
+Rather than analyzing a single operating point, the study systematically crosses three key design dimensions: two working fluids with significantly different transport properties ($\text{H}_2$ and $\text{N}_2$) \cite{nist_refprop}, three operational flow regimes ($5\text{ m/s}$, $10\text{ m/s}$, and $15\text{ m/s}$) \cite{anderson2017, crane410}, and four distinct obturator geometries featuring varying orifice counts and diameters (\texttt{A}, \texttt{B}, \texttt{C}, and \texttt{D}). To handle the generation, execution, and post-processing of this simulation matrix, a custom Python-based pipeline was developed, which manipulates OpenFOAM dictionaries, submits batch jobs to the cluster, selectively extracts postProcessing directories via Secure Copy Protocol (\texttt{scp}), and compiles an interactive HTML-Plotly report \cite{plotly_docs}. %
+
+The final objective of this work transcends traditional CFD analysis by synthesizing the parametric DoE dataset into an interactive tool, built with the Python \texttt{Streamlit} framework \cite{streamlit_docs}. This application abstracts the underlying computational complexity, allowing a non-expert user to input desired fluid behavioral parameters and immediately identify the optimal excess flow valve for their specific tank or pipeline application.
+
+The manuscript is structured as follows:
+\begin{itemize}
+    \item \textbf{Chapter 1} details the numerical model, governing equations, physical property definitions, HPC environment, mesh generation process and solver troubleshooting. %
+    \item \textbf{Chapter 2} defines the 24-case DoE matrix, explains the reason behind the choice of the selected fluid and kinematic parameters, and explains the Python/Bash automation scripts for case generation and HPC data retrieval. %
+    \item \textbf{Chapter 3} presents the post-processing methodology, the automated Plotly dashboard architecture, and the fluid dynamic results across the DoE space. %
+    \item \textbf{Chapter 4} illustrates the software architecture and user interface of the interactive valve selection tool.
+    \item \textbf{Chapter 5} summarizes the main conclusions and outlines potential future developments.
+\end{itemize}

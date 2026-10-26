@@ -1,0 +1,25 @@
+\chapter{Development of the Interactive Selection Tool}
+\label{ch:selection_tool}
+
+To translate the 24-case CFD Design of Experiments into an accessible engineering utility, an interactive software application was conceived using the Python \texttt{Streamlit} framework \cite{streamlit_docs}. This chapter describes the software architecture, data aggregation logic, and decision-making algorithm that enables non-expert users to select the optimal excess flow valve configuration.
+
+\section{Software Architecture and Data Aggregation}
+\label{sec:software_architecture}
+The selection tool operates on a two-tier architecture separating offline HPC data reduction from real-time user interaction:
+\begin{enumerate}
+    \item \textbf{Converged State Extraction:} Using the parsing functions established in \texttt{generate\_reports.py}, the converged steady-state values (averaged over the final iterations of each \texttt{simpleFoam} run) for pressure drop $\Delta P$, axial obturator force $F_x$, and volume flux $Q$ are extracted from all 24 \texttt{postProcessing/} directories and compiled into a structured lookup table. %
+    \item \textbf{Dimensional Scaling Engine:} Because the incompressible CFD results are stored in kinematic form, the backend engine dynamically multiplies the dimensionless/kinematic coefficients by the actual gas density $\rho(p_{\text{tank}}, T_{\text{tank}})$ corresponding to the user's specific storage tank operating pressure and temperature \cite{white2016, nist_refprop}.
+\end{enumerate}
+
+\section{User Interface and Valve Recommendation Logic}
+\label{sec:recommendation_logic}
+Through the web-based graphical user interface (GUI), the user specifies four operational constraints:
+\begin{itemize}
+    \item Working gas selection ($\text{H}_2$ or $\text{N}_2$). %
+    \item Operating tank pressure and temperature.
+    \item Nominal required flow rate ($Q_{\text{nom}}$ or $\dot{m}_{\text{nom}}$) and maximum allowable pressure drop ($\Delta p_{\text{max}}$) during normal operation.
+    \item Target excess flow trip threshold ($Q_{\text{trip}}$) and pre-load spring force ($F_{\text{spring}}$) required to actuate the obturator during a line rupture.
+\end{itemize}
+
+Upon receiving these inputs, the tool interpolates the CFD response surfaces across the four obturator geometries (\texttt{3Fori\_1p5mm}, \texttt{3Fori\_3mm}, \texttt{6Fori\_1p5mm}, and \texttt{6Fori\_3mm}). %
+It filters out geometries that exceed $\Delta p_{\text{max}}$ at nominal flow or fail to generate $F_x \ge F_{\text{spring}}$ at the rupture flow rate, ranking the remaining viable valves and displaying their interactive Plotly performance curves directly within the browser \cite{plotly_docs, streamlit_docs}.

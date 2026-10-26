@@ -1,0 +1,138 @@
+\documentclass[12pt,a4paper,twoside,openright]{report}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{booktabs}
+
+% -------------------- Page Setup --------------------
+\geometry{a4paper, top=3cm, bottom=3cm, left=3.5cm, right=2.5cm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[RE]{\leftmark}
+\fancyhead[LO]{\rightmark}
+
+% -------------------- Code Snippet Formatting --------------------
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\lstset{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegray},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{orange},
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,                 
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+% Optional: Uncomment the line below when writing to compile ONLY a specific chapter (saves time!)
+% \includeonly{chapters/ch4_results}
+
+\begin{document}
+
+% -------------------- Title Page --------------------
+\begin{titlepage}
+    \begin{center}
+        \includegraphics[width=0.7\textwidth]{Pics/Motor-Valley-partners-centri-di-formazione-MUNER-stream-logo-2.png}\\[1cm]
+
+
+        \rule[0cm]{15cm}{0.1mm}
+        \rule[0.5cm]{15cm}{0.6mm}
+
+        
+        {\Large \uppercase{Advanced automotive Engineering}} \\[0.5cm]
+        {\large Racing Car Design} \\[3cm]
+        
+        {\Large \textbf{CFD Design and Analysis of Excess Flow Valves through Design of Experiments and Development of an Interactive Tool}} \\[3cm]
+        
+        \begin{minipage}[t]{0.45\textwidth}
+            \begin{flushleft} \large
+                \textit{Supervisor}\\
+                \textbf{Prof. Enrico Stalio} \\
+                \textit{Co-supervisor}\\
+                \textbf{Dott. Filippo Moroni} 
+            \end{flushleft}
+        \end{minipage}
+        \begin{minipage}[t]{0.45\textwidth}
+            \begin{flushright} \large
+                \textit{Candidate}\\
+                \textbf{Andrea Amoruso}
+            \end{flushright}
+        \end{minipage}\\[3cm]
+        
+        {\large Graduation Session 01/12/2026} \\[0.5cm]
+        {\large Academic Year 2025/2026}
+    \end{center}
+\end{titlepage}
+
+\cleardoublepage
+
+% -------------------- Quote Page ---------------------------
+\thispagestyle{empty}
+\vspace*{5cm}
+\begin{flushright}
+    \textit{"Perchè infondo la vita è tutto un equilibrio sopra la follia"} \\
+    \textit{-Vasco Rossi}
+\end{flushright}
+\cleardoublepage
+
+% -------------------- Indices --------------------
+\tableofcontents
+\cleardoublepage
+\listoffigures
+\cleardoublepage
+\listoftables
+\cleardoublepage
+
+% -------------------- Main Thesis Chapters --------------------
+\include{01_Introduction}
+\include{02_Chapter1}
+\include{03_Chapter2}
+\include{04_Chapter3}
+\include{05_Chapter4}
+\include{06_Chapter5}
+
+% -------------------- Appendix --------------------
+\appendix
+\include{07_Appendix}
+
+% -------------------- Bibliography --------------------
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Bibliography}
+\begin{thebibliography}{99}
+    \bibitem{openfoam_user} OpenFOAM Foundation, \textit{OpenFOAM v10 User Guide}, 2022. URL: \url{https://openfoam.org}.
+    \bibitem{hpc_aries} University of Modena and Reggio Emilia (UNIMORE), \textit{ARIES High-Performance Computing Cluster Documentation}.
+    \bibitem{white2016} F. M. White, \textit{Fluid Mechanics}, 8th ed., McGraw-Hill Education, New York, 2016.
+    \bibitem{crane410} Crane Co., \textit{Flow of Fluids Through Valves, Fittings, and Pipe (Technical Paper No. 410)}, 2018.
+    \bibitem{moukalled2016} F. Moukalled, L. Mangani, and M. Darwish, \textit{The Finite Volume Method in Computational Fluid Dynamics}, Springer, 2016.
+    \bibitem{anderson2017} J. D. Anderson, \textit{Fundamentals of Aerodynamics}, 6th ed., McGraw-Hill Education, 2017.
+    \bibitem{menter1994} F. R. Menter, ``Two-equation eddy-viscosity turbulence models for engineering applications,'' \textit{AIAA Journal}, vol. 32, no. 8, pp. 1598--1605, 1994.
+    \bibitem{pellegrini1996} F. Pellegrini and J. Roman, ``SCOTCH: A Software Package for Static Mapping,'' in \textit{HPCN}, Springer, 1996.
+    \bibitem{nist_refprop} E. W. Lemmon et al., \textit{NIST Standard Reference Database 23: REFPROP}, Version 10.0, NIST, 2018.
+    \bibitem{plotly_docs} Plotly Technologies Inc., \textit{Plotly Python Graphing Library}, 2015. URL: \url{https://plot.ly}.
+    \bibitem{streamlit_docs} Streamlit Inc., \textit{Streamlit Documentation}. URL: \url{https://docs.streamlit.io/}.
+\end{thebibliography}
+
+% -------------------- Acknowledgments --------------------
+\cleardoublepage
+\input{08_Acknowledgements}
+
+\end{document}

@@ -1,0 +1,78 @@
+\chapter{Design of Experiments (DoE) and HPC Automation}
+\label{ch:doe_automation}
+
+To systematically characterize the fluid dynamic behavior of the excess flow valve across diverse operating environments, a full-factorial Design of Experiments (DoE) was conducted. This chapter details the selection and physical justification of the three design factors: working fluid, inlet flow regime, and obturator geometry. Moreover, in this chapter are described the Python scripts engineered to automate case generation, SLURM job submission and remote data retrieval. %
+
+\section{Definition of the DoE Parameter Space}
+\label{sec:doe_parameters}
+The parametric investigation explores three primary dimensions governing valve actuation in gas storage tank systems, resulting in a full-factorial matrix of $2 \times 3 \times 4 = 24$ CFD simulations: %
+
+\subsection{Working Fluids ($\text{H}_2$ and $\text{N}_2$)}
+Excess flow valves are widely deployed in both inert gas lines and high-safety hydrogen storage applications. Consequently, Hydrogen ($\text{H}_2$) and Nitrogen ($\text{N}_2$) were selected as the two working fluids. %
+In accordance with the National Institute of Standards and Technology (NIST) REFPROP thermophysical database \cite{nist_refprop}, the transport properties were evaluated at standard reference conditions ($T = 20^{\circ}\text{C}$, $p = 1\text{ atm}$):
+\begin{itemize}
+    \item \textbf{Hydrogen ($\text{H}_2$):} Density $\rho_{\text{H}_2} \approx 0.0838\text{ kg/m}^3$, dynamic viscosity $\mu_{\text{H}_2} \approx 8.80 \times 10^{-6}\text{ Pa}\cdot\text{s}$, yielding a kinematic viscosity of $\nu_{\text{H}_2} = 1.05 \times 10^{-4}\text{ m}^2/\text{s}$ \cite{nist_refprop}.
+    \item \textbf{Nitrogen ($\text{N}_2$):} Density $\rho_{\text{N}_2} \approx 1.165\text{ kg/m}^3$, dynamic viscosity $\mu_{\text{N}_2} \approx 1.76 \times 10^{-5}\text{ Pa}\cdot\text{s}$, yielding a kinematic viscosity of $\nu_{\text{N}_2} = 1.51 \times 10^{-5}\text{ m}^2/\text{s}$ \cite{nist_refprop}.
+\end{itemize}
+Because the kinematic viscosity of $\text{H}_2$ is nearly seven times higher than that of $\text{N}_2$, comparing these two gases at identical inlet velocities directly isolates the influence of the Reynolds number ($Re = U D / \nu$) on viscous losses and obturator drag \cite{white2016}.
+
+\subsection{Inlet Velocity Regimes and Mass Flux Derivation}
+To evaluate the valve across its entire operational envelope, three distinct inlet velocity levels were established based on industrial pipeline sizing standards and the mathematical validity limits of the incompressible solver:
+\begin{enumerate}
+    \item \textbf{Nominal Flow ($U = 15\text{ m/s}$):} Standard engineering guidelines for industrial pneumatic and gas distribution pipelines (such as Crane Technical Paper No. 410 \cite{crane410} and White \cite{white2016}) recommend maintaining nominal gas velocities between $10\text{ m/s}$ and $20\text{ m/s}$ to minimize acoustic noise, erosion, and head loss. Thus, $15\text{ m/s}$ represents normal baseline tank discharge. %
+    \item \textbf{High Demand / Surge ($U = 40\text{ m/s}$):} Represents an elevated peak-demand flow rate approaching the valve's trip threshold, where localized flow separation and pressure drops intensify significantly. %
+    \item \textbf{Line Rupture / Excess Flow ($U = 80\text{ m/s}$):} Simulates a downstream pipe failure requiring immediate obturator actuation. %
+    From aerodynamic theory \cite{anderson2017}, a gas flow can be modeled as incompressible without significant density-variation errors provided the Mach number satisfies $Ma = U / c < 0.3$, where $c$ is the speed of sound. At $20^{\circ}\text{C}$, the speed of sound in $\text{N}_2$ is $c_{\text{N}_2} \approx 349\text{ m/s}$ (giving a $Ma = 0.3$ limit of $104.7\text{ m/s}$), while in $\text{H}_2$ it is $c_{\text{H}_2} \approx 1304\text{ m/s}$ \cite{nist_refprop}. Setting the maximum velocity to $80\text{ m/s}$ ($Ma_{\text{N}_2} \approx 0.23$, $Ma_{\text{H}_2} \approx 0.06$) captures severe excess flow conditions while rigorously respecting the incompressible assumptions of \texttt{simpleFoam} \cite{anderson2017, openfoam_user}.
+\end{enumerate}
+
+From the STL bounding box of \texttt{inlet.stl} (Table \ref{tab:stl_stats}), the circular inlet patch spans from $-3.90\text{ mm}$ to $+3.90\text{ mm}$ in the $y$ and $z$ directions, corresponding to an inlet radius of $r_{\text{in}} = 3.90\text{ mm}$ ($D_{\text{in}} = 7.80\text{ mm}$) and a cross-sectional area of: %
+\begin{equation}
+    A_{\text{in}} = \pi r_{\text{in}}^2 = \pi (0.0039\text{ m})^2 \approx 4.778 \times 10^{-5}\text{ m}^2
+    \label{eq:inlet_area}
+\end{equation}
+By applying the one-dimensional continuity equation \cite{white2016}, the volumetric flux $Q = U \cdot A_{\text{in}}$ and corresponding mass flow rate $\dot{m} = \rho \cdot Q = \rho \cdot U \cdot A_{\text{in}}$ are uniquely determined for any operating tank pressure, as shown in Table \ref{tab:flow_regimes} for standard atmospheric reference density.
+
+\begin{table}[H]
+\centering
+\caption{Inlet velocity regimes, volumetric fluxes, and reference mass flow rates ($T = 20^{\circ}\text{C}$, $p = 1\text{ atm}$) across the $D_{\text{in}} = 7.8\text{ mm}$ inlet patch.} %
+\label{tab:flow_regimes}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Operating Regime} & \textbf{Inlet Velocity $U$ [m/s]} & \textbf{Volume Flux $Q$ [$\text{m}^3/\text{s}$]} & \textbf{$\dot{m}_{\text{N}_2}$ [kg/s]} & \textbf{$\dot{m}_{\text{H}_2}$ [kg/s]} \\
+\midrule
+1. Nominal Flow  & 15.0 & $7.168 \times 10^{-4}$ & $8.35 \times 10^{-4}$ & $6.01 \times 10^{-5}$ \\ %
+2. High Demand   & 40.0 & $1.911 \times 10^{-3}$ & $2.23 \times 10^{-3}$ & $1.60 \times 10^{-4}$ \\ %
+3. Line Rupture  & 80.0 & $3.823 \times 10^{-3}$ & $4.45 \times 10^{-3}$ & $3.20 \times 10^{-4}$ \\ %
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Obturator Geometries (\texttt{wallObt})}
+Four distinct obturator CAD configurations were investigated to evaluate how flow area restriction and orifice distribution affect the axial closing force and pressure drop across the valve: %
+\begin{itemize}
+    \item \textbf{\texttt{Obt\_A} (\texttt{3Fori\_1p5mm.stl}):} Obturator plate featuring 3 pass-through holes, each with a diameter of $1.5\text{ mm}$ (total orifice area $A_{\text{orifice}} \approx 5.30\text{ mm}^2$). %
+    \item \textbf{\texttt{Obt\_B} (\texttt{3Fori\_3mm.stl}):} Obturator plate featuring 3 pass-through holes, each with a diameter of $3.0\text{ mm}$ (total orifice area $A_{\text{orifice}} \approx 21.21\text{ mm}^2$). %
+    \item \textbf{\texttt{Obt\_C} (\texttt{6Fori\_1p5mm.stl}):} Obturator plate featuring 6 pass-through holes, each with a diameter of $1.5\text{ mm}$ (total orifice area $A_{\text{orifice}} \approx 10.60\text{ mm}^2$). %
+    \item \textbf{\texttt{Obt\_D} (\texttt{6Fori\_3mm.stl}):} Obturator plate featuring 6 pass-through holes, each with a diameter of $3.0\text{ mm}$ (total orifice area $A_{\text{orifice}} \approx 42.41\text{ mm}^2$). %
+\end{itemize}
+
+\section{Python Case Generation and Submission Pipeline}
+\label{sec:python_doe_generator}
+To eliminate human error when preparing the 24 OpenFOAM directories, a dedicated Python automation script (\texttt{doe\_generator.py}, reported in Appendix \ref{sec:app_doe_gen}) was developed. The script operates on a pristine template directory (\texttt{CASE\_BASE}) containing placeholder strings (\texttt{FLUX\_VALUE} in \texttt{0/include/initialConditions} and \texttt{NU\_VALUE} in \texttt{constant/physicalProperties}). %
+
+Using nested loops over the fluid dictionary, velocity list, and geometry list, the script performs five automated steps for each of the 24 combinations:
+\begin{enumerate}
+    \item Constructs a standardized directory identifier (e.g., \texttt{Sim\_H2\_Flux15\_Obt\_A} or \texttt{Sim\_H2\_Flux15\_3Fori\_1p5mm}). %
+    \item Clones the \texttt{CASE\_BASE} folder structure using \texttt{shutil.copytree()}.
+    \item Fetches the specific obturator STL file from an external geometry repository (\texttt{Geometrie\_STL}) and overwrites \texttt{constant/geometry/wallObt.stl} via \texttt{shutil.copyfile()}. Because the destination filename remains fixed as \texttt{wallObt.stl}, neither \texttt{surfaceFeaturesDict} nor \texttt{snappyHexMeshDict} requires text modification. %
+    \item Injects the target inlet velocity and fluid kinematic viscosity into their respective OpenFOAM dictionaries. %
+    \item Submits the job directly to the SLURM scheduler on ARIES via \texttt{subprocess.run(["sbatch", "run\_aries\_2.sh"])}. %
+\end{enumerate}
+
+\section{Automated Remote Post-Processing Extraction}
+\label{sec:scp_extraction}
+Once all 24 simulations converged on the ARIES cluster (stored inside the remote directory \texttt{/unimore\_home/fluids11/SIM\_DoE\_1610}), each case folder contained several gigabytes of decomposed processor meshes and field data. %
+Downloading all 24 full directories to a local workstation is inefficient and unnecessary for quantitative performance analysis, as the essential integrated quantities are stored entirely within the lightweight \texttt{postProcessing/} subdirectory of each case. %
+
+However, because every simulation names this subfolder \texttt{postProcessing/} with identical internal file names, manual file-by-file downloading risks data mix-ups. %
+To solve this, a second Python script (\texttt{download\_postprocessing.py}, detailed in Appendix \ref{sec:app_scp_script}) was executed locally from the Windows Command Prompt. The script scans the local directory tree for the 24 pre-existing \texttt{Sim\_*} folders and invokes the OpenSSH Secure Copy Protocol (\texttt{scp -r}) via \texttt{os.system()} to recursively fetch each remote \texttt{postProcessing/} folder directly into its matching local simulation directory. %
