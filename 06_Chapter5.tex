@@ -1,10 +1,15 @@
 \chapter{Conclusions}
 \label{ch:conclusions}
 
-This thesis established an end-to-end, automated computational methodology for the fluid dynamic analysis, parametric optimization, and industrial selection of excess flow valves. By integrating OpenFOAM version 10 on the 52-core ARIES HPC cluster with custom Bash and Python workflows, a full-factorial Design of Experiments (DoE) comprising 24 simulations was successfully executed across two gases ($\text{H}_2$ and $\text{N}_2$), three velocity regimes ($15, 40,$ and $80\text{ m/s}$), and four obturator geometries. %
+The present work defines a CFD-based framework for investigating the influence of gas properties, inlet velocity and obturator-hole geometry on excess flow valve behavior. The reference Design of Experiments is the \texttt{SIM\_DoE\_2210} campaign, comprising 24 planned combinations of two gases, three inlet velocities ($5$, $10$ and $15\,\mathrm{m\,s^{-1}}$), two hole counts and two hole diameters.
 
-From a numerical standpoint, the hybrid meshing pipeline (\texttt{blockMesh}, \texttt{surfaceFeatures}, and parallel \texttt{snappyHexMesh}) paired with \texttt{scotch} domain decomposition achieved an exceptional parallel load balance across 52 cores, limiting cell count deviation to just $1\%$ above the $32,500$-cell average. %
-Furthermore, identifying and resolving the 32-bit integer overflow in parallel streamline tracking ensured robust, uninterrupted batch execution across the entire DoE matrix. %
+The study combines OpenFOAM 10 simulations with a scripted preparation and HPC workflow. The intended response variables include the inlet-to-outlet pressure difference, the axial fluid load acting on a stationary obturator and the corresponding dimensionless coefficients.
 
-From an engineering perspective, the automated \texttt{scp} data extraction and Plotly \texttt{Master\_Dashboard.html} architecture transformed gigabytes of raw HPC data into a lightweight, interactive visual database. %
-Coupling this database with a Streamlit selection tool demonstrates how high-fidelity CFD simulations can be packaged into a fast, intuitive decision-support system for non-expert users. Future developments may extend this framework to compressible high-Mach solvers (such as \texttt{rhoSimpleFoam}) for choked-flow rupture scenarios and incorporate fluid-structure interaction (FSI) dynamic meshes to model the transient closing motion of the obturator.
+\paragraph{Status of the numerical investigation.}
+At the time of drafting, a subset of the hydrogen cases still requires numerical stabilization. The reported forces also require confirmation of the density used by the incompressible force integration. Consequently, final statements about geometric ranking, cross-fluid performance, pressure-loss trends or valve trip behavior are deferred until convergence, conservation, mesh quality and density conventions have been checked. Reaching the final prescribed solver iteration is not sufficient evidence of convergence.
+
+\paragraph{Scope and future developments.}
+The fixed-geometry, incompressible steady-state approach is intended to support a comparative design assessment, not to predict the transient closing trajectory or closing time of a complete mechanical valve. After verification of the dataset, future work may complete the DoE response analysis and the interactive comparison tool, evaluate locally compressible flow effects and investigate transient or fluid--structure interaction methods to resolve obturator motion.
+
+% TODO: Replace this provisional conclusion with quantified, verified findings
+% after the SIM_DoE_2210 campaign and the interactive tool are completed.
