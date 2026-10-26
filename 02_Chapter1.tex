@@ -1,71 +1,70 @@
 \chapter{Numerical Model and CFD Setup}
 \label{ch:numerical_setup}
 
-This chapter provides an overview of the physical and computational setup employed for the fluid dynamic simulation of the excess flow valves. The discussion covers the governing equations, fluid property modeling, boundary condition architecture, hardware and software HPC environment, hybrid grid generation pipeline, parallel domain decomposition, and solver troubleshooting within OpenFOAM \cite{openfoam_user}. %
+This chapter describes the mathematical model, computational domain, boundary conditions, discretization and HPC workflow adopted for the excess flow valve simulations. Numerical configuration details are taken from the \texttt{SIM\_DoE\_2210} case files. Since several cases are still undergoing numerical stabilization, the present chapter distinguishes the \emph{specified} setup from verification results that have yet to be established.
 
-\section{Governing Equations, Turbulence Modeling and Physical properties}
+\section{Governing Equations and Modeling Assumptions}
 \label{sec:governing_equations}
-The fluid modelled to simulate the valves is assumed to be both steady-state and incompressible, so underlying implicitly that the gas flows with a Mach number which remains below the compressibility threshold of $Ma < 0.3$ \cite{anderson2017} allowing the fluid density $\rho$ to be treated as constant. Consequently, the governing Reynolds-Averaged Navier-Stokes (RANS) equations for conservation of mass (continuity) and momentum reduce to their kinematic forms \cite{white2016, moukalled2016}:
 
+The numerical model represents three-dimensional, steady, single-phase flow around a fixed obturator. The OpenFOAM 10 solver \texttt{simpleFoam} solves an incompressible, constant-density Reynolds-averaged Navier--Stokes (RANS) system \cite{openfoam_user,moukalled2016}. Neglecting body forces, the mass-conservation equation is
 \begin{equation}
-    \nabla \cdot \mathbf{U} = 0
+    \nabla\cdot\mathbf{U}=0,
     \label{eq:continuity}
 \end{equation}
-
+where $\mathbf{U}$ denotes mean velocity. A schematic eddy-viscosity representation of the mean momentum balance is
 \begin{equation}
-    \nabla \cdot (\mathbf{U} \otimes \mathbf{U}) = -\nabla P + \nabla \cdot \left[ (\nu + \nu_t) \left( \nabla \mathbf{U} + (\nabla \mathbf{U})^T \right) \right]
+    \nabla\cdot(\mathbf{U}\otimes\mathbf{U})
+    =-\nabla P+\nabla\cdot\left[(\nu+\nu_t)
+    \left(\nabla\mathbf{U}+(\nabla\mathbf{U})^{T}\right)\right],
     \label{eq:momentum}
 \end{equation}
+where $P$ is the kinematic (modified) pressure, $\nu=\mu/\rho$ is the molecular kinematic viscosity and $\nu_t$ is the modeled turbulent eddy viscosity. Here the isotropic part of the modeled Reynolds stress is understood to be incorporated into the modified pressure; the equation summarizes the physical closure rather than reproducing every discrete term implemented by \texttt{simpleFoam} \cite{menter1994,openfoam_user}. The solved pressure field has dimensions of $\mathrm{m^2\,s^{-2}}$; conversion to a pressure difference in pascals requires multiplication by an appropriate density.
 
-\vspace{0.8mm}
+The archived \texttt{constant/momentumTransport} dictionary selects a RANS formulation with the $k$--$\omega$ Shear Stress Transport (SST) model \cite{menter1994}. Its near-wall $k$--$\omega$ behavior and outer-flow $k$--$\epsilon$ blending make it a candidate for flows featuring adverse pressure gradients and separation. This choice does not, by itself, guarantee accuracy. In particular, some hydrogen operating points have relatively low inlet Reynolds numbers, so turbulence-model and inlet-condition sensitivity should be assessed before drawing general conclusions.
 
-where $\mathbf{U}$ is the Reynolds-averaged velocity vector, $P = p/\rho$ is the kinematic pressure (static pressure divided by density, with dimensions $[\text{m}^2/\text{s}^2]$), $\nu = \mu/\rho$ is the molecular kinematic viscosity, and $\nu_t$ is the turbulent eddy kinematic viscosity \cite{openfoam_user, moukalled2016}.
-\newline \\
-To close the RANS system and accurately resolve both the near-wall boundary layer along the valve casing and the detached shear layers downstream of the obturator orifices, the two-equation $k-\omega$ Shear Stress Transport (SST) turbulence model \cite{menter1994} has been employed. This model has been chosen because it blends the $k-\omega$ model in the viscous near-wall region with the freestream-independent $k-\epsilon$ model in the bulk flow, providing better accuracy in adverse pressure gradients and separating flows, which are expected in a complex geometry like the tested valves channels.
+The working-fluid kinematic viscosity is defined in \texttt{constant/physicalProperties} using the constant-viscosity model:
+\begin{lstlisting}[language=C++,caption={Parameterized constant-viscosity entry used in the OpenFOAM setup.}]
+viscosityModel constant;
+nu [0 2 -1 0 0 0 0] NU_VALUE;
+\end{lstlisting}
+The placeholder is replaced for each gas as described in Chapter~\ref{ch:doe}. The archived \texttt{SIM\_DoE\_2210} inlet data include the initial turbulence quantities $k=10^{-6}\,\mathrm{m^2\,s^{-2}}$ and $\omega=10\,\mathrm{s^{-1}}$. Their physical basis and influence on the computed loads require verification; they are not asserted here to be universally representative of the actual upstream system.
 
-In OpenFOAM the solved RANS system is divided by density $\rho$, so to characterize the working fluid from a transport perspective, only the kinematic viscosity $\nu$ is needed \cite{openfoam_user}. In OpenFOAM 10, this property ha to be specified inside the \texttt{constant/physicalProperties} dictionary using the constant viscosity model \cite{openfoam_user}: %
+\subsection*{Assessment of the incompressible approximation}
+The common guideline $Ma\lesssim0.3$ refers to the \emph{local} Mach number, $Ma=|\mathbf{U}|/c$, rather than only the inlet value \cite{anderson2017}. Velocity increases within the obturator passages may therefore produce locally compressible flow even when the inlet velocity is moderate. For illustration, if all inlet flow passed through the nominal holes of obturator A, continuity would give an average passage velocity approximately nine times the inlet velocity; this estimate is not a computed maximum because other flow paths and contraction effects must be examined. The eventual validity assessment should include a local-velocity check against gas sound speed and, if necessary, comparison with a compressible formulation. Until then, the incompressible model is treated as a modeling assumption, not a verified property of every case.
 
-\vspace{1.5mm}
-
-\begin{lstlisting}[language=C++, captionpos=b, caption={Structure of the \texttt{constant/physicalProperties} dictionary.}]
-viscosityModel  constant;
-
-nu              [0 2 -1 0 0 0 0] NU_VALUE;
-\end{lstlisting} %
-
-Here, the dimensional set \texttt{[0 2 -1 0 0 0 0]} enforces SI units of $\text{m}^2/\text{s}$ in the [\textit{kg m s K mol A cd}] system, and \texttt{NU\_VALUE} acts as a parameter for automated injection during the Design of Experiments. 
-
-\section{Domain geometry and Boundary Conditions}
+\section{Computational Domain and Boundary Conditions}
 \label{sec:boundary_conditions}
-The numerical domain that represents the different valve solutions has been divided into 5 different sections in order to create a modular system for the DoE building and applying different boundary conditions together with different meshing parameters. Moreover, this is useful for further data post processing, splitting the simulation outputs on different domain zones.
+
+The fluid domain is bounded by five principal named surface patches: \texttt{inlet}, \texttt{outlet}, \texttt{wall1}, \texttt{wall2} and \texttt{wallObt}. These names describe boundary regions of a single computational domain, not five independent fluid domains. The stationary obturator is represented by the \texttt{wallObt} surface. The inlet and outlet are positioned away from the most restrictive region to reduce direct interference with the internal flow; independence from boundary placement still requires a numerical check.
 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{Pics/Slice_ObtA.png}
-    \caption{Slice of the numerical domain}
+    \caption{Longitudinal section of the valve fluid domain for obturator A, showing the inlet, outlet and wall regions.}
     \label{fig:dominio}
 \end{figure}
 
-The \ref{fig:dominio} shows the different domain sections, also highlighting the direction of the fluid flowing inside the valve. The geometry has the inlet and outlet not positioned right near the obturator to avoid numericla errors and not having at the inlet an inlfuence of the outlet boundary condition.
+Figure~\ref{fig:dominio} identifies the streamwise $x$ direction used for the pressure and axial-force comparisons. The boundary conditions in the archived \texttt{SIM\_DoE\_2210} velocity and pressure dictionaries are summarized in Table~\ref{tab:domainBC}.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
+\caption{Velocity and kinematic-pressure boundary conditions for the reference CFD setup.}
 \label{tab:domainBC}
-\begin{tabular}{llc}
+\small
+\begin{tabular}{@{}lll@{}}
 \toprule
-\textbf{Section name} & \textbf{BC typology} & \textbf{BC value}  \\%
+\textbf{Patch} & \textbf{Velocity $\mathbf{U}$} & \textbf{Kinematic pressure $P$}\\
 \midrule
-\texttt{Inlet}   & \texttt{velocity-inlet}     &  {\texttt{FLUX\_VALUE} $m/s$} \\ %
-\texttt{Outlet}  & \texttt{pressure-outlet}    &  {$0$ $Pa$}     \\ %
-\texttt{Wall1}   & \texttt{wall}               &  {$0$ $m/s$}   \\ %
-\texttt{Wall2}   & \texttt{wall}               &  {$0$ $m/s$}    \\ %
-\texttt{WallObt} & \texttt{wall}               &  {$5,0$ $m/s$} \\ %
+\texttt{inlet}   & \texttt{fixedValue}, $(U_{\mathrm{in}},0,0)$ & \texttt{zeroGradient}\\
+\texttt{outlet}  & \texttt{inletOutlet} & \texttt{fixedValue}, $0\,\mathrm{m^2\,s^{-2}}$\\
+\texttt{wall1}   & \texttt{noSlip} & \texttt{zeroGradient}\\
+\texttt{wall2}   & \texttt{noSlip} & \texttt{zeroGradient}\\
+\texttt{wallObt} & \texttt{noSlip} & \texttt{zeroGradient}\\
 \bottomrule
 \end{tabular}
-\caption{Domain sections with respective boundary condition} %
 \end{table}
 
-Streamline parametric variations of the inlet flow regime are regulated without manually editing field files in the \texttt{0/} directory, by using an external variable file via the directive \texttt{\#include "include/initialConditions"} applying it directly to the \texttt{inlet} patch prior to solver execution through the usage of a parameter for automated injection during the Design of Experiments. %
+In the velocity field, an included \texttt{initialConditions} dictionary specifies the inlet vector for each operating point. At the outlet, the \texttt{inletOutlet} velocity condition permits a zero-gradient outflow and prescribes a value where local backflow is detected. The outlet pressure is a zero \emph{reference kinematic pressure}, not a specification that the system operates at zero absolute pressure. The $k$, $\omega$ and turbulent-viscosity fields require their own inlet, outlet and wall conditions, implemented through the corresponding OpenFOAM dictionaries; these should be documented together with their sensitivity when the setup is finalized.
 
 \begin{figure}[htbp]
     \centering
@@ -109,35 +108,25 @@ Streamline parametric variations of the inlet flow regime are regulated without 
         \label{fig:wall23D}
     \end{subfigure}
 
-    \caption{3D overview of the numerical domain sections}
+    \caption{CAD surfaces used to define the inlet, outlet and solid-wall boundary patches (obturator A shown).}
     \label{fig:Domain single sections}
-\end{figure} 
+\end{figure}
 
-
-
-\section{Workflow Automation Scripts}
+\section{Numerical Discretization and Execution Workflow}
 \label{sec:workflow_automation}
-To execute the simulations without manual intervention, a suite of Bash scripts were used, in order to manage pre-processing, solving, and directory maintenance: %
 
-\begin{enumerate}
-    \item \textbf{Full Pipeline Execution (\texttt{run\_aries\_2.sh}):} Dynamically computes the total MPI task count (\texttt{TOTAL\_TASKS=\$((SLURM\_NTASKS\_PER\_NODE * SLURM\_NNODES))}) and writes \texttt{numberOfSubdomains 52;} into \texttt{system/numProcs}, which is subsequently included via \texttt{\#include "numProcs"} inside \texttt{system/decomposeParDict}. %
-    It then sequentially runs \texttt{blockMesh}, \texttt{surfaceFeatures}, \texttt{decomposePar -copyZero -force}, parallel \texttt{snappyHexMesh}, and parallel \texttt{simpleFoam}. %
-    \item \textbf{Solver-Only Restart (\texttt{solver\_only.sh}):} Isolates the \texttt{mpirun -np \$TOTAL\_TASKS simpleFoam -parallel} execution, enabling rapid solver restarts or boundary condition testing without regenerating the computational grid. %
-    \item \textbf{Case Maintenance (\texttt{Allclean} and \texttt{clean.sh}):} \texttt{Allclean} removes generated timestep folders (\texttt{rm -rf *[1-9]*}) and log files (\texttt{rm -f log.*}), while \texttt{clean.sh} purges the parallel processor directories (\texttt{rm -r *rocess*}). %
-\end{enumerate}
+OpenFOAM applies a finite-volume discretization of the steady equations. In the \texttt{SIM\_DoE\_2210} \texttt{fvSchemes} dictionary, velocity convection uses a bounded \texttt{linearUpwindV} scheme with a limited velocity gradient, while the transport of $k$ and $\omega$ uses bounded upwind schemes. Gradient interpolation is mainly linear, and Laplacian terms employ a corrected formulation. These choices balance resolution and numerical robustness but do not eliminate the need to inspect oscillations or sensitivity to mesh quality.
+
+Pressure--velocity coupling is based on the SIMPLE algorithm \cite{openfoam_user,moukalled2016}. The archived \texttt{fvSolution} configuration specifies ten non-orthogonal correction passes and equation relaxation factors of $0.9$ for velocity and $0.5$ for both turbulence variables. Solver tolerances control the solution of individual algebraic systems; they must not be confused with a demonstrated convergence of the overall nonlinear flow solution.
+
+Case execution is managed using Bash scripts that prepare the mesh, partition the domain and launch parallel meshing and solving on ARIES. The principal sequence is \texttt{blockMesh}, \texttt{surfaceFeatures}, \texttt{decomposePar}, parallel \texttt{snappyHexMesh} and parallel \texttt{simpleFoam}. Solver-only restarts are available without repeating the mesh stage. The generation of the complete factorial case set and subsequent retrieval of reduced outputs are addressed in Chapter~\ref{ch:doe}.
 
 \section{Hybrid Mesh Generation Strategy}
 \label{sec:mesh_generation}
-Spatial discretization of the fluid domain was achieved using a hybrid top-down approach that combined structured hexahedral generation with automated polyhedral surface splinting \cite{openfoam_user}. %
 
-First, \texttt{blockMesh} constructs a structured hexahedral bounding box spanning from $(-0.01, -0.0145, -0.0145)\text{ m}$ to $(0.175, 0.0145, 0.0145)\text{ m}$, producing a total of $1,690,000$ cells, $1,746,756$ nodes and $5,126,225$ faces ($5,013,775$ internal faces), bounded by six topological patches: \texttt{front}, \texttt{back}, \texttt{inlet}, \texttt{outlet}, \texttt{bottom}, and \texttt{top}. %
-The base cells exhibit nearly isotropic, orthogonal dimensions of $\Delta x = 0.4625\text{ mm}$ and $\Delta y = \Delta z = 0.4462\text{ mm}$, with an aspect ratio useful for successive refinement. %
+The \texttt{SIM\_DoE\_2210} setup uses a structured hexahedral background grid generated by \texttt{blockMesh}, followed by local castellated refinement, surface snapping and layer generation using \texttt{snappyHexMesh} \cite{openfoam_user}. The background box extends from $(-0.010,-0.0145,-0.0145)\,\mathrm{m}$ to $(0.175,0.0145,0.0145)\,\mathrm{m}$. The dictionary specifies $370\times58\times58$ cells, giving $1{,}244{,}680$ \emph{background} cells with nominal spacing $\Delta x=\Delta y=\Delta z=0.5\,\mathrm{mm}$. This is not the final snapped-mesh cell count.
 
-Next, the \texttt{surfaceFeatures} utility processes the Stereolithography (\texttt{.stl}) CAD geometries defining the valve boundaries or sections as named before: \texttt{inlet.stl}, \texttt{outlet.stl}, \texttt{wall1.stl}, \texttt{wall2.stl}, and \texttt{wallObt.stl}. %
-As summarized in Table \ref{tab:stl_stats}, the obturator geometry (\texttt{wallObt.stl}) presents the highest geometric complexity, comprising $10,715$ triangles and $5,637$ vertices. %
-Using an included angle threshold of $150^{\circ}$, \texttt{surfaceFeatures} extracts sharp convex, concave, and region edges into \texttt{.eMesh} and \texttt{.extendedFeatureEdgeMesh} files.
-Moreover, for the domain obturator section a mesh refinement regions are used in order to catch properly the flow behaviour in this domain section, which is the highest in complexity. The refinement had a \tetxttt{level \= 2} value.%
-Finally, \texttt{snappyHexMesh} is executed in parallel across all cores with the \texttt{-overwrite} flag to refine cells near the feature edges, castellate the volume by removing cells outside the fluid region, and snap the boundary vertices onto the STL surfaces. %
+The geometry consists of imported STL surfaces named \texttt{inlet.stl}, \texttt{outlet.stl}, \texttt{wall1.stl}, \texttt{wall2.stl} and \texttt{wallObt.stl}. The last is replaced to generate the different obturator variants. Representative surface statistics for the obturator-A CAD files are provided in Table~\ref{tab:stl_stats}; these counts must not be assumed to be identical for all four obturators.
 
 \begin{table}[H]
 \centering
@@ -153,39 +142,31 @@ Finally, \texttt{snappyHexMesh} is executed in parallel across all cores with th
 \texttt{wallObt.stl} & 10,715 & 5,637 & 2,897  \\ %
 \bottomrule
 \end{tabular}
-\caption{Geometric statistics of the valve STL surfaces processed by \texttt{surfaceFeatures}.} %
+\caption{Representative CAD-surface statistics for the obturator-A geometry, processed by \texttt{surfaceFeatures}.} %
 \label{tab:stl_stats}
 \end{table}
 
+Feature edges are extracted using \texttt{surfaceFeatures}. The archived \texttt{snappyHexMeshDict} specifies surface refinement level~1 for the inlet and outlet and level~2 for the two wall surfaces and the obturator. It also defines a cylindrical local refinement region near the obturator, with endpoints $(0.035,0,0)\,\mathrm{m}$ and $(0.046,0,0)\,\mathrm{m}$, radius $0.011\,\mathrm{m}$ and refinement level~2. These are requested refinement settings; the final realized cell distribution must be checked from the generated mesh.
+
+The \texttt{addLayers} option is enabled, with two surface layers requested on \texttt{wallObt} and an expansion ratio of~2. Layer survival and local near-wall resolution must be assessed using the completed mesh and $y^+$ values before asserting that the chosen SST wall treatment is adequately resolved. Recommended additions for the final chapter are a close-up of the cells around the holes, \texttt{checkMesh} diagnostics and a three-level mesh-sensitivity comparison for pressure drop and obturator force.
+
 \section{HPC Infrastructure and Domain Decomposition}
 \label{sec:hpc_environment}
-Given the high computational cost associated with resolving the three-dimensional turbulent flow across 24 geometric and operational configurations, all numerical simulations were executed on the ARIES High-Performance Computing (HPC) cluster provided by the University of Modena and Reggio Emilia \cite{hpc_aries}. %
-Job scheduling and hardware allocation were managed through the SLURM (Simple Linux Utility for Resource Management) workload manager. %
 
-Each simulation was granted exclusive access (\texttt{--exclusive}) to a single computational node (\texttt{nodes=1}) equipped with 52 logical CPU cores (\texttt{ntasks-per-node=52}) and 490 GB of system RAM (\texttt{mem=490g}). %
+The cases are prepared for execution on the ARIES High-Performance Computing (HPC) infrastructure at the University of Modena and Reggio Emilia \cite{hpc_aries}. SLURM manages job allocation; the reference setup requests one node and 52 MPI tasks. This is an allocation of MPI ranks and should not be equated with 52 physical cores without confirming the node hardware. The \texttt{scotch} domain decomposition method is specified to distribute cells over the subdomains while limiting communication interfaces \cite{pellegrini1996}.
 
-Distributed memory parallelism was initialized by loading the GNU Compiler Collection (\texttt{gcc-12.1.1/gcc}) and the OpenMPI message-passing library compiled with NCCL support (\texttt{gcc-12.1.1/ompi-4.1.5\_nccl}), followed by sourcing the OpenFOAM environment configuration. %
+The number of cells per subdomain and the processor-interface counts depend on the actual mesh and decomposition. Earlier load-balance statistics should therefore not be reused as performance evidence for the \texttt{SIM\_DoE\_2210} meshes. Final documentation should report the actual decomposition statistics, wall-clock runtime and resource use for representative accepted cases, if those logs are available.
 
-To leverage the 52 logical processors on the ARIES node, the computational domain is partitioned prior to running \texttt{snappyHexMesh} using \texttt{decomposePar -copyZero -force}. %
-The \texttt{scotch} decomposition algorithm \cite{pellegrini1996} was selected due to its ability to minimize inter-processor communication boundaries (processor faces) on complex unstructured topologies without requiring geometric directional inputs. %
+\section{Numerical Verification and Current Limitations}
+\label{sec:numerical_verification}
 
-The decomposition log confirms a balanced load across the 52 subdomains (\texttt{Processor 0} through \texttt{Processor 51}): %
+A solver run reaching its configured final iteration does not establish physical or numerical convergence. Prior to using any response in the DoE comparison, each case should be checked against consistent acceptance criteria:
 \begin{itemize}
-    \item \textbf{Average cell count per core:} $32,500$ cells. %
-    \item \textbf{Maximum cell count per core:} $32,825$ cells (observed on Processors 9, 19, and 45), representing a maximum computational load imbalance of only $1\%$ above the mean. %
-    \item \textbf{Inter-processor communication:} $138,841$ total processor faces, with an average of $7.69$ processor patches ($5,340$ shared faces) per core. %
+    \item decay or stabilization of the equation residuals, supplemented by stable inlet--outlet pressure difference and integrated obturator force histories;
+    \item inlet--outlet flux balance and the absence of unphysical pressure or force excursions;
+    \item mesh-quality diagnostics (including skewness and non-orthogonality), local $y^+$ values and sensitivity to grid refinement;
+    \item sensitivity to turbulence inlet conditions and, where local Mach numbers warrant it, the incompressibility approximation.
 \end{itemize}
+Quantitative acceptance tolerances, the number of iterations included in any terminal average and results from the mesh study are to be reported once the final runs have been assessed. Several hydrogen cases in the \texttt{SIM\_DoE\_2210} campaign are still being stabilized and must not be interpreted as converged responses at this stage.
 
-%\section{Solver Configuration and Parallel Troubleshooting}
-%\label{sec:solver_troubleshooting}
-%Steady-state flow resolution is performed using \texttt{simpleFoam}, which implements the Semi-Implicit Method for Pressure-Linked Equations (SIMPLE) velocity-pressure coupling algorithm \cite{openfoam_user, moukalled2016}. %
-
-%During preliminary validation runs on node \texttt{cnode05.hpc.unimo.lan}, two diagnostic behaviors were addressed in the SLURM log (\texttt{slurm-145216.out}): %
-%\begin{enumerate}
- %   \item \textbf{Non-Fatal MPI/CUDA Warnings:} The OpenMPI module (\texttt{ompi-4.1.5\_nccl}) emitted warnings regarding missing shared libraries (\texttt{libcuda.so.1}) and OpenFabrics device initialization (\texttt{mlx5\_0}). %
-%    Because OpenFOAM 10 executes purely on CPU cores, the absence of GPU drivers disables CUDA-aware MPI support harmlessly without impacting numerical accuracy or CPU parallel communication.
-%    \item \textbf{Parallel Streamline Integer Overflow:} At the start of the time loop, the solver terminated with \texttt{FOAM FATAL ERROR: bad size -2147483647} inside \texttt{Foam::List<T>::List} (line 61 of \texttt{List.C}), triggering an \texttt{MPI\_ABORT} on rank 0. %
-%    The stack trace isolated the fault to \texttt{Foam::functionObjects::streamlines::write()}. %
-%    In heavily partitioned meshes (52 subdomains), lagrangian particle tracking for on-the-fly streamline generation can fail when seed points intersect processor patch boundaries, causing memory allocation counters to overflow the signed 32-bit integer limit ($-2^{31} + 1 = -2,147,483,647$). %
-%    Disabling the \texttt{streamlines} function object in \texttt{system/controlDict} and deferring 3D flow visualization to offline ParaView post-processing permanently resolved the crash.
-%\end{enumerate}
+A further consistency check concerns the forces function object. In the archived reference setup it uses \texttt{rhoInf = 33.801} for dimensionalizing forces from an incompressible pressure field. This value differs from the atmospheric reference densities introduced in Section~\ref{sec:doe_parameters}. Hence the force files should not be presented as already evaluated at those reference densities. With identical kinematic solutions, a force obtained using the configured value may be rescaled according to $F_{\mathrm{target}}=F_{\mathrm{reported}}\,\rho_{\mathrm{target}}/\rho_{\mathrm{Inf}}$, provided all relevant components use the same density convention. The result should not be multiplied by density a second time. This correction, together with a sign convention for the axial force, is required before the final cross-fluid comparison.
