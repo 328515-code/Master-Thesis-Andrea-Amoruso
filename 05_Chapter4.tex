@@ -1,14 +1,14 @@
 \chapter{Development of the Interactive Selection Tool}
 \label{ch:selection_tool}
 
-To translate the 24-case CFD Design of Experiments into an accessible engineering utility, an interactive software application was conceived using the Python \texttt{Streamlit} framework \cite{streamlit_docs}. This chapter describes the software architecture, data aggregation logic, and decision-making algorithm that enables non-expert users to select the optimal excess flow valve configuration.
+To translate the 24-case CFD Design of Experiments into an accessible engineering utility, an interactive software application is planned using the Python \texttt{Streamlit} framework \cite{streamlit_docs}. This chapter describes the software architecture, data aggregation logic, and decision-making algorithm intended to help users compare candidate valve configurations within the verified simulation range.
 
 \section{Software Architecture and Data Aggregation}
 \label{sec:software_architecture}
-The selection tool operates on a two-tier architecture separating offline HPC data reduction from real-time user interaction:
+The proposed selection tool is organized around a two-tier architecture separating offline HPC data reduction from real-time user interaction:
 \begin{enumerate}
-    \item \textbf{Converged State Extraction:} Using the parsing functions established in \texttt{generate\_reports.py}, the converged steady-state values (averaged over the final iterations of each \texttt{simpleFoam} run) for pressure drop $\Delta P$, axial obturator force $F_x$, and volume flux $Q$ are extracted from all 24 \texttt{postProcessing/} directories and compiled into a structured lookup table. %
-    \item \textbf{Dimensional Scaling Engine:} Because the incompressible CFD results are stored in kinematic form, the backend engine dynamically multiplies the dimensionless/kinematic coefficients by the actual gas density $\rho(p_{\text{tank}}, T_{\text{tank}})$ corresponding to the user's specific storage tank operating pressure and temperature \cite{white2016, nist_refprop}.
+    \item \textbf{Converged State Extraction:} Using the parsing functions established in \texttt{generate\_reports.py}, the accepted steady-state values (after residual, force, pressure and continuity checks) for pressure drop $\Delta P$, axial obturator force $F_x$, and volume flux $Q$ are extracted from all 24 \texttt{postProcessing/} directories and compiled into a structured lookup table. %
+    \item \textbf{Dimensional Scaling Engine:} Kinematic pressure differences would be converted to pascals using an appropriate density. OpenFOAM force outputs may already include the density specified in the \texttt{forces} function object, so they must not be multiplied by density twice. Extrapolation to different tank pressures and temperatures would require a separate assessment of changes in density, viscosity and possible compressibility \cite{white2016,nist_refprop}.
 \end{enumerate}
 
 \section{User Interface and Valve Recommendation Logic}
@@ -21,5 +21,5 @@ Through the web-based graphical user interface (GUI), the user specifies four op
     \item Target excess flow trip threshold ($Q_{\text{trip}}$) and pre-load spring force ($F_{\text{spring}}$) required to actuate the obturator during a line rupture.
 \end{itemize}
 
-Upon receiving these inputs, the tool interpolates the CFD response surfaces across the four obturator geometries (\texttt{3Fori\_1p5mm}, \texttt{3Fori\_3mm}, \texttt{6Fori\_1p5mm}, and \texttt{6Fori\_3mm}). %
-It filters out geometries that exceed $\Delta p_{\text{max}}$ at nominal flow or fail to generate $F_x \ge F_{\text{spring}}$ at the rupture flow rate, ranking the remaining viable valves and displaying their interactive Plotly performance curves directly within the browser \cite{plotly_docs, streamlit_docs}.
+Once a verified dataset is available, the tool may interpolate CFD responses across the four obturator geometries (\texttt{3Fori\_1p5mm}, \texttt{3Fori\_3mm}, \texttt{6Fori\_1p5mm}, and \texttt{6Fori\_3mm}). %
+The proposed logic would exclude geometries that exceed $\Delta p_{\text{max}}$ at nominal flow or fail to generate $F_x \ge F_{\text{spring}}$ at a specified comparison flow rate, subject to consistency of the force direction and a separately validated closure criterion. A preliminary implementation would display comparative Plotly performance curves, identify its interpolation limits and avoid claiming experimentally validated trip thresholds \cite{plotly_docs, streamlit_docs}.
