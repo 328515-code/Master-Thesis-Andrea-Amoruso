@@ -1,37 +1,84 @@
 \chapter{Results and Post-Processing}
 \label{ch:results}
 
-This chapter outlines the post-processing architecture developed to parse, visualize, and compare the quantitative outputs across the 24 DoE simulations. It describes the structure of the OpenFOAM function objects, the automated HTML/Plotly reporting dashboard, and the flow-response quantities relevant to eventual valve-design comparisons. %
+The archive supplied for the \texttt{SIM\_DoE\_2210} study includes configurations for 12 hydrogen and 12 nitrogen cases, with three imposed inlet velocities ($5$, $10$ and $15\,\mathrm{m\,s^{-1}}$) and four obturator geometries. All 12 hydrogen cases include \texttt{postProcessing} histories; no such numerical data are present in the nitrogen case folders. Consequently, this chapter presents \emph{preliminary hydrogen results only}. Comparisons between the two working fluids remain pending.
 
 \section{Structure of OpenFOAM Post-Processing Data}
 \label{sec:postprocessing_structure}
-During the execution of \texttt{simpleFoam}, runtime function objects defined in \texttt{system/controlDict} continuously evaluate surface integrals, wall shear metrics, and aerodynamic forces, writing the output into the \texttt{postProcessing/} directory starting from time folder \texttt{0/}. %
-Each simulation generates five specific data streams: %
 
+The case \texttt{controlDict} selects the steady-state solver \texttt{simpleFoam} and specifies an end index of 3000. The output index labels solver iterations, not physical seconds. The hydrogen case directories contain five post-processing streams:
 \begin{itemize}
-    \item \textbf{Inlet Average Pressure (\texttt{inlet\_pressure\_avg/0/surfaceFieldValue.dat}):} Tracks the area-averaged kinematic pressure across the \texttt{inlet} patch over solver iterations. %
-    \item \textbf{Outlet Average Pressure (\texttt{outlet\_pressure\_avg/0/surfaceFieldValue.dat}):} Tracks the area-averaged kinematic pressure across the \texttt{outlet} patch, enabling direct computation of the overall valve pressure drop $\Delta P = P_{\text{in}} - P_{\text{out}}$. %
-    \item \textbf{Inlet Volume Flux (\texttt{inlet\_volume\_flux/0/surfaceFieldValue.dat}):} Computes the surface integral of the velocity vector across the inlet patch (\texttt{areaIntegrate(U)}). %
-    Because the inlet velocity is prescribed as a fixed Dirichlet boundary condition in a steady-state incompressible solver, the axial volumetric flux is nominally imposed by the inlet velocity. The reference range for the current campaign is $Q\approx2.39\times10^{-4}$ to $7.17\times10^{-4}\,\mathrm{m^3\,s^{-1}}$ (Table~\ref{tab:flow_regimes}), with the CFD-integrated value depending on the discretized inlet area. Actual inlet and outlet fluxes must be checked for conservation. %
-    \item \textbf{Dimensionless Wall Distance (\texttt{yPlus1/0/yPlus.dat}):} Records the minimum, maximum, and area-averaged $y^+$ values across all solid wall patches (\texttt{wall1}, \texttt{wall2}, \texttt{wallObt}) to verify boundary layer resolution for the $k-\omega$ SST turbulence model. %
-    \item \textbf{Obturator Forces (\texttt{forceCoeffs\_Obt/0/forces.dat}):} Logs the three-dimensional pressure force vector $\mathbf{F}_p = (F_{px}, F_{py}, F_{pz})$ and viscous force vector $\mathbf{F}_v = (F_{vx}, F_{vy}, F_{vz})$ acting on \texttt{wallObt}. %
-    The total force component along the positive $x$ axis is given by $F_{x,\text{tot}} = F_{px} + F_{vx}$. %
+\item \textbf{Area-averaged kinematic pressure}, for the inlet and outlet, in \texttt{inlet\_pressure\_avg/0/surfaceFieldValue.dat} and \texttt{outlet\_pressure\_avg/0/surfaceFieldValue.dat}.
+\item \textbf{Integrated inlet velocity}, in \texttt{inlet\_volume\_flux/0/surfaceFieldValue.dat}. Its axial component is the inlet volumetric flow rate in $\mathrm{m^3\,s^{-1}}$.
+\item \textbf{Near-wall distance}, in \texttt{yPlus1/0/yPlus.dat}, reporting minimum, maximum and average $y^+$ for the solid patches at intervals of 100 iterations.
+\item \textbf{Pressure and viscous forces}, in \texttt{forceCoeffs\_Obt/0/forces.dat}. Despite the output-directory name, the actual function-object type is \texttt{forces}; its values are dimensional forces in newtons.
 \end{itemize}
 
-\section{Automated Plotly Reporting and Master Dashboard}
+For each case the dimensional inlet-to-outlet pressure difference and streamwise obturator force are determined using
+\begin{equation}
+\Delta p=\rho_{\rm ref}(P_{\rm in}-P_{\rm out}),\qquad
+F_x=F_{p,x}+F_{\nu,x},
+\label{eq:processed_responses}
+\end{equation}
+where $P$ is kinematic pressure and $\rho_{\rm ref}=0.0838\,\mathrm{kg\,m^{-3}}$ for the hydrogen cases. Because the function object already uses \texttt{rhoInf = 0.0838}, $F_x$ is \emph{not multiplied by density again}. Positive $F_x$ denotes the global $+x$ direction; it is not necessarily the valve's mechanical closing direction.
+
+\section{Data Extraction and Preliminary Stability Screening}
 \label{sec:plotly_dashboard}
-To inspect convergence and compare physical quantities across all 24 simulations without manually opening 120 raw \texttt{.dat} text files, a batch post-processing script (\texttt{generate\_reports.py}, Appendix \ref{sec:app_plotly_script}) was built using the Python \texttt{Plotly} library \cite{plotly_docs}. %
 
-The script employs custom text parsers and regular expressions (\texttt{re}) to extract time series and nested vector tuples from the OpenFOAM \texttt{.dat} files. %
-For every simulation directory (\texttt{Sim\_*}), the script generates a standalone $2 \times 2$ responsive CSS grid dashboard (\texttt{CFD\_Report\_<CaseName>.html}) featuring four interactive charts: (1) Inlet vs. Outlet Pressure, (2) Inlet Volume Flux, (3) Patch-grouped Average $y^+$ Development, and (4) Total Forces ($F_x, F_y, F_z$) on the obturator. %
+The hydrogen folders include a standalone HTML/Plotly report for each case and a \texttt{Master\_Dashboard.html} navigation page. In addition, their raw \texttt{.dat} histories can be parsed directly. For a consistent preliminary assessment, each response was averaged over the final 301 records, covering solver iterations 2700--3000 inclusive:
+\begin{equation}
+\bar R=\frac{1}{N}\sum_{i=1}^N R_i,\qquad
+{\rm CV}(R)=\frac{\sqrt{\frac{1}{N}\sum_{i=1}^N(R_i-\bar R)^2}}{|\bar R|},\quad N=301.
+\label{eq:terminal_average}
+\end{equation}
+Here CV is the relative standard deviation within the averaging window. It is a descriptive stability indicator, not an independent convergence or uncertainty estimate.
 
-Furthermore, to provide a unified entry point for the entire DoE, the script automatically compiles a top-level \texttt{Master\_Dashboard.html} file. This master interface features a navigation sidebar listing all 24 simulation cases alongside an embedded HTML \texttt{<iframe>} container; clicking any simulation button triggers a JavaScript callback that dynamically loads the corresponding interactive Plotly report into the main viewport.
+All twelve hydrogen cases have finite force and pressure histories ending at iteration 3000. The terminal-window CV ranges from approximately $0.33\%$ to $3.58\%$ for $F_x$ and from $0.16\%$ to $2.25\%$ for $\Delta p$. The largest values occur for obturator B at $10\,\mathrm{m\,s^{-1}}$. These observations suggest considerably more stable terminal outputs than the previously discarded campaign, but residual convergence and mesh independence have not yet been demonstrated.
 
-\section{Mesh Verification and Fluid Dynamic Trends}
+The inlet patch area reported in the hydrogen surface-integration files is $4.616760\times10^{-5}\,\mathrm{m^2}$, approximately $3.38\%$ smaller than the nominal inlet CAD area of $4.778\times10^{-5}\,\mathrm{m^2}$. The recorded inlet volume fluxes at 5, 10 and $15\,\mathrm{m\,s^{-1}}$ are approximately $2.30838\times10^{-4}$, $4.61676\times10^{-4}$ and $6.92514\times10^{-4}\,\mathrm{m^3\,s^{-1}}$, respectively. Inlet flow-rate checks should therefore use the \emph{actual discretized area}. An outlet-flux diagnostic is not included in the archive, preventing a direct global conservation check.
+
+\section{Preliminary Hydrogen Fluid-Dynamic Trends}
 \label{sec:fluid_trends}
 
-The quantitative comparison of the \texttt{SIM\_DoE\_2210} cases is pending acceptance of the CFD solutions. The current hydrogen campaign contains cases requiring numerical stabilization, and no response surface, scaling exponent or final geometry ranking is presented as verified at this stage.
+The values in Tables~\ref{tab:hydrogen_pressure} and~\ref{tab:hydrogen_force} are means from iterations 2700--3000, not certified converged solutions. Pressure differences are expressed in pascals; the force output is already in newtons.
 
-Once the cases meet the criteria in Section~\ref{sec:numerical_verification}, the analysis will compare the axial force, inlet-to-outlet pressure drop, dimensionless coefficients and mass-conservation error across the selected factors. Main-effect and interaction plots will be used to distinguish changes due to the number and diameter of holes from those associated with inlet velocity and working fluid.
+\begin{table}[htbp]
+\centering
+\caption{Preliminary mean hydrogen pressure drop $\overline{\Delta p}$ [Pa] from the final 301 solver iterations.}
+\label{tab:hydrogen_pressure}
+\begin{tabular}{@{}rcccc@{}}
+\toprule
+$U_{\rm in}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} & \textbf{Obt.\ C} & \textbf{Obt.\ D}\\
+\midrule
+5  & 142.85 & 16.97 & 48.52 & 8.59\\
+10 & 471.56 & 55.36 & 152.31 & 26.20\\
+15 & 979.98 & 107.41 & 306.35 & 52.47\\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Before computing dimensional cross-fluid comparisons, the force output density setting (\texttt{rhoInf}) and the reference density must be reconciled as discussed in Chapter~\ref{ch:numerical_setup}. Mesh quality, near-wall $y^+$ statistics and the sensitivity of the principal responses to grid resolution should also be documented. Only verified cases will be used as input data for the engineering selection tool.
+\begin{table}[htbp]
+\centering
+\caption{Preliminary mean hydrogen axial force $\overline{F}_x$ [N] from the final 301 solver iterations.}
+\label{tab:hydrogen_force}
+\begin{tabular}{@{}rcccc@{}}
+\toprule
+$U_{\rm in}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} & \textbf{Obt.\ C} & \textbf{Obt.\ D}\\
+\midrule
+5  & 0.023507 & 0.001805 & 0.007235 & 0.000511\\
+10 & 0.078263 & 0.006454 & 0.023246 & 0.001878\\
+15 & 0.163441 & 0.012906 & 0.047044 & 0.004117\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For each geometry, the preliminary pressure difference and $+x$ force increase with inlet velocity. At each tested velocity, both response magnitudes follow the order A, C, B, D, from highest to lowest. This ordering agrees qualitatively with the reduction in nominal open area described in Chapter~\ref{ch:doe}, but local flow structure and surface-pressure distribution also influence the integrated responses.
+
+At $15\,\mathrm{m\,s^{-1}}$, obturator A produces approximately $980\,\mathrm{Pa}$ pressure drop and $0.1634\,\mathrm{N}$ axial force, compared with approximately $52.5\,\mathrm{Pa}$ and $0.00412\,\mathrm{N}$ for obturator D. The strong difference highlights a pressure-loss versus hydrodynamic-load trade-off. It does not establish a preferred valve without an independently specified force balance, sign convention and pressure-loss requirement. An exact quadratic velocity law has not been assumed or fitted from these preliminary data.
+
+\section{Wall-Distance Diagnostics and Remaining Validation}
+\label{sec:near_wall_verification}
+
+At solver iteration 3000, the maximum reported obturator-patch $y^+$ for geometry A is approximately $0.53$, $1.76$ and $2.92$ at the three increasing velocities. These values and the low $y^+$ found on other geometries should be interpreted together with the realized near-wall mesh, surface-layer survival and turbulence-wall treatment. Small $y^+$ alone does not demonstrate a reliable mesh.
+
+The results presented here are limited by the absence of solver residual histories, a measured outlet flux, mesh-convergence evidence and nitrogen numerical outputs. Before completing the two-fluid DoE or the selection tool, these records must be obtained or generated and the solution-quality criteria of Section~\ref{sec:numerical_verification} applied. Finally, the archive's fluid properties represent nominal ambient-reference conditions, not a numerical campaign at $437\,\mathrm{bar}$ and $-40\,^{\circ}\mathrm{C}$.
