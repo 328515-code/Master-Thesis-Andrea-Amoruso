@@ -26,7 +26,7 @@ The \texttt{constant/momentumTransport} dictionary selects a RANS formulation wi
 The SST closure blends $k$--$\omega$ behavior near walls with an outer-flow $k$--$\epsilon$ formulation; it was selected to provide a RANS description of adverse pressure gradients and separation at a tractable computational cost \cite{menter1994}. This is a modeling choice rather than a guarantee of accuracy. At lower inlet Reynolds numbers the assumed turbulence state can become especially influential, so the results must be interpreted with reference to Reynolds number, imposed turbulence quantities and mesh resolution.
 
 The working-fluid kinematic viscosity is defined in \texttt{constant/physicalProperties} using the constant-viscosity model:
-\begin{lstlisting}[language=C++,caption={Parameterized constant-viscosity entry used in the OpenFOAM setup.}]
+\begin{lstlisting}[language=C++,caption={Parameterized constant-viscosity entry used in the OpenFOAM setup.}, captionpos=b]
 viscosityModel constant;
 nu [0 2 -1 0 0 0 0] NU_VALUE;
 \end{lstlisting}
@@ -51,8 +51,6 @@ Figure~\ref{fig:dominio} identifies the streamwise $x$ direction used for the pr
 
 \begin{table}[htbp]
 \centering
-\caption{CFD setup velocity and kinematic-pressure boundary conditions}
-\label{tab:domainBC}
 \small
 \begin{tabular}{@{}lll@{}}
 \toprule
@@ -65,6 +63,9 @@ Figure~\ref{fig:dominio} identifies the streamwise $x$ direction used for the pr
 \texttt{wallObt} & \texttt{noSlip} & \texttt{zeroGradient}\\
 \bottomrule
 \end{tabular}
+\caption{CFD setup velocity and kinematic-pressure boundary conditions}
+\label{tab:domainBC}
+
 \end{table}
 
 For the velocity field, an included \texttt{initialConditions} dictionary specifies the inlet vector at each operating point. At the outlet, the \texttt{inletOutlet} velocity condition permits a zero-gradient outflow and prescribes a value where local backflow can be detected. The outlet pressure is a zero \emph{reference kinematic pressure}, not a specification that the system operates at zero absolute pressure. The $k$, $\omega$ and turbulent-viscosity fields require their own inlet, outlet and wall conditions, implemented through the corresponding OpenFOAM dictionaries.
