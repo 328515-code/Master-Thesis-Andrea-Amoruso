@@ -1,15 +1,19 @@
 \chapter{Conclusions}
 \label{ch:conclusions}
 
-The present work defines a CFD-based framework for investigating the influence of gas properties, inlet velocity and obturator-hole geometry on excess flow valve behavior. The reference Design of Experiments is the \texttt{SIM\_DoE\_2210} campaign, comprising 24 planned combinations of two gases, three inlet velocities ($5$, $10$ and $15\,\mathrm{m\,s^{-1}}$), two hole counts and two hole diameters.
+This work describes a reproducible CFD-based framework for comparing excess flow valve obturators using a full-factorial Design of Experiments (DoE). The reference simulation campaign comprises two working gases ($\mathrm{H}_2$ and $\mathrm{N}_2$), three imposed inlet velocities ($5$, $10$ and $15\,\mathrm{m\,s^{-1}}$), and four geometries defined by combinations of three or six holes with diameters of $1.5$ or $3.0\,\mathrm{mm}$. The workflow integrates OpenFOAM 10, automated case preparation, an HPC execution pipeline and post-processing reports.
 
-The study combines OpenFOAM 10 simulations with a scripted preparation and HPC workflow. The intended response variables include the inlet-to-outlet pressure difference, the axial fluid load acting on a stationary obturator and the corresponding dimensionless coefficients.
+\paragraph{Available numerical evidence.}
+The newly supplied archive contains all 24 case configurations and pressure, force, volume-flux and wall-distance histories for the 12 hydrogen cases. The nitrogen setups are present, but their numerical \texttt{postProcessing} outputs were not included. The two gases have been configured with the reference-property values described in Chapter~\ref{ch:doe}; these are not high-pressure, low-temperature calculations.
 
-\paragraph{Status of the numerical investigation.}
-At the time of drafting, a subset of the hydrogen cases still requires numerical stabilization. The reported forces also require confirmation of the density used by the incompressible force integration. Consequently, final statements about geometric ranking, cross-fluid performance, pressure-loss trends or valve trip behavior are deferred until convergence, conservation, mesh quality and density conventions have been checked. Reaching the final prescribed solver iteration is not sufficient evidence of convergence.
+\paragraph{Preliminary hydrogen findings.}
+Over the last 301 solver iterations, the hydrogen results show increasing pressure drop and positive-$x$ obturator force with increasing inlet velocity for each geometry. In all three velocity conditions, the preliminary ordering of pressure drop and axial force is A, C, B and D. At $15\,\mathrm{m\,s^{-1}}$, the terminal-window averages for obturator A are approximately $980\,\mathrm{Pa}$ and $0.1634\,\mathrm{N}$, compared with $52.5\,\mathrm{Pa}$ and $0.00412\,\mathrm{N}$ for obturator D. These outcomes suggest a design trade-off between reduced flow resistance and increased hydrodynamic loading.
 
-\paragraph{Scope and future developments.}
-The fixed-geometry, incompressible steady-state approach is intended to support a comparative design assessment, not to predict the transient closing trajectory or closing time of a complete mechanical valve. After verification of the dataset, future work may complete the DoE response analysis and the interactive comparison tool, evaluate locally compressible flow effects and investigate transient or fluid--structure interaction methods to resolve obturator motion.
+\paragraph{Remaining limitations.}
+All twelve hydrogen histories contain finite values through solver iteration 3000, but neither final residual convergence nor grid independence has been established from the available archive. An outlet flow-rate diagnostic and the nitrogen results are also missing. Consequently, the observations are preliminary and cannot support a completed fluid-to-fluid comparison or a validated valve ranking. Furthermore, a steady incompressible simulation with a fixed obturator does not resolve transient closing motion or a valve trip threshold.
 
-% TODO: Replace this provisional conclusion with quantified, verified findings
-% after the SIM_DoE_2210 campaign and the interactive tool are completed.
+\paragraph{Next steps.}
+Future work should verify the hydrogen solutions, obtain and assess nitrogen post-processing data, complete the factorial comparisons and implement an interactive tool that exposes its data-quality and interpolation limits. Additional real-fluid modeling and possible compressible simulations would be necessary to evaluate the separately discussed operating state of $437\,\mathrm{bar}$ and $-40\,^{\circ}\mathrm{C}$.
+
+% Update with fully verified results, numerical-uncertainty evidence
+% and completed application assessment before final submission.
