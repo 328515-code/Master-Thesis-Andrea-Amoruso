@@ -1,7 +1,7 @@
 \chapter{Design of Experiments (DoE) and HPC Automation}
 \label{ch:doe}
 
-This chapter defines the parameter space of the numerical Design of Experiments (DoE) and the workflow for producing, running and organizing the cases. The 24 combinations define the factorial design. Configurations have been prepared for all cases and post-processing histories are currently available for the 12 hydrogen cases, whereas the corresponding nitrogen histories remain unavailable. Chapter~\ref{ch:results} therefore reports preliminary hydrogen responses and keeps the full two-fluid comparison pending numerical verification and receipt of nitrogen outputs.
+This chapter explains how the Design of Experiments (DoE) is constructed and translated into a reproducible set of OpenFOAM cases. The study is organized around four factors and 24 prescribed combinations. Particular attention is given to why these factors are relevant for a spring-loaded EFV, how geometry and fluid properties are handled consistently, and how the computed outputs are transformed into engineering responses. The resulting procedure supports repeatable comparisons among the obturator concepts introduced in Chapter~\ref{ch:efv_operation}.
 
 \section{Definition of the DoE Parameter Space}
 \label{sec:doe_parameters}
@@ -12,7 +12,7 @@ The four physical factors are working fluid, inlet velocity, number of obturator
     2_{\mathrm{hole\ counts}}\times2_{\mathrm{diameters}}=24.
     \label{eq:doe_cases}
 \end{equation}
-Treating hole count and diameter as separate factors makes it possible to discuss their individual contributions and their interaction rather than considering geometry only as an unstructured four-level category.
+Treating hole count and diameter as separate factors allows their individual effects and interaction to be investigated. For example, doubling hole diameter increases the nominal area of each circular passage by a factor of four, whereas doubling the hole count doubles the total passage area, provided the hole diameters are unchanged. Their effects on force and pressure difference are nevertheless not necessarily independent because the detailed flow structure changes with both parameters \cite{white2016,crane410}.
 
 \begin{table}[htbp]
 \centering
@@ -48,10 +48,10 @@ $\mathrm{N}_2$ & $1.165$ & $1.76\times10^{-5}$ & $1.51\times10^{-5}$\\
 \end{tabular}
 \end{table}
 
-The incompressible momentum solution depends on kinematic viscosity, and thus on the Reynolds number $Re=U_{\mathrm{in}}D_{\mathrm{in}}/\nu$. At equal inlet velocity and geometry, a comparison of the two gases changes this Reynolds number. Dimensional pressure losses and forces also depend on density, so a cross-fluid comparison must distinguish the kinematic flow response from its dimensional scaling. The atmospheric reference state is a modeling convention: the CFD case configurations use $\nu_{\mathrm{H}_2}=1.05\times10^{-4}$ and $\nu_{\mathrm{N}_2}=1.51\times10^{-5}\,\mathrm{m^2\,s^{-1}}$, while the force dictionaries use $\rho_{\mathrm{H}_2}=0.0838$ and $\rho_{\mathrm{N}_2}=1.165\,\mathrm{kg\,m^{-3}}$. Because \texttt{simpleFoam} solves a kinematic-pressure field with a relative pressure datum, an absolute pressure of $1\,\mathrm{atm}$ is not explicitly enforced through the \texttt{0/p} outlet value. The gas-property set, rather than the absolute pressure datum, defines the reference-state approximation. The separately considered operating condition of $437\,\mathrm{bar}$ and $-40\,^{\circ}\mathrm{C}$ is not represented by the present files.
+The incompressible momentum solution depends on kinematic viscosity, and thus on the Reynolds number $Re=U_{\mathrm{in}}D_{\mathrm{in}}/\nu$. At equal inlet velocity and geometry, a comparison of the two gases changes this Reynolds number. Dimensional pressure losses and forces also depend on density, so a cross-fluid comparison must distinguish the kinematic flow response from its dimensional scaling. The atmospheric reference state is a modeling convention: the CFD case configurations use $\nu_{\mathrm{H}_2}=1.05\times10^{-4}$ and $\nu_{\mathrm{N}_2}=1.51\times10^{-5}\,\mathrm{m^2\,s^{-1}}$, while the force dictionaries use $\rho_{\mathrm{H}_2}=0.0838$ and $\rho_{\mathrm{N}_2}=1.165\,\mathrm{kg\,m^{-3}}$. Because \texttt{simpleFoam} solves a kinematic-pressure field with a relative pressure datum, an absolute pressure of $1\,\mathrm{atm}$ is not explicitly enforced through the \texttt{0/p} outlet value. The gas-property set, rather than the outlet reference-pressure datum, defines the reference-state approximation. In a hydrogen refuelling application, pressure and temperature can vary considerably during dispensing, so a separate fluid-property and compressibility assessment is required to extend the reference-state model to higher-pressure conditions \cite{sae_j2601,nist_refprop}.
 
 \subsection{Inlet Velocity Levels and Reference Flow Rates}
-The three inlet velocities selected for the present study are $5$, $10$ and $15\,\mathrm{m\,s^{-1}}$. They define a low-to-moderate inlet-velocity range for a systematic comparison; they are not identified here with verified nominal, surge or line-rupture trip conditions. Any association with a particular valve specification must be supported by the corresponding operating requirements.
+The three inlet velocities selected for the present study are $5$, $10$ and $15\,\mathrm{m\,s^{-1}}$. These levels provide three distinct flow-demand conditions with a common reference geometry, enabling sensitivity to velocity to be assessed without changing the valve architecture. They are numerical factors rather than direct assignments to particular SAE~J2601 refuelling events or to a calibrated mechanical trip flow. Such assignments would require the relevant station-level flow requirement and a valve spring-force specification \cite{sae_j2601}.
 
 The nominal circular inlet diameter is $D_{\mathrm{in}}=7.8\,\mathrm{mm}$, giving
 \begin{equation}
@@ -128,7 +128,40 @@ D & 6 & 3.0 & 42.41 & 0.888\\
 \label{fig:obturator_variants}
 \end{figure}
 
-The open-area ratio provides a useful geometric descriptor, but local contraction, the obturator shape and recirculation may also affect the pressure drop and axial force. Consequently, the relative performance of the four variants is a hypothesis to be examined from verified CFD outputs rather than assumed in advance.
+The open-area ratio is useful for preliminary geometric comparison, but it is not by itself a loss or force coefficient: local contraction, the obturator shape and downstream recirculation also influence the pressure distribution and integral loading \cite{white2016,crane410}. For an EFV installed in a refuelling line, the objective is to compare the compromise between hydraulic resistance during normal filling and fluid-induced actuation load. Neither the smallest nor the largest opening should be declared optimal without the associated mechanical requirements.
+
+
+\section{Factorial Comparison and Interaction Analysis}
+\label{sec:factorial_analysis}
+
+The experimental design may be viewed as a set of twelve gas--velocity conditions, each evaluated on the four combinations of hole number and diameter. This arrangement permits paired geometric comparisons at fixed gas and inlet velocity. For example, the difference $R(n=6,d)-R(n=3,d)$ estimates the influence of hole count at the chosen diameter, while $R(n,d=3.0\,\mathrm{mm})-R(n,d=1.5\,\mathrm{mm})$ estimates the effect of hole size. Here $R$ can represent pressure loss, axial force or a dimensionless response coefficient.
+
+A hole-count--diameter interaction occurs when the effect of increasing hole count depends on which diameter is selected. A convenient two-level interaction contrast for each gas and velocity is
+\begin{equation}
+I_{nd}=
+\left[R(6,3.0)-R(3,3.0)\right]-
+\left[R(6,1.5)-R(3,1.5)\right],
+\label{eq:hole_interaction}
+\end{equation}
+where diameters are expressed in millimetres for brevity. A nonzero contrast indicates that the two geometrical effects are not additive on the scale of the selected response. The three velocity levels can also be used to examine the departure from a simple proportional or quadratic dependence on inlet speed.
+
+The factorial approach makes the design comparison systematic, but the chosen simulation points do not constitute independent experimental replicates. A fitted statistical model should not assign physical measurement uncertainty solely from numerical variation. Engineering conclusions should instead be connected to numerical checks, clear force sign conventions and the mechanical closing-force criterion introduced in Section~\ref{sec:efv_principle}.
+
+\section{Automated Case Lifecycle and Traceability}
+\label{sec:case_lifecycle}
+
+The automation process is organized into a sequence of controlled transformations rather than one monolithic calculation:
+\begin{enumerate}
+\item \textbf{Template definition}: establish a common computational domain, solver settings, patch names and processing function objects.
+\item \textbf{Parameter injection}: select the fluid kinematic viscosity, reference density and inlet velocity; replace the obturator STL using the corresponding geometry variant.
+\item \textbf{Case preparation}: generate or refine the mesh and write the domain decomposition for the allocated MPI task count.
+\item \textbf{Execution}: submit the case to SLURM and execute the OpenFOAM workflow on the allocated node.
+\item \textbf{Output extraction}: collect the pressure, inlet-flow, wall-distance and force histories, retaining each case identifier.
+\item \textbf{Data reduction}: use the same averaging interval and physical reference quantities for each comparable output.
+\end{enumerate}
+The sequence helps reduce manual editing errors and makes it possible to compare computational cases generated under equivalent numerical settings. The CFD dictionaries are the authoritative description of each case, while the Python and Bash scripts automate their repeated application.
+
+For refuelling-system design, this traceability is particularly valuable because a change in operating pressure or temperature is not merely a label change: the associated density and viscosity may change, affecting Reynolds number and dimensional force scaling. A high-pressure application therefore requires a deliberately specified thermodynamic state, rather than applying a post-processing multiplier to a result obtained with an unrelated kinematic viscosity \cite{nist_refprop,white2016}.
 
 \section{Python Case Generation and Submission Pipeline}
 \label{sec:python_doe_generator}
@@ -137,14 +170,14 @@ A Python-based workflow is used to reduce repetitive manual case preparation. It
 
 An illustrative generator, updated to the factor levels and gas properties adopted in this study, is reproduced in Appendix~\ref{sec:app_doe_gen}. As the original execution script was not available for verification, the listing is presented as an illustrative, reproducible implementation rather than as a verbatim record of the submitted jobs.
 
-For reproducibility, the final report should record the exact parameter dictionary and geometry file associated with each generated case, the final scripts and the solver version. It should also differentiate the number of cases \emph{generated or submitted} from the number that meet the numerical acceptance criteria.
+A complete case record associates the selected gas and its viscosity and density settings with the inlet velocity, obturator identifier, solver settings and mesh dictionaries. Using a consistent naming convention makes automated post-processing reliable, but the scientific interpretation is independent of the physical directory location. The simulation settings and output definitions provide the provenance necessary for an engineering comparison.
 
 \section{Automated Remote Post-Processing Extraction}
 \label{sec:scp_extraction}
 
 The OpenFOAM run directories include processor meshes and field files that are substantially larger than the reduced \texttt{postProcessing/} outputs used for preliminary response screening. A local Python script can retrieve each case's \texttt{postProcessing/} directory using \texttt{scp} while preserving the simulation's directory identifier, thereby reducing unnecessary transfer and the risk of mixing cases.
 
-The example in Appendix~\ref{sec:app_scp_script} uses configurable generic paths, since the physical storage location is not relevant to the methodology. Post-processing results are currently available for hydrogen, whereas numerical outputs for nitrogen remain to be included. Retrieved data are not automatically accepted as valid steady-state responses. Force, pressure and flux histories must first pass the checks introduced in Section~\ref{sec:numerical_verification}.
+The example in Appendix~\ref{sec:app_scp_script} uses configurable generic paths, since the storage location is not relevant to the underlying engineering procedure. Once retrieved, the output files are associated with their case factors before any pressure or force statistics are computed. The numerical checks described in Section~\ref{sec:numerical_verification} help prevent an apparently complete output table from being mistaken for an independently validated result.
 
 \section{Response Variables and Planned DoE Analysis}
 \label{sec:doe_analysis}
@@ -156,7 +189,7 @@ The principal outputs are the inlet-to-outlet pressure difference, the total axi
     F_x=F_{p,x}+F_{\nu,x},
     \label{eq:doe_responses}
 \end{equation}
-where $P$ is kinematic pressure. In the submitted hydrogen \texttt{forces.dat} files, $F_x$ has already been dimensionalized with \texttt{rhoInf = 0.0838}; no additional density multiplication is applied. The sign of $F_x$ is defined relative to the positive streamwise $x$ axis; it must not automatically be identified as a positive closing force without confirming the mechanism's actual direction of travel.
+where $P$ is kinematic pressure. In the hydrogen \texttt{forces.dat} files, $F_x$ has already been dimensionalized with \texttt{rhoInf = 0.0838}; no additional density multiplication is applied. The sign of $F_x$ is defined relative to the positive streamwise $x$ axis; it must not automatically be identified as a positive closing force without confirming the mechanism's actual direction of travel.
 
 For comparisons across flow levels and gases, the following coefficients are proposed:
 \begin{equation}
@@ -167,4 +200,4 @@ For comparisons across flow levels and gases, the following coefficients are pro
 \end{equation}
 Here $A_{\mathrm{in}}$ is the selected reference area and must be used consistently in all cases. Comparisons should include main effects for gas, velocity, hole count and hole diameter and selected interaction plots, particularly hole count $\times$ hole diameter and fluid $\times$ velocity.
 
-Because these are deterministic numerical runs without independent physical replicates, an apparent statistical fit must not be interpreted as experimental uncertainty. Any regression, factorial contrast or variance-based analysis should be accompanied by numerical-quality checks and the limits of the chosen sample. No quantitative ranking or predictive interpolation is asserted until a sufficiently complete and accepted response table is available.
+Because these are deterministic numerical runs without independent physical replicates, an apparent statistical fit must not be interpreted as experimental uncertainty. Any regression, factorial contrast or variance-based analysis should be accompanied by numerical-quality checks and the limits of the chosen sample. The analysis should report the responses together with the reference state, the adopted averaging interval and any limits associated with extrapolation or numerical sensitivity.
