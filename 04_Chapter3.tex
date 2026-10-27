@@ -44,8 +44,6 @@ The values in Tables~\ref{tab:hydrogen_pressure} and~\ref{tab:hydrogen_force} ar
 
 \begin{table}[htbp]
 \centering
-\caption{Preliminary mean hydrogen pressure drop $\overline{\Delta p}$ [Pa] from the final 301 solver iterations.}
-\label{tab:hydrogen_pressure}
 \begin{tabular}{@{}rcccc@{}}
 \toprule
 $U_{\rm in}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} & \textbf{Obt.\ C} & \textbf{Obt.\ D}\\
@@ -55,12 +53,13 @@ $U_{\rm in}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} & \tex
 15 & 979.98 & 107.41 & 306.35 & 52.47\\
 \bottomrule
 \end{tabular}
+\caption{Preliminary mean hydrogen pressure drop $\overline{\Delta p}$ [Pa] from the final 301 solver iterations.}
+\label{tab:hydrogen_pressure}
+
 \end{table}
 
 \begin{table}[htbp]
 \centering
-\caption{Preliminary mean hydrogen axial force $\overline{F}_x$ [N] from the final 301 solver iterations.}
-\label{tab:hydrogen_force}
 \begin{tabular}{@{}rcccc@{}}
 \toprule
 $U_{\rm in}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} & \textbf{Obt.\ C} & \textbf{Obt.\ D}\\
@@ -70,6 +69,9 @@ $U_{\rm in}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} & \tex
 15 & 0.163441 & 0.012906 & 0.047044 & 0.004117\\
 \bottomrule
 \end{tabular}
+\caption{Preliminary mean hydrogen axial force $\overline{F}_x$ [N] from the final 301 solver iterations.}
+\label{tab:hydrogen_force}
+
 \end{table}
 
 For each geometry, the preliminary pressure difference and $+x$ force increase with inlet velocity. At each tested velocity, both response magnitudes follow the order A, C, B, D, from highest to lowest. This ordering agrees qualitatively with the reduction in nominal open area described in Chapter~\ref{ch:doe}, but local flow structure and surface-pressure distribution also influence the integrated responses.
