@@ -16,8 +16,6 @@ Treating hole count and diameter as separate factors allows their individual eff
 
 \begin{table}[htbp]
 \centering
-\caption{Factors and levels defining the full-factorial DoE.}
-\label{tab:doe_factors}
 \begin{tabular}{@{}lll@{}}
 \toprule
 \textbf{Factor} & \textbf{Levels} & \textbf{Number of levels}\\
@@ -28,6 +26,9 @@ Obturator hole count & 3, 6 & 2\\
 Hole diameter & $1.5$, $3.0\,\mathrm{mm}$ & 2\\
 \bottomrule
 \end{tabular}
+\caption{Factors and levels defining the full-factorial DoE.}
+\label{tab:doe_factors}
+
 \end{table}
 
 \subsection{Working Fluids ($\mathrm{H}_2$ and $\mathrm{N}_2$)}
@@ -35,8 +36,6 @@ Hydrogen and nitrogen were selected to investigate gases with markedly different
 
 \begin{table}[htbp]
 \centering
-\caption{Reference fluid properties used to define the DoE. The density is also needed when converting kinematic pressure or scaling forces consistently.}
-\label{tab:fluid_properties}
 \small
 \begin{tabular}{@{}lccc@{}}
 \toprule
@@ -46,6 +45,9 @@ $\mathrm{H}_2$ & $0.0838$ & $8.80\times10^{-6}$ & $1.05\times10^{-4}$\\
 $\mathrm{N}_2$ & $1.165$ & $1.76\times10^{-5}$ & $1.51\times10^{-5}$\\
 \bottomrule
 \end{tabular}
+\caption{Reference fluid properties used to define the DoE. The density is also needed when converting kinematic pressure or scaling forces consistently.}
+\label{tab:fluid_properties}
+
 \end{table}
 
 The incompressible momentum solution depends on kinematic viscosity, and thus on the Reynolds number $Re=U_{\mathrm{in}}D_{\mathrm{in}}/\nu$. At equal inlet velocity and geometry, a comparison of the two gases changes this Reynolds number. Dimensional pressure losses and forces also depend on density, so a cross-fluid comparison must distinguish the kinematic flow response from its dimensional scaling. The atmospheric reference state is a modeling convention: the CFD case configurations use $\nu_{\mathrm{H}_2}=1.05\times10^{-4}$ and $\nu_{\mathrm{N}_2}=1.51\times10^{-5}\,\mathrm{m^2\,s^{-1}}$, while the force dictionaries use $\rho_{\mathrm{H}_2}=0.0838$ and $\rho_{\mathrm{N}_2}=1.165\,\mathrm{kg\,m^{-3}}$. Because \texttt{simpleFoam} solves a kinematic-pressure field with a relative pressure datum, an absolute pressure of $1\,\mathrm{atm}$ is not explicitly enforced through the \texttt{0/p} outlet value. The gas-property set, rather than the outlet reference-pressure datum, defines the reference-state approximation. In a hydrogen refuelling application, pressure and temperature can vary considerably during dispensing, so a separate fluid-property and compressibility assessment is required to extend the reference-state model to higher-pressure conditions \cite{sae_j2601,nist_refprop}.
@@ -70,8 +72,6 @@ The quantities in Table~\ref{tab:flow_regimes} use the nominal CAD inlet area an
 
 \begin{table}[htbp]
 \centering
-\caption{Nominal reference flow rates for the selected inlet velocities ($20\,^{\circ}\mathrm{C}$, $1\,\mathrm{atm}$).}
-\label{tab:flow_regimes}
 \small
 \begin{tabular}{@{}rccc@{}}
 \toprule
@@ -85,6 +85,9 @@ $\dot m_{\mathrm{H}_2}$ [$\mathrm{kg\,s^{-1}}$]\\
 15 & $7.168\times10^{-4}$ & $8.350\times10^{-4}$ & $6.006\times10^{-5}$\\
 \bottomrule
 \end{tabular}
+\caption{Nominal reference flow rates for the selected inlet velocities ($20\,^{\circ}\mathrm{C}$, $1\,\mathrm{atm}$).}
+\label{tab:flow_regimes}
+
 \end{table}
 
 The corresponding inlet Reynolds numbers are approximately $371$, $743$ and $1114$ for hydrogen, compared with $2583$, $5166$ and $7748$ for nitrogen. These are inlet-scale values and do not establish whether the separated flow around the obturator is everywhere laminar or turbulent. Likewise, the inlet Mach number is insufficient to certify incompressibility within the more restrictive passages (Section~\ref{sec:governing_equations}).
@@ -101,8 +104,6 @@ the open-area ratio $\beta$ quantifies the nominal restriction relative to the i
 
 \begin{table}[htbp]
 \centering
-\caption{Nominal dimensions and open-area ratios of the four obturator configurations.}
-\label{tab:obturator_variants}
 \begin{tabular}{@{}lrrrr@{}}
 \toprule
 \textbf{Variant} & \textbf{Holes} & $d$ [mm] & $A_{\mathrm{holes}}$ [$\mathrm{mm^2}$] & $\beta$\\
@@ -113,6 +114,9 @@ C & 6 & 1.5 & 10.60 & 0.222\\
 D & 6 & 3.0 & 42.41 & 0.888\\
 \bottomrule
 \end{tabular}
+\caption{Nominal dimensions and open-area ratios of the four obturator configurations.}
+\label{tab:obturator_variants}
+
 \end{table}
 
 \begin{figure}[htbp]
