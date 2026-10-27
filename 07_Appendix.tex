@@ -4,7 +4,7 @@
 
 \section{Illustrative DoE Case Generator (\texttt{doe\_generator.py})}
 \label{sec:app_doe_gen}
-The following reproducible example matches the factor levels and gas-property settings found in the supplied \texttt{SIM\_DoE\_2210} cases. It is a reconstruction for documentation, \emph{not} a claim that this is the exact historical script used to generate or submit the uploaded cases. The example requires a clean \texttt{CASE\_BASE} template containing the tokens \texttt{FLUX\_VALUE} and \texttt{NU\_VALUE}.
+The following illustrative example uses the factor levels and gas-property settings selected for the numerical study. It is a reconstruction for documentation, \emph{not} a claim that this is the exact script originally used to generate or submit the cases. The example requires a clean \texttt{CASE\_BASE} template containing the tokens \texttt{FLUX\_VALUE} and \texttt{NU\_VALUE}.
 
 \begin{lstlisting}[language=Python,caption={Illustrative Python generator for 24 cases with consistent gas properties.}]
 from pathlib import Path
@@ -25,7 +25,7 @@ geometries = {
 
 base_case = Path("CASE_BASE")
 geometry_dir = Path("Geometrie_STL")
-output_dir = Path("SIM_DoE_2210")
+output_dir = Path("DoE_Cases")
 output_dir.mkdir(parents=True, exist_ok=True)
 
 def replace_token(path, token, replacement):
@@ -104,15 +104,15 @@ mpirun -np $TOTAL_TASKS simpleFoam -parallel > out_run
 
 \section{Remote Post-Processing Extraction (\texttt{download\_postprocessing.py})}
 \label{sec:app_scp_script}
-The example below illustrates directory-preserving extraction for the two-gas case structure provided in the archive. The remote cluster path is a placeholder because the location of the new results on ARIES was not supplied. Only the hydrogen output was present in the submitted archive.
+The following example illustrates directory-preserving retrieval of post-processing results for the two gases. The paths are generic placeholders to be configured for the execution environment, rather than a record of where the simulation files were stored. Results are currently available for hydrogen, while nitrogen post-processing remains pending.
 
 \begin{lstlisting}[language=Python,caption={Illustrative SCP retrieval of each case's post-processing output.}]
 from pathlib import Path
 import subprocess
 
 user_and_host = "fluids11@hpc.unimo.lan"
-remote_root = "/SET/ACTUAL/REMOTE/PATH/SIM_DoE_2210"
-local_root = Path("SIM_DoE_2210")
+remote_root = "/path/to/DoE_Cases"
+local_root = Path("DoE_Cases")
 
 for gas in ("Hydrogen", "Nitrogen"):
     folder = local_root / gas
