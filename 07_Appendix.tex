@@ -2,78 +2,80 @@
 \chapter{Codes and Automation Scripts}
 \label{ch:appendix_codes}
 
-\section{DoE Case Generator Script (\texttt{doe\_generator.py})}
+\section{Illustrative DoE Case Generator (\texttt{doe\_generator.py})}
 \label{sec:app_doe_gen}
-\begin{lstlisting}[language=Python, caption={Python script for automated generation of the 24 OpenFOAM DoE cases.}]
-import os
+The following reproducible example matches the factor levels and gas-property settings found in the supplied \texttt{SIM\_DoE\_2210} cases. It is a reconstruction for documentation, \emph{not} a claim that this is the exact historical script used to generate or submit the uploaded cases. The example requires a clean \texttt{CASE\_BASE} template containing the tokens \texttt{FLUX\_VALUE} and \texttt{NU\_VALUE}.
+
+\begin{lstlisting}[language=Python,caption={Illustrative Python generator for 24 cases with consistent gas properties.}]
+from pathlib import Path
 import shutil
-import subprocess
-import itertools
+import re
 
-# ==================== 1. DoE PARAMETERS ====================
-
-# Kinematic viscosity (nu) [m^2/s] at 20 C, 1 atm (NIST REFPROP)
 fluids = {
-    "H2": "1.05e-04",
-    "N2": "1.51e-05"
+    "H2": {"nu": "1.05e-04", "rho": "0.0838"},
+    "N2": {"nu": "1.51e-05", "rho": "1.165"},
+}
+velocities = [5, 10, 15]
+geometries = {
+    "A": "3Fori_1p5mm.stl",
+    "B": "3Fori_3mm.stl",
+    "C": "6Fori_1p5mm.stl",
+    "D": "6Fori_3mm.stl",
 }
 
-# Velocity @ inlet [m/s]
-fluxes = ["15", "40", "80"]
+base_case = Path("CASE_BASE")
+geometry_dir = Path("Geometrie_STL")
+output_dir = Path("SIM_DoE_2210")
+output_dir.mkdir(parents=True, exist_ok=True)
 
-# Obturators
-geometries = ["3Fori_1p5mm.stl", "3Fori_3mm.stl", "6Fori_1p5mm.stl", "6Fori_3mm.stl"]
+def replace_token(path, token, replacement):
+    text = path.read_text()
+    if token not in text:
+        raise ValueError(f"Missing token {token}: {path}")
+    path.write_text(text.replace(token, replacement))
 
-# Folder definition
-base_case_dir = r"C:\Users\andre\Desktop\Tesi\Simulazioni\CASE_BASE"
-doe_run_dir = r"C:\Users\andre\Desktop\Tesi\Simulazioni"
-geom_source_dir = r"C:\Users\andre\Desktop\Tesi\Simulazioni\Geometrie_STL"
+def set_active_density(path, density):
+    text = path.read_text()
+    # Match only an uncommented, active rhoInf entry.
+    new_text, n = re.subn(
+        r"(?m)^(\s*)rhoInf\s+[^;]+;",
+        lambda match: match.group(1) + f"rhoInf {density};",
+        text,
+    )
+    if n != 1:
+        raise ValueError(f"Expected one active rhoInf: {path}")
+    path.write_text(new_text)
 
-# ==================== 2. HELPER FUNCTION ====================
-
-def replace_in_file(filepath, search_text, replace_text):
-    with open(filepath, 'r') as file:
-        file_data = file.read()
-    file_data = file_data.replace(search_text, replace_text)
-    with open(filepath, 'w') as file:
-        file.write(file_data)
-
-# ==================== 3. GENERATE AND SUBMIT CASES ====================
-
-if not os.path.exists(doe_run_dir):
-    os.makedirs(doe_run_dir)
-
-for fluid, nu_val in fluids.items():
-    for flux in fluxes:
-        for geom in geometries:
-            geom_name = geom.replace('.stl', '')
-            case_name = f"Sim_{fluid}_Flux{flux}_{geom_name}"
-            case_path = os.path.join(doe_run_dir, case_name)
-
-            print(f"Generating case: {case_name}")
-
-            if os.path.exists(case_path):
-                shutil.rmtree(case_path)
-            shutil.copytree(base_case_dir, case_path)
-
-            src_stl = os.path.join(geom_source_dir, geom)
-            dst_stl = os.path.join(case_path, "constant", "geometry", "wallObt.stl")
-            shutil.copyfile(src_stl, dst_stl)
-
-            init_cond_path = os.path.join(case_path, "0", "include", "initialConditions")
-            replace_in_file(init_cond_path, "FLUX_VALUE", flux)
-
-            transport_path = os.path.join(case_path, "constant", "physicalProperties")
-            replace_in_file(transport_path, "NU_VALUE", nu_val)
-
-            # subprocess.run(["sbatch", "run_aries_2.sh"], cwd=case_path)
-
-print("DoE Generation Complete. 24 cases prepared.")
+for gas, props in fluids.items():
+    for u in velocities:
+        for label, stl_name in geometries.items():
+            name = f"Sim_{gas}_Flux{u:02d}_Obt_{label}"
+            case = output_dir / gas / name
+            case.parent.mkdir(parents=True, exist_ok=True)
+            if case.exists():
+                raise FileExistsError(case)
+            shutil.copytree(base_case, case)
+            shutil.copyfile(
+                geometry_dir / stl_name,
+                case / "constant/geometry/wallObt.stl",
+            )
+            replace_token(
+                case / "0/include/initialConditions",
+                "FLUX_VALUE", str(u),
+            )
+            replace_token(
+                case / "constant/physicalProperties",
+                "NU_VALUE", props["nu"],
+            )
+            set_active_density(
+                case / "system/forces", props["rho"],
+            )
+print("Prepared 24 DoE cases; submission is a separate step.")
 \end{lstlisting}
 
 \section{SLURM Execution and Maintenance Scripts (Bash)}
 \label{sec:app_slurm_scripts}
-\begin{lstlisting}[language=bash, caption={Full meshing and solving SLURM submission script (\texttt{run\_aries\_2.sh}).}]
+\begin{lstlisting}[language=bash, caption={Full meshing and solving SLURM submission script (\texttt{run\_aries.sh}).}]
 #!/bin/bash
 #SBATCH --account=fluids
 #SBATCH --partition=high
@@ -102,29 +104,32 @@ mpirun -np $TOTAL_TASKS simpleFoam -parallel > out_run
 
 \section{Remote Post-Processing Extraction (\texttt{download\_postprocessing.py})}
 \label{sec:app_scp_script}
-\begin{lstlisting}[language=Python, caption={Python script utilizing \texttt{scp} to selectively download \texttt{postProcessing} folders from ARIES.}]
-import os
+The example below illustrates directory-preserving extraction for the two-gas case structure provided in the archive. The remote cluster path is a placeholder because the location of the new results on ARIES was not supplied. Only the hydrogen output was present in the submitted archive.
 
-hpc_user = "fluids11"
-hpc_host = "hpc.unimo.lan"
-remote_base_dir = "/unimore_home/fluids11/SIM_DoE_1610"
+\begin{lstlisting}[language=Python,caption={Illustrative SCP retrieval of each case's post-processing output.}]
+from pathlib import Path
+import subprocess
 
-local_base_dir = os.path.dirname(os.path.abspath(__file__))
+user_and_host = "fluids11@hpc.unimo.lan"
+remote_root = "/SET/ACTUAL/REMOTE/PATH/SIM_DoE_2210"
+local_root = Path("SIM_DoE_2210")
 
-sim_folders = [f for f in os.listdir(local_base_dir) 
-               if os.path.isdir(os.path.join(local_base_dir, f)) and f.startswith("Sim_")]
-
-for case in sim_folders:
-    remote_path = f"{hpc_user}@{hpc_host}:{remote_base_dir}/{case}/postProcessing"
-    local_case_dir = os.path.join(local_base_dir, case)
-    print(f"\n---> Fetching data for: {case}")
-    scp_command = f'scp -r {remote_path} "{local_case_dir}"'
-    os.system(scp_command)
-\end{lstlisting} %
+for gas in ("Hydrogen", "Nitrogen"):
+    folder = local_root / gas
+    for case in sorted(folder.glob("Sim_*")):
+        remote = (
+            f"{user_and_host}:{remote_root}/{gas}/"
+            f"{case.name}/postProcessing"
+        )
+        subprocess.run(
+            ["scp", "-r", remote, str(case)],
+            check=True,
+        )
+\end{lstlisting}
 
 \section{Batch Plotly Report and Master Dashboard Generator (\texttt{generate\_reports.py})}
 \label{sec:app_plotly_script}
-\begin{lstlisting}[language=Python, caption={Automated data parser, Plotly report generator, and Master HTML Dashboard builder.}]
+\begin{lstlisting}[language=Python, caption={Illustrative parsing functions from the Plotly reporting workflow (extract; not a complete executable report generator).}]
 import os
 import re
 import plotly.graph_objects as go
@@ -212,5 +217,5 @@ for case in sorted(sim_folders):
     t_flux, f_x, f_y, f_z = parse_vector_data(file_flux)
     yplus_data = parse_yplus(file_yplus)
     t_forces, fx, fy, fz = parse_forces(file_forces)
-    # Figures generated and saved to CFD_Report_<case>.html (see Section 4.2)
+    # Figures generated and saved to CFD_Report_<case>.html (see Chapter 3)
 \end{lstlisting} %
