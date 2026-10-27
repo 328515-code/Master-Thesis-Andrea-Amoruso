@@ -1,4 +1,3 @@
-\appendix
 \chapter{Codes and Automation Scripts}
 \label{ch:appendix_codes}
 
@@ -6,7 +5,7 @@
 \label{sec:app_doe_gen}
 The following illustrative example uses the factor levels and gas-property settings selected for the numerical study. It is a reconstruction for documentation, \emph{not} a claim that this is the exact script originally used to generate or submit the cases. The example requires a clean \texttt{CASE\_BASE} template containing the tokens \texttt{FLUX\_VALUE} and \texttt{NU\_VALUE}.
 
-\begin{lstlisting}[language=Python,caption={Illustrative Python generator for 24 cases with consistent gas properties.}]
+\begin{lstlisting}[language=Python,caption={Illustrative Python generator for 24 cases with consistent gas properties.}, captionpos=b]
 from pathlib import Path
 import shutil
 import re
@@ -75,7 +74,7 @@ print("Prepared 24 DoE cases; submission is a separate step.")
 
 \section{SLURM Execution and Maintenance Scripts (Bash)}
 \label{sec:app_slurm_scripts}
-\begin{lstlisting}[language=bash, caption={Full meshing and solving SLURM submission script (\texttt{run\_aries.sh}).}]
+\begin{lstlisting}[language=bash, caption={Full meshing and solving SLURM submission script (\texttt{run\_aries.sh}).}, captionpos=b]
 #!/bin/bash
 #SBATCH --account=fluids
 #SBATCH --partition=high
@@ -104,9 +103,9 @@ mpirun -np $TOTAL_TASKS simpleFoam -parallel > out_run
 
 \section{Remote Post-Processing Extraction (\texttt{download\_postprocessing.py})}
 \label{sec:app_scp_script}
-The following example illustrates directory-preserving retrieval of post-processing results for the two gases. The paths are generic placeholders to be configured for the execution environment, rather than a record of where the simulation files were stored. Results are currently available for hydrogen, while nitrogen post-processing remains pending.
+The following example illustrates directory-preserving retrieval of post-processing results for the two gases. The paths are generic placeholders to be configured for the execution environment, rather than a record of where the simulation files were stored. The same retrieval structure can be applied to every case of the factorial design.
 
-\begin{lstlisting}[language=Python,caption={Illustrative SCP retrieval of each case's post-processing output.}]
+\begin{lstlisting}[language=Python,caption={Illustrative SCP retrieval of each case's post-processing output.}, captionpos=b]
 from pathlib import Path
 import subprocess
 
@@ -129,7 +128,7 @@ for gas in ("Hydrogen", "Nitrogen"):
 
 \section{Batch Plotly Report and Master Dashboard Generator (\texttt{generate\_reports.py})}
 \label{sec:app_plotly_script}
-\begin{lstlisting}[language=Python, caption={Illustrative parsing functions from the Plotly reporting workflow (extract; not a complete executable report generator).}]
+\begin{lstlisting}[language=Python, caption={Illustrative parsing functions from the Plotly reporting workflow (extract; not a complete executable report generator).}, captionpos=b]
 import os
 import re
 import plotly.graph_objects as go
@@ -195,7 +194,7 @@ def parse_forces(filepath):
                 fz.append(p_force[2] + v_force[2])
     return times, fx, fy, fz
 
-local_base_dir = r"C:\Users\andre\Desktop\Tesi\Simulazioni"
+local_base_dir = "DoE_Cases"
 sim_folders = [f for f in os.listdir(local_base_dir) 
                if os.path.isdir(os.path.join(local_base_dir, f)) and f.startswith("Sim_")]
 dashboard_links = []

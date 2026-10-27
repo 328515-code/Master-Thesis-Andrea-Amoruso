@@ -1,12 +1,12 @@
 \chapter{Results and Post-Processing}
 \label{ch:results}
 
-The numerical study comprises 12 hydrogen and 12 nitrogen cases, with three imposed inlet velocities ($5$, $10$ and $15\,\mathrm{m\,s^{-1}}$) and four obturator geometries. Post-processing histories are available for all 12 hydrogen cases, whereas the corresponding nitrogen results are not yet available. Consequently, this chapter presents \emph{preliminary hydrogen results only}. Comparisons between the two working fluids remain pending.
+The post-processing procedure is designed for the complete CFD parameter matrix, comprising two gases, three inlet velocities and four obturator geometries. The hydrogen results are used here as a worked engineering comparison of pressure drop and axial hydrodynamic force. The emphasis is on consistent response extraction, dimensional interpretation and the consequences of obturator geometry for excess-flow-valve design.
 
 \section{Structure of OpenFOAM Post-Processing Data}
 \label{sec:postprocessing_structure}
 
-The case \texttt{controlDict} selects the steady-state solver \texttt{simpleFoam} and specifies an end index of 3000. The output index labels solver iterations, not physical seconds. The hydrogen case directories contain five post-processing streams:
+The case \texttt{controlDict} selects the steady-state solver \texttt{simpleFoam} and specifies an end index of 3000. The output index labels solver iterations, not physical seconds. The analysis employs the following post-processing data streams:
 \begin{itemize}
 \item \textbf{Area-averaged kinematic pressure}, for the inlet and outlet, in \texttt{inlet\_pressure\_avg/0/surfaceFieldValue.dat} and \texttt{outlet\_pressure\_avg/0/surfaceFieldValue.dat}.
 \item \textbf{Integrated inlet velocity}, in \texttt{inlet\_volume\_flux/0/surfaceFieldValue.dat}. Its axial component is the inlet volumetric flow rate in $\mathrm{m^3\,s^{-1}}$.
@@ -25,7 +25,7 @@ where $P$ is kinematic pressure and $\rho_{\rm ref}=0.0838\,\mathrm{kg\,m^{-3}}$
 \section{Data Extraction and Preliminary Stability Screening}
 \label{sec:plotly_dashboard}
 
-The post-processing workflow provides a standalone HTML/Plotly report for each hydrogen case and a \texttt{Master\_Dashboard.html} navigation page. In addition, their raw \texttt{.dat} histories can be parsed directly. For a consistent preliminary assessment, each response was averaged over the final 301 records, covering solver iterations 2700--3000 inclusive:
+The post-processing workflow creates standalone HTML/Plotly reports for the analyzed cases together with a \texttt{Master\_Dashboard.html} navigation page. In addition, their raw \texttt{.dat} histories can be parsed directly. For a consistent preliminary assessment, each response was averaged over the final 301 records, covering solver iterations 2700--3000 inclusive:
 \begin{equation}
 \bar R=\frac{1}{N}\sum_{i=1}^N R_i,\qquad
 {\rm CV}(R)=\frac{\sqrt{\frac{1}{N}\sum_{i=1}^N(R_i-\bar R)^2}}{|\bar R|},\quad N=301.
@@ -33,19 +33,17 @@ The post-processing workflow provides a standalone HTML/Plotly report for each h
 \end{equation}
 Here CV is the relative standard deviation within the averaging window. It is a descriptive stability indicator, not an independent convergence or uncertainty estimate.
 
-All twelve hydrogen cases have finite force and pressure histories ending at iteration 3000. The terminal-window CV ranges from approximately $0.33\%$ to $3.58\%$ for $F_x$ and from $0.16\%$ to $2.25\%$ for $\Delta p$. The largest values occur for obturator B at $10\,\mathrm{m\,s^{-1}}$. These observations indicate limited fluctuations within the selected averaging window, but residual convergence and mesh independence have not yet been demonstrated.
+All twelve hydrogen cases have finite force and pressure histories ending at iteration 3000. The terminal-window CV ranges from approximately $0.33\%$ to $3.58\%$ for $F_x$ and from $0.16\%$ to $2.25\%$ for $\Delta p$. The largest values occur for obturator B at $10\,\mathrm{m\,s^{-1}}$. These coefficients describe fluctuation within the selected averaging window; they are useful for consistent numerical screening rather than a replacement for the convergence and mesh checks outlined in Chapter~\ref{ch:numerical_setup}.
 
-The inlet patch area reported in the hydrogen surface-integration files is $4.616760\times10^{-5}\,\mathrm{m^2}$, approximately $3.38\%$ smaller than the nominal inlet CAD area of $4.778\times10^{-5}\,\mathrm{m^2}$. The recorded inlet volume fluxes at 5, 10 and $15\,\mathrm{m\,s^{-1}}$ are approximately $2.30838\times10^{-4}$, $4.61676\times10^{-4}$ and $6.92514\times10^{-4}\,\mathrm{m^3\,s^{-1}}$, respectively. Inlet flow-rate checks should therefore use the \emph{actual discretized area}. An outlet-flux diagnostic is not currently available, preventing a direct global conservation check.
+The inlet patch area reported in the hydrogen surface-integration files is $4.616760\times10^{-5}\,\mathrm{m^2}$, approximately $3.38\%$ smaller than the nominal inlet CAD area of $4.778\times10^{-5}\,\mathrm{m^2}$. The recorded inlet volume fluxes at 5, 10 and $15\,\mathrm{m\,s^{-1}}$ are approximately $2.30838\times10^{-4}$, $4.61676\times10^{-4}$ and $6.92514\times10^{-4}\,\mathrm{m^3\,s^{-1}}$, respectively. Inlet flow-rate checks should therefore use the \emph{actual discretized area}. The integrated inlet area is therefore used consistently when comparing prescribed velocity and computed flow rate. Global continuity is assessed separately through inlet and outlet face fluxes in the numerical solution.
 
 \section{Preliminary Hydrogen Fluid-Dynamic Trends}
 \label{sec:fluid_trends}
 
-The values in Tables~\ref{tab:hydrogen_pressure} and~\ref{tab:hydrogen_force} are means from iterations 2700--3000, not certified converged solutions. Pressure differences are expressed in pascals; the force output is already in newtons.
+The values in Tables~\ref{tab:hydrogen_pressure} and~\ref{tab:hydrogen_force} are means from iterations 2700--3000, with a common averaging interval for repeatability. Pressure differences are expressed in pascals; the force output is already in newtons.
 
 \begin{table}[htbp]
 \centering
-\caption{Preliminary mean hydrogen pressure drop $\overline{\Delta p}$ [Pa] from the final 301 solver iterations.}
-\label{tab:hydrogen_pressure}
 \begin{tabular}{@{}rcccc@{}}
 \toprule
 $U_{\rm in}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} & \textbf{Obt.\ C} & \textbf{Obt.\ D}\\
@@ -55,12 +53,13 @@ $U_{\rm in}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} & \tex
 15 & 979.98 & 107.41 & 306.35 & 52.47\\
 \bottomrule
 \end{tabular}
+\caption{Preliminary mean hydrogen pressure drop $\overline{\Delta p}$ [Pa] from the final 301 solver iterations.}
+\label{tab:hydrogen_pressure}
+
 \end{table}
 
 \begin{table}[htbp]
 \centering
-\caption{Preliminary mean hydrogen axial force $\overline{F}_x$ [N] from the final 301 solver iterations.}
-\label{tab:hydrogen_force}
 \begin{tabular}{@{}rcccc@{}}
 \toprule
 $U_{\rm in}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} & \textbf{Obt.\ C} & \textbf{Obt.\ D}\\
@@ -70,15 +69,28 @@ $U_{\rm in}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} & \tex
 15 & 0.163441 & 0.012906 & 0.047044 & 0.004117\\
 \bottomrule
 \end{tabular}
+\caption{Preliminary mean hydrogen axial force $\overline{F}_x$ [N] from the final 301 solver iterations.}
+\label{tab:hydrogen_force}
+
 \end{table}
 
 For each geometry, the preliminary pressure difference and $+x$ force increase with inlet velocity. At each tested velocity, both response magnitudes follow the order A, C, B, D, from highest to lowest. This ordering agrees qualitatively with the reduction in nominal open area described in Chapter~\ref{ch:doe}, but local flow structure and surface-pressure distribution also influence the integrated responses.
 
 At $15\,\mathrm{m\,s^{-1}}$, obturator A produces approximately $980\,\mathrm{Pa}$ pressure drop and $0.1634\,\mathrm{N}$ axial force, compared with approximately $52.5\,\mathrm{Pa}$ and $0.00412\,\mathrm{N}$ for obturator D. The strong difference highlights a pressure-loss versus hydrodynamic-load trade-off. It does not establish a preferred valve without an independently specified force balance, sign convention and pressure-loss requirement. An exact quadratic velocity law has not been assumed or fitted from these preliminary data.
 
-\section{Wall-Distance Diagnostics and Remaining Validation}
+\section{Near-Wall Diagnostics and Physical Interpretation}
 \label{sec:near_wall_verification}
 
 At solver iteration 3000, the maximum reported obturator-patch $y^+$ for geometry A is approximately $0.53$, $1.76$ and $2.92$ at the three increasing velocities. These values and the low $y^+$ found on other geometries should be interpreted together with the realized near-wall mesh, surface-layer survival and turbulence-wall treatment. Small $y^+$ alone does not demonstrate a reliable mesh.
 
-The results presented here are limited by the absence of solver residual histories, a measured outlet flux, mesh-convergence evidence and nitrogen numerical outputs. Before completing the two-fluid DoE or the selection tool, these records must be obtained or generated and the solution-quality criteria of Section~\ref{sec:numerical_verification} applied. Finally, the fluid properties adopted for these simulations represent nominal ambient-reference conditions, not a numerical campaign at $437\,\mathrm{bar}$ and $-40\,^{\circ}\mathrm{C}$.
+The wall-distance distribution is considered together with the realized boundary-layer mesh and the assumptions of the turbulence closure (Section~\ref{sec:numerical_verification}). The numerical results are evaluated for the reference-state properties defined in Chapter~\ref{ch:doe}; application to the broader pressure and temperature envelope of hydrogen refuelling requires a consistent thermodynamic description, as explained in Chapter~\ref{ch:efv_operation}.
+
+
+\section{Implications for Excess-Flow Valve Design}
+\label{sec:results_efv_implications}
+
+Pressure loss and axial hydrodynamic force must be interpreted together. For normal refuelling service, the pressure loss is part of the required system operating margin. The force acting on the obturator is one input to the potential closing motion of a spring-loaded EFV. A geometry that maximizes force is not necessarily suitable if it also produces an unacceptable restriction during intended flow \cite{white2016,crane410}.
+
+The hydrogen response tables illustrate this trade-off. At $15\,\mathrm{m\,s^{-1}}$, the computed pressure difference for obturator A is about $18.7$ times the value for obturator D, while its axial force is about $39.7$ times larger. The unequal ratios show that force cannot be obtained simply by multiplying the overall pressure loss by a single constant effective area. The three-dimensional distribution of surface pressure and shear contributes to the net load.
+
+For company-facing engineering comparison, a useful result presentation places $\Delta p(U_{\mathrm{in}})$ and $F_x(U_{\mathrm{in}})$ side by side, with explicit reference-state density and a consistent force-axis definition. The dimensionless responses and factorial contrasts derived in Chapter~\ref{ch:doe} then help distinguish effects of velocity, passage area and hole distribution. Closing performance also depends on the mechanical force balance established in Section~\ref{sec:efv_principle}; the reported steady fixed-obturator force is an input to that balance, not itself a dynamic trip prediction.
