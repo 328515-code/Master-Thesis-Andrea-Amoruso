@@ -1,7 +1,7 @@
 \chapter{Results and Post-Processing}
 \label{ch:results}
 
-The post-processing procedure is designed for the complete CFD parameter matrix, comprising two gases, three inlet velocities and four obturator geometries. The hydrogen results are used here as a worked engineering comparison of pressure drop and axial hydrodynamic force. The emphasis is on consistent response extraction, dimensional interpretation and the consequences of obturator geometry for excess-flow-valve design.
+The post-processing procedure is designed for the complete CFD parameter matrix, comprising two gases, three inlet velocities and four obturator geometries. The hydrogen results presented in this chapter use the ambient-reference property values of Table~\ref{tab:fluid_properties}, so the reported dimensional forces and pressure differences represent that baseline, \emph{not} the selected $430\,\mathrm{bar}$, $-40\,^{\circ}\mathrm{C}$ dispensing condition. The hydrogen results are used here as a worked engineering comparison of pressure drop and axial hydrodynamic force. The emphasis is on consistent response extraction, dimensional interpretation and the consequences of obturator geometry for excess-flow-valve design.
 
 \section{Structure of OpenFOAM Post-Processing Data}
 \label{sec:postprocessing_structure}
@@ -85,6 +85,13 @@ At solver iteration 3000, the maximum reported obturator-patch $y^+$ for geometr
 
 The wall-distance distribution is considered together with the realized boundary-layer mesh and the assumptions of the turbulence closure (Section~\ref{sec:numerical_verification}). The numerical results are evaluated for the reference-state properties defined in Chapter~\ref{ch:doe}; application to the broader pressure and temperature envelope of hydrogen refuelling requires a consistent thermodynamic description, as explained in Chapter~\ref{ch:efv_operation}.
 
+
+\section{Comparison Between Reference-State and Dispensing Conditions}
+\label{sec:results_operating_states}
+
+The ambient-reference CFD data offer a controlled way to examine the influence of hole geometry and inlet velocity, while the application of the EFV downstream of the pre-cooler motivates a distinct high-pressure, low-temperature analysis. To interpret the latter, the relevant densities and kinematic viscosities must be evaluated consistently at $430\,\mathrm{bar}$ absolute and $-40\,^{\circ}\mathrm{C}$, rather than using the ambient values from Table~\ref{tab:fluid_properties} \cite{nist_refprop_online}. Both sets of simulations can be analysed using the same pressure and force definitions, but the results should be labelled by thermodynamic state and must not be combined as if they represented equal mass-flow rates.
+
+In particular, dimensional pressure drop is obtained by multiplying the computed \emph{kinematic} pressure difference by the reference density for the corresponding case, and the \texttt{forces} function object already applies \texttt{rhoInf} to obtain the load in newtons. The two states may also have different Reynolds numbers at the same imposed inlet velocity. Interpretation within a refuelling protocol additionally requires attention to the variable delivery pressure and temperature rather than assuming one design point describes the entire fill \cite{sae_j2601,elgowainy2017}.
 
 \section{Implications for Excess-Flow Valve Design}
 \label{sec:results_efv_implications}
