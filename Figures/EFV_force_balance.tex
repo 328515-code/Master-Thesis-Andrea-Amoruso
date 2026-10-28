@@ -1,0 +1,19 @@
+% Conceptual free-body model and CFD outputs (same x-axis as the text).
+\begin{tikzpicture}[>=Latex,line width=0.8pt,
+  textnode/.style={font=\small,align=center}]
+\draw[fill=black!18,thick] (3.5,0) rectangle (4.1,2.0);
+\node[textnode] at (3.8,-0.43) {Movable obturator};
+\draw[->,line width=1.2pt] (0.3,1.35)--(3.1,1.35)
+ node[midway,above,textnode] {$F_{\mathrm{fluid},x}$};
+\draw[->,line width=1.2pt] (7.0,1.35)--(4.5,1.35)
+ node[midway,above,textnode] {$F_0+kx$};
+\draw[densely dotted] (0.0,0.75)--(7.0,0.75);
+\node[textnode] at (0.65,0.34) {$p_{\mathrm{in}}$};
+\node[textnode] at (6.40,0.34) {$p_{\mathrm{out}}$};
+\draw[->,thick] (3.7,-1.1)--(5.3,-1.1)
+ node[midway,below,font=\footnotesize] {$+x$ towards seat};
+\node[draw,rounded corners,inner sep=5pt,fill=black!3,textnode] at (3.6,-2.45)
+ {$m\ddot{x}=F_{\mathrm{fluid},x}-F_0-kx-F_{\mathrm{other}}$};
+\node[textnode] at (3.6,-3.2)
+ {Fixed-obturator CFD provides a load at prescribed position,\\not the transient displacement $x(t)$.};
+\end{tikzpicture}

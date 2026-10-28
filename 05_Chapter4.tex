@@ -35,6 +35,13 @@ For each discrete geometry, response curves can be displayed at the simulated in
 
 The intended hydrogen-refuelling use case brings pressures, temperatures and filling transients beyond the information contained in a single reference-state, incompressible CFD calculation. SAE~J2601 describes dispensing protocols and operating constraints, while ISO~19880-1 and ISO~19880-3 address station and valve safety \cite{sae_j2601,iso19880_1,iso19880_3}. Consequently, any input describing a new thermodynamic state must be associated with appropriately evaluated fluid density, viscosity and an assessment of compressibility. A change in pressure or temperature should not be represented solely by multiplying an existing force result by a density ratio, since Reynolds number and local flow structure may also change.
 
+\section{Reference-State Selection for Dispenser-Line Use}
+\label{sec:tool_430bar}
+
+The industrial application places the EFV downstream of the hydrogen pre-cooler, near the dispenser (Figure~\ref{fig:station_efv_location}). The primary application-oriented condition is approximately $430\,\mathrm{bar}$ absolute and $-40\,^{\circ}\mathrm{C}$, while the ambient-property runs provide a separate numerical reference. The software should therefore associate every CFD response with its gas, selected thermodynamic state, kinematic viscosity, force-reference density and inlet-velocity setting.
+
+For a user-specified operating state, the application must not simply convert an ambient result into a high-pressure prediction using a density multiplier. The Reynolds number, mass-flow equivalence and possible compressibility effects must be considered. If results obtained at different states are compared at equal velocity, the resulting mass-flow difference should be reported; if the engineering requirement instead specifies equal mass flow, the inlet velocity must be adjusted consistently \cite{white2016,nist_refprop_online}. The SAE~J2601 T40 context and ISO~19880-3 valve-safety scope define the intended application, but a fluid-dynamic comparison remains distinct from a certified EFV actuation or station-safety assessment \cite{sae_j2601,iso19880_3}.
+
 \section{Traceability and Presentation for Industrial Use}
 \label{sec:industrial_traceability}
 
