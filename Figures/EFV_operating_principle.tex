@@ -1,0 +1,43 @@
+% Conceptual schematic only; actual geometry and stroke depend on EFV design.
+\begin{tikzpicture}[>=Latex,line width=0.75pt,
+ lab/.style={font=\footnotesize,align=center},
+ flow/.style={->,line width=1.1pt}]
+\begin{scope}
+\node[font=\small\bfseries] at (3,3.25) {(a) Normal-flow condition};
+\draw[thick] (0,0.45)--(6.1,0.45) (0,2.55)--(6.1,2.55);
+\draw[thick] (0,0.45)--(0,2.55) (6.1,0.45)--(6.1,2.55);
+\draw[fill=black!22,thick] (2.6,1.02) rectangle (3.15,1.98);
+\draw[fill=black!40] (4.52,1.05) rectangle (4.72,1.95);
+\draw[thick] (3.15,1.5)--(3.4,1.5)--(3.58,1.78)--(3.82,1.22)--(4.05,1.78)--(4.3,1.22)--(4.52,1.5);
+\draw[flow] (-0.45,2.22)--(1.7,2.22);
+\draw[flow] (-0.45,0.78)--(1.7,0.78);
+\draw[flow] (3.3,2.22)--(5.7,2.22);
+\draw[flow] (3.3,0.78)--(5.7,0.78);
+\node[lab] at (1.05,2.87) {Inlet flow};
+\node[lab] at (2.78,-0.13) {Obturator};
+\node[lab] at (4.7,-0.13) {Seat};
+\node[lab] at (5.24,1.5) {Outlet};
+\draw[->] (2.9,2.82)--(3.55,2.82) node[midway,above,font=\scriptsize] {$F_{\mathrm{fluid},x}$};
+\draw[->] (4.3,2.82)--(3.75,2.82) node[midway,above,font=\scriptsize] {$F_{\mathrm{spring}}$};
+\end{scope}
+\begin{scope}[xshift=7.5cm]
+\node[font=\small\bfseries] at (3,3.25) {(b) Excess-flow tendency};
+\draw[thick] (0,0.45)--(6.1,0.45) (0,2.55)--(6.1,2.55);
+\draw[thick] (0,0.45)--(0,2.55) (6.1,0.45)--(6.1,2.55);
+\draw[fill=black!22,thick] (3.93,1.02) rectangle (4.48,1.98);
+\draw[fill=black!40] (4.52,1.05) rectangle (4.72,1.95);
+\draw[thick] (4.48,1.5)--(4.58,1.5);
+\draw[flow] (-0.5,2.19)--(2.3,2.19);
+\draw[flow] (-0.5,0.81)--(2.3,0.81);
+\draw[flow] (4.82,2.19)--(5.7,2.19);
+\draw[flow] (4.82,0.81)--(5.7,0.81);
+\draw[->,thick] (3.10,1.5)--(3.78,1.5);
+\node[lab] at (1.0,2.87) {Increased inlet flow};
+\node[lab] at (3.95,-0.13) {Obturator\\near seat};
+\node[lab] at (5.35,1.5) {Outlet};
+\node[lab] at (3.0,-0.58) {Motion towards closure};
+\draw[->,thick] (3.3,2.82)--(4.05,2.82) node[midway,above,font=\scriptsize] {$F_{\mathrm{fluid},x}$};
+\draw[->] (5.25,2.82)--(4.65,2.82) node[midway,above,font=\scriptsize] {$F_{\mathrm{spring}}$};
+\end{scope}
+\draw[->] (5.5,-0.95)--(7.4,-0.95) node[midway,below,font=\scriptsize] {$+x$: closure direction};
+\end{tikzpicture}
