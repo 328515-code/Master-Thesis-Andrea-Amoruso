@@ -45,12 +45,30 @@ $\mathrm{H}_2$ & $0.0838$ & $8.80\times10^{-6}$ & $1.05\times10^{-4}$\\
 $\mathrm{N}_2$ & $1.165$ & $1.76\times10^{-5}$ & $1.51\times10^{-5}$\\
 \bottomrule
 \end{tabular}
-\caption{Reference fluid properties used to define the DoE. The density is also needed when converting kinematic pressure or scaling forces consistently.}
+\caption{Ambient-reference gas properties ($20\,^{\circ}\mathrm{C}$, approximately $1\,\mathrm{atm}$) for the baseline CFD cases; these are not the properties of hydrogen at the selected high-pressure dispensing state.}
 \label{tab:fluid_properties}
 
 \end{table}
 
 The incompressible momentum solution depends on kinematic viscosity, and thus on the Reynolds number $Re=U_{\mathrm{in}}D_{\mathrm{in}}/\nu$. At equal inlet velocity and geometry, a comparison of the two gases changes this Reynolds number. Dimensional pressure losses and forces also depend on density, so a cross-fluid comparison must distinguish the kinematic flow response from its dimensional scaling. The atmospheric reference state is a modeling convention: the CFD case configurations use $\nu_{\mathrm{H}_2}=1.05\times10^{-4}$ and $\nu_{\mathrm{N}_2}=1.51\times10^{-5}\,\mathrm{m^2\,s^{-1}}$, while the force dictionaries use $\rho_{\mathrm{H}_2}=0.0838$ and $\rho_{\mathrm{N}_2}=1.165\,\mathrm{kg\,m^{-3}}$. Because \texttt{simpleFoam} solves a kinematic-pressure field with a relative pressure datum, an absolute pressure of $1\,\mathrm{atm}$ is not explicitly enforced through the \texttt{0/p} outlet value. The gas-property set, rather than the outlet reference-pressure datum, defines the reference-state approximation. In a hydrogen refuelling application, pressure and temperature can vary considerably during dispensing, so a separate fluid-property and compressibility assessment is required to extend the reference-state model to higher-pressure conditions \cite{sae_j2601,nist_refprop}.
+
+\subsection{High-Pressure, Low-Temperature Dispensing Reference}
+\label{sec:doe_highpressure_state}
+
+The industrial EFV is situated in the hydrogen delivery line \emph{after the pre-cooling heat exchanger and close to the dispenser}. This selected location makes a cold, high-pressure gas state a more representative physical reference than ambient conditions. The application-oriented design point is $p_{\mathrm{ref}}=430\,\mathrm{bar}$ (treated as absolute) and $T_{\mathrm{ref}}=-40\,^{\circ}\mathrm{C}$ ($233.15\,\mathrm{K}$); its choice and the connection with H35/H70 dispensing and T40 fuel-delivery conditions are explained in Section~\ref{sec:efv_reference_state} \cite{sae_j2601,elgowainy2017}.
+
+At the high-pressure reference state, density and viscosity must be calculated consistently at the same $(p,T)$, preferably from a real-fluid property model. In the constant-viscosity OpenFOAM implementation the required quantities are
+\begin{equation}
+\rho_{\mathrm{ref}}=\rho(p_{\mathrm{ref}},T_{\mathrm{ref}}),\quad
+\mu_{\mathrm{ref}}=\mu(p_{\mathrm{ref}},T_{\mathrm{ref}}),\quad
+\nu_{\mathrm{ref}}=\frac{\mu_{\mathrm{ref}}}{\rho_{\mathrm{ref}}}.
+\label{eq:highpressure_properties}
+\end{equation}
+For an incompressible \texttt{simpleFoam} case, $\nu_{\mathrm{ref}}$ enters the governing flow equations through the \texttt{physicalProperties} dictionary, whereas $\rho_{\mathrm{ref}}$ enters the dimensional load calculation through the \texttt{forces} function object's \texttt{rhoInf} parameter. A zero-reference outlet kinematic pressure is not equivalent to directly imposing an absolute pressure of $430\,\mathrm{bar}$ \cite{openfoam_user,nist_refprop_online}.
+
+Because the comparison here is velocity-controlled, the volumetric flow rate at a given inlet area is approximately $Q=U_{\mathrm{in}}A_{\mathrm{in}}$, while the mass flow rate is $\dot m=\rho_{\mathrm{ref}}Q$. Thus, the same velocity at ambient and high pressure \emph{does not} correspond to the same hydrogen mass-flow demand. The velocity-dependent Reynolds number also changes through $\nu_{\mathrm{ref}}$. Comparisons intended to reflect a fixed dispenser mass-flow demand should instead match $\dot m$ and adjust the inlet velocity for the selected density; this must be done consistently with the actual discretized inlet area and the validity range of the flow model.
+
+The ambient-reference data in Table~\ref{tab:fluid_properties} remain useful as a separate baseline for sensitivity analysis. Their densities, viscosities and dimensional forces are not transferred unchanged to the $430\,\mathrm{bar}$, $-40\,^{\circ}\mathrm{C}$ cases. Any extension to strongly nonuniform pressure and temperature fields also requires reconsideration of the constant-density approximation.
 
 \subsection{Inlet Velocity Levels and Reference Flow Rates}
 The three inlet velocities selected for the present study are $5$, $10$ and $15\,\mathrm{m\,s^{-1}}$. These levels provide three distinct flow-demand conditions with a common reference geometry, enabling sensitivity to velocity to be assessed without changing the valve architecture. They are numerical factors rather than direct assignments to particular SAE~J2601 refuelling events or to a calibrated mechanical trip flow. Such assignments would require the relevant station-level flow requirement and a valve spring-force specification \cite{sae_j2601}.
