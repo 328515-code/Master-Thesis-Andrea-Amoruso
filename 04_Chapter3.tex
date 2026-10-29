@@ -23,7 +23,7 @@ The submitted dictionaries give $\rho_{\mathrm{H}_2}=33.77\,\mathrm{kg\,m^{-3}}$
 \section{Data Reduction and Terminal Numerical Behaviour}
 \label{sec:plotly_dashboard}
 
-The \texttt{simpleFoam} output index represents solver iteration, not elapsed physical time. All 24 supplied configurations have pressure and force histories reaching iteration 3000. To apply a reproducible comparison to each case, the final 301 samples (indices 2700--3000 inclusive) were extracted. For a numerical response $R_i$, the arithmetic mean and the coefficient of variation are
+The \texttt{simpleFoam} output index represents solver iteration, not elapsed physical time. Twenty-three of the supplied configurations have pressure and force histories extending to iteration~3000. The updated nitrogen case with obturator A at $5\,\mathrm{m\,s^{-1}}$ contains records only through iteration~1372. To apply a reproducible comparison, the last 301 samples of each case were extracted: indices 2700--3000 for the 23 longer histories and 1072--1372 for the corrected nitrogen case. These are iteration indices, not elapsed physical seconds. For a numerical response $R_i$, the arithmetic mean and the coefficient of variation are
 \begin{equation}
 \overline{R}=\frac{1}{N}\sum_{i=1}^{N}R_i,
 \qquad
@@ -93,7 +93,7 @@ Pressure loss and force increase strongly with inlet speed for every configurati
 
 Hydrogen is the actual refuelling fuel and retains priority in the design interpretation. Nitrogen was included as a second working fluid because it is a familiar industrial gas in hydrogen-system purging and inerting procedures; its inclusion broadens the physical-property comparison without making it a substitute for hydrogen in fuel delivery \cite{h2tools_purging,doe_hydrogen_practices}. Nitrogen and hydrogen differ substantially in density, viscosity and resulting Reynolds number at the same imposed velocity.
 
-The nitrogen results are reported in Tables~\ref{tab:nitrogen_pressure} and~\ref{tab:nitrogen_force}. One data-integrity qualification is necessary. In the supplied archive, the nitrogen case with obturator A at $5\,\mathrm{m\,s^{-1}}$ has force, pressure, inlet-flow and $y^+$ histories \emph{identical at the byte level} to the corresponding hydrogen outputs, despite using different physical-property settings in the case dictionaries. Therefore, its numerical response cannot be considered independently established; the tables identify that entry as not independently assessable.
+The nitrogen results are reported in Tables~\ref{tab:nitrogen_pressure} and~\ref{tab:nitrogen_force}. The corrected numerical output for obturator A at $5\,\mathrm{m\,s^{-1}}$ has been independently checked against the hydrogen data and no longer contains the previously duplicated histories. It uses the active nitrogen properties $\rho_{\mathrm{N}_2}=481.352\,\mathrm{kg\,m^{-3}}$ and $\nu_{\mathrm{N}_2}=7.932\times10^{-8}\,\mathrm{m^2\,s^{-1}}$. However, its output ends at iteration~1372 rather than~3000; consequently, the reported means are calculated over iterations 1072--1372. Its pressure-loss and force coefficients of variation over this final 301-sample interval are approximately $0.759\%$ and $0.723\%$, respectively. The shorter numerical history is retained as a transparent qualification, not interpreted as proof of convergence.
 
 \begin{table}[htbp]
 \centering
@@ -101,12 +101,12 @@ The nitrogen results are reported in Tables~\ref{tab:nitrogen_pressure} and~\ref
 \toprule
 $U_{\mathrm{in}}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} & \textbf{Obt.\ C} & \textbf{Obt.\ D}\\
 \midrule
-5 & n.a. & 52.61 & 130.74 & 24.90\\
+5 & 471.72 & 52.61 & 130.74 & 24.90\\
 10 & 1877.86 & 206.79 & 526.50 & 99.30\\
 15 & 4225.06 & 466.30 & 1178.52 & 224.35\\
 \bottomrule
 \end{tabular}
-\caption{Nitrogen: mean pressure loss $\overline{\Delta p}$ [kPa] at the high-pressure reference state, iterations 2700--3000. The 5 m/s obturator-A output is excluded due to duplicated source histories.}
+\caption{Nitrogen: mean pressure loss $\overline{\Delta p}$ [kPa] at the high-pressure reference state. The averaging window is iterations 2700--3000 except for obturator A at $5\,\mathrm{m\,s^{-1}}$, which uses iterations 1072--1372 of the corrected shorter run.}
 \label{tab:nitrogen_pressure}
 \end{table}
 
@@ -116,12 +116,12 @@ $U_{\mathrm{in}}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} &
 \toprule
 $U_{\mathrm{in}}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} & \textbf{Obt.\ C} & \textbf{Obt.\ D}\\
 \midrule
-5 & n.a. & 7.125 & 20.732 & 2.383\\
+5 & 79.462 & 7.125 & 20.732 & 2.383\\
 10 & 316.116 & 28.051 & 83.294 & 9.844\\
 15 & 711.635 & 62.492 & 187.091 & 21.799\\
 \bottomrule
 \end{tabular}
-\caption{Nitrogen: mean total axial force $\overline{F}_x$ [N] at the high-pressure reference state, iterations 2700--3000. The 5 m/s obturator-A output is excluded due to duplicated source histories.}
+\caption{Nitrogen: mean total axial force $\overline{F}_x$ [N] at the high-pressure reference state. The averaging window is iterations 2700--3000 except for obturator A at $5\,\mathrm{m\,s^{-1}}$, which uses iterations 1072--1372 of the corrected shorter run.}
 \label{tab:nitrogen_force}
 \end{table}
 
@@ -130,7 +130,7 @@ The magnitude of the nitrogen loads is generally much greater than that of hydro
 \section{Near-Wall Diagnostics and Numerical Interpretation}
 \label{sec:near_wall_verification}
 
-The final post-processing outputs include minimum, maximum and average wall-distance values for the selected patches. At iteration 3000, the maximum $y^+$ reported on the obturator ranges from approximately 156 to 1256 across the hydrogen cases. The nitrogen cases exhibit larger maxima, exceeding 4000 in the most restrictive and highest-velocity combination. These values warrant careful interpretation of near-wall turbulence modelling, viscous loads and wall-layer resolution: they cannot be used as evidence that all surfaces are resolved with $y^+\approx1$ \cite{menter1994,openfoam_user}.
+The final post-processing outputs include minimum, maximum and average wall-distance values for the selected patches. At iteration 3000, the maximum $y^+$ reported on the obturator ranges from approximately 156 to 1256 across the hydrogen cases. The nitrogen cases exhibit larger maxima, exceeding 4000 in the most restrictive and highest-velocity combination. For the corrected nitrogen case at $5\,\mathrm{m\,s^{-1}}$ with obturator A, the last $y^+$ record is at iteration~1300, where the obturator-patch maximum is approximately 1450. These values warrant careful interpretation of near-wall turbulence modelling, viscous loads and wall-layer resolution: they cannot be used as evidence that all surfaces are resolved with $y^+\approx1$ \cite{menter1994,openfoam_user}.
 
 The results are numerical terminal-window estimates, not experimental validation of EFV trip behavior. Residual histories, outlet-flux balance, mesh independence and local passage velocity are distinct verification quantities. For hydrogen, the greatest terminal fluctuation occurs in obturator B at the higher velocities. For nitrogen, the maximum pressure loss of approximately $4.23\,\mathrm{MPa}$ represents about $9.7\%$ of the nominal $43.7\,\mathrm{MPa}$ reference pressure, making constant density more consequential for the secondary gas comparison. Even when an overall pressure ratio is moderate, local Mach number may increase in the narrow passages \cite{anderson2017}.
 
