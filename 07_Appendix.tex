@@ -3,7 +3,7 @@
 
 \section{Illustrative DoE Case Generator (\texttt{doe\_generator.py})}
 \label{sec:app_doe_gen}
-The following illustrative example uses the factor levels and gas-property settings selected for the numerical study. It is a reconstruction for documentation, \emph{not} a claim that this is the exact script originally used to generate or submit the cases. The example requires a clean \texttt{CASE\_BASE} template containing the tokens \texttt{FLUX\_VALUE} and \texttt{NU\_VALUE}.
+The following illustrative example uses the factor levels and high-pressure gas-property settings from the final numerical study (nominal $437\,\mathrm{bar}$ and $233\,\mathrm{K}$). It is included for reproducibility of the case-generation logic and gives priority to hydrogen as the intended vehicle-refuelling gas. Nitrogen is treated as a complementary fluid. It is a reconstruction for documentation, \emph{not} a claim that this is the exact script originally used to generate or submit the cases. The example requires a clean \texttt{CASE\_BASE} template containing the tokens \texttt{FLUX\_VALUE} and \texttt{NU\_VALUE}.
 
 \begin{lstlisting}[language=Python,caption={Illustrative Python generator for 24 cases with consistent gas properties.}, captionpos=b]
 from pathlib import Path
@@ -11,8 +11,8 @@ import shutil
 import re
 
 fluids = {
-    "H2": {"nu": "1.05e-04", "rho": "0.0838"},
-    "N2": {"nu": "1.51e-05", "rho": "1.165"},
+    "H2": {"nu": "2.709e-07", "rho": "33.77"},
+    "N2": {"nu": "7.932e-08", "rho": "481.352"},
 }
 velocities = [5, 10, 15]
 geometries = {

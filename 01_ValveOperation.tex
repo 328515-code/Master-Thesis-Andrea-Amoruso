@@ -29,16 +29,18 @@ Pre-cooling is relevant to fast vehicle refuelling because compression of the ga
 
 A representative reference state for this component-level investigation is therefore selected as
 \begin{equation}
-  p_{\mathrm{ref}}=430\,\mathrm{bar}=43.0\,\mathrm{MPa},
+  p_{\mathrm{ref}}=437\,\mathrm{bar}=43.7\,\mathrm{MPa},
   \qquad
-  T_{\mathrm{ref}}=-40\,^{\circ}\mathrm{C}=233.15\,\mathrm{K}.
+  T_{\mathrm{ref}}\simeq-40\,^{\circ}\mathrm{C}=233\,\mathrm{K}.
   \label{eq:efv_reference_state}
 \end{equation}
-The pressure is treated as \emph{absolute} in the thermophysical-property evaluation; if the industrial pressure specification is instead given in bar gauge, the absolute pressure must first be established. The selected pair represents a specified design operating point, \emph{not} a pressure--temperature requirement universally imposed by SAE~J2601 or a claim that pressure remains constant throughout an entire fill. In particular, $430\,\mathrm{bar}$ should not be mistaken for the complete operating envelope of an H70 dispenser.
+The pressure is treated as \emph{absolute} in the thermophysical-property evaluation; if the industrial pressure specification is instead given in bar gauge, the absolute pressure must first be established. The selected pair represents a specified design operating point, \emph{not} a pressure--temperature requirement universally imposed by SAE~J2601 or a claim that pressure remains constant throughout an entire fill. In particular, $437\,\mathrm{bar}$ should not be mistaken for the complete operating envelope of an H70 dispenser.
+
+This $437\,\mathrm{bar}$ state corresponds to the reference setting adopted in the final simulation files, rather than an additional storage-folder identifier or a mandatory condition specified by SAE~J2601. The reference values in the final OpenFOAM dictionaries are $\rho_{\mathrm{H}_2}=33.77\,\mathrm{kg\,m^{-3}}$ and $\nu_{\mathrm{H}_2}=2.709\times10^{-7}\,\mathrm{m^2\,s^{-1}}$, with the corresponding secondary nitrogen settings documented in Chapter~\ref{ch:doe}.
 
 At this state, hydrogen is a dense, high-pressure gas and its density cannot reliably be inferred from the ideal-gas equation alone. Both $\rho(p,T)$ and the dynamic viscosity $\mu(p,T)$ should be determined using a consistent real-fluid database or correlation, such as NIST REFPROP, before assigning the constant kinematic viscosity $\nu=\mu/\rho$ and the reference density used by OpenFOAM's force calculation \cite{nist_refprop,nist_refprop_online}. The reference pressure is \emph{not} imposed merely by setting the kinematic outlet pressure to zero in the incompressible solver; it is represented indirectly by selecting the thermodynamic-state-dependent fluid properties.
 
-The high-pressure, low-temperature calculations are intended to provide the principal application-oriented comparison for the EFV. Atmospheric-reference calculations can serve as a secondary sensitivity study, but are not interchangeable with cold, pressurized dispensing conditions. At the same imposed velocity and geometry, the mass flow rate $\dot m=\rho U A$ differs with density, while changes in kinematic viscosity alter the Reynolds number and potentially the computed flow structure. The numerical modelling implications are developed in Chapter~\ref{ch:numerical_setup}; the full high-pressure response analysis is treated separately from the established ambient-reference results.
+The completed high-pressure, low-temperature calculations provide the principal application-oriented comparison for the EFV. Atmospheric-reference calculations can serve as a secondary sensitivity study, but are not interchangeable with cold, pressurized dispensing conditions. At the same imposed velocity and geometry, the mass flow rate $\dot m=\rho U A$ differs with density, while changes in kinematic viscosity alter the Reynolds number and potentially the computed flow structure. The numerical modelling implications are developed in Chapter~\ref{ch:numerical_setup}; the full high-pressure response analysis is treated separately from the established ambient-reference results.
 
 \section{Operating Principle of a Passive Excess-Flow Valve}
 \label{sec:efv_principle}
