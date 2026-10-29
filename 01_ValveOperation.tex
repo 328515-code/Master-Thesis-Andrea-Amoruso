@@ -1,46 +1,48 @@
-\chapter{Excess-Flow Valves and Their Role in Hydrogen Refuelling}
+\chapter{Excess-Flow Valves in Hydrogen refueling}
 \label{ch:efv_operation}
 
-\section{Hydrogen Refuelling Infrastructure and Safety Functions}
-\label{sec:refuelling_context}
+\section{Hydrogen Refueling Infrastructure and Safety Functions}
+\label{sec:Refueling_context}
 
-The design of an excess-flow valve (EFV) needs to be considered in the context of the system in which it operates. A gaseous hydrogen refuelling station typically brings together a hydrogen supply, compression and buffer-storage equipment, temperature-control devices, and a dispensing unit connected to the vehicle through a hose and nozzle. ISO~19880-1 defines general safety and performance requirements for gaseous hydrogen fuelling stations, including these principal subsystems \cite{iso19880_1}. The station must deliver the intended flow during a normal fill while retaining the ability to limit or isolate releases following a malfunction.
+The design of an excess-flow valve (EFV) needs to be considered in the context of the system in which it operates. A gaseous hydrogen Refueling station typically brings together a hydrogen supply, compression and buffer-storage equipment, temperature-control devices, and a dispensing unit connected to the vehicle through a hose and nozzle, as the ISO~19880-1 indicates \cite{iso19880_1}. The station must deliver the intended flow during a normal fill while maintaining the ability to limit or isolate releases after a malfunction.
 
 
 \begin{figure}[htbp]
 \centering
 \resizebox{\textwidth}{!}{\input{Figures/EFV_station_location.tex}}
-\caption{Conceptual hydrogen-refuelling flow path and the selected location of the investigated EFV downstream of the pre-cooler, near the dispenser. This location is specified by the industrial application; the figure is illustrative and does not prescribe a station layout required by ISO~19880-1 \cite{iso19880_1,nrel_csd2014}.}
+\caption{Hydrogen refueling system flow path scheme with highlighted location of the EFV}
 \label{fig:station_efv_location}
 \end{figure}
 
-For light-duty vehicle refuelling, SAE~J2601 specifies fuelling protocols for the H35 and H70 nominal pressure classes, corresponding to $35$ and $70\,\mathrm{MPa}$, and identifies fuel-delivery temperature categories T20, T30 and T40. The T40 designation refers to a nominal fuel-delivery temperature of $-40\,^{\circ}\mathrm{C}$. The fuelling protocol constrains quantities such as mass-flow rate, pressure-rise rate, delivery temperature and end pressure; these are system-level operating limits rather than boundary conditions automatically reproduced by a valve-scale CFD model \cite{sae_j2601}. In practice, the gas pressure and temperature change during a filling event. Their values must therefore be specified for the operating point being investigated.
+For normal duty vehicles refueling, SAE~J2601 specifies fueling protocols for the H35 and H70 nominal pressure classes, corresponding to $35$ and $70\,\mathrm{MPa}$, and identifies fuel delivery temperature categories T20, T30 and T40. The T40 designation refers to a nominal fuel-delivery temperature of $-40\,^{\circ}\mathrm{C}$. The fueling protocol constrains also quantities such as mass-flow rate, pressure-rise rate, delivery temperature and end pressure, these values will be used as references for the successive CFD simulation \cite{sae_j2601}. Gas pressure and temperature change during a filling event, this requires to specify which system section is studied.
 
-An EFV is one element of a wider protective arrangement. ISO~19880-3, which addresses valve safety performance for gaseous hydrogen fuelling stations, includes EFVs among several distinct valve categories, alongside check valves, flow-control valves, breakaway devices, pressure safety valves and actuated shut-off valves \cite{iso19880_3}. An EFV limits abnormal \emph{forward} flow; a check valve prevents reverse flow, while an emergency shut-off function responds to a commanded or detected hazardous condition. A hose breakaway device addresses the specific mechanical separation of the dispenser connection. These functions are complementary and should not be represented as interchangeable \cite{iso19880_1,iso19880_3,h2tools_valves}.
+An EFV is just one element of a wider protective arrangement, alongside check valves, flow-control valves, breakaway devices, pressure safety valves and actuated shut-off valves \cite{iso19880_3}. 
+In particular the purpose of an EFV is limiting abnormal \emph{forward} flow; while check valves prevent reverse flow and emergency shut-off, instead an hose breakaway addresses the specific mechanical separation of the dispenser connection. These functions are complementary and should not be represented as interchangeable \cite{iso19880_1,iso19880_3,h2tools_valves}.
 
-From a component-design perspective, the relevant questions are not limited to whether a valve can shut off flow. The engineer must also consider the pressure loss in normal service, the repeatability of its response, the influence of gas properties, and whether the required hydrodynamic force can be generated at the intended excess-flow condition. These competing requirements motivate the geometrical and fluid-dynamic comparisons developed in the following chapters.
+From a component design perspective, the relevant questions are not limited to whether a valve can shut off flow. The engineer must also consider the pressure loss in normal service, the repeatability of its response, the influence of gas properties, and whether the required hydrodynamic force can be generated at the intended excess-flow condition. These competing requirements motivate the geometrical and fluid-dynamic comparisons developed in the following chapters.
 
 \section{EFV Installation Point and Reference Operating State}
 \label{sec:efv_reference_state}
 
-For the industrial application addressed in this thesis, the excess-flow valve is located \emph{downstream of the pre-cooling heat exchanger, in the high-pressure delivery line close to the dispenser}, as indicated in Figure~\ref{fig:station_efv_location}. This component position is a project requirement provided for the present design; it must not be interpreted as a statement that ISO~19880-3 requires every gaseous-hydrogen station to place its EFV at this exact location. The standard establishes requirements and test methods for high-pressure hydrogen-station valves, including excess-flow valves, and distinguishes several valve functions \cite{iso19880_3}.
+For the industrial application addressed in this thesis, the excess-flow valve is located \emph{downstream of the pre-cooling heat exchanger, in the high-pressure delivery line close to the dispenser}, as indicated in Figure~\ref{fig:station_efv_location}, this is not a normative required location. The standard only establishes requirements and test methods for high-pressure hydrogen-station valves, including excess-flow valves, and distinguishes several valve functions \cite{iso19880_3}.
 
-Pre-cooling is relevant to fast vehicle refuelling because compression of the gas in the on-board storage system raises its temperature during filling. SAE~J2601 addresses H35 ($35\,\mathrm{MPa}$ nominal working pressure) and H70 ($70\,\mathrm{MPa}$) vehicle storage and defines the T40 delivery-temperature category. Pre-cooling stations are commonly arranged so that a heat exchanger conditions the hydrogen before it passes towards the dispenser \cite{sae_j2601,elgowainy2017,iso19880_1}. Consequently, ambient-temperature hydrogen properties are not representative of the selected valve's intended cold delivery-line condition.
+Pre-cooling is a relevant aspect for fast vehicle refueling because compression of the gas in the on-board storage system raises its temperature during filling. The normative SAE~J2601 addresses H35 ($35\,\mathrm{MPa}$ nominal working pressure) and H70 ($70\,\mathrm{MPa}$) vehicle storage and defines the T40 delivery-temperature category. Pre-cooling stations are usually arranged so that a heat exchanger conditions the hydrogen before it passes to the dispenser \cite{sae_j2601,elgowainy2017,iso19880_1}. Therefore, ambient Hydrogen properties are not representative of the selected valve's intended cold delivery-line condition.
 
-A representative reference state for this component-level investigation is therefore selected as
+A representative reference state for the pursued investigation is therefore selected as:
 \begin{equation}
   p_{\mathrm{ref}}=437\,\mathrm{bar}=43.7\,\mathrm{MPa},
   \qquad
   T_{\mathrm{ref}}\simeq-40\,^{\circ}\mathrm{C}=233\,\mathrm{K}.
   \label{eq:efv_reference_state}
 \end{equation}
-The pressure is treated as \emph{absolute} in the thermophysical-property evaluation; if the industrial pressure specification is instead given in bar gauge, the absolute pressure must first be established. The selected pair represents a specified design operating point, \emph{not} a pressure--temperature requirement universally imposed by SAE~J2601 or a claim that pressure remains constant throughout an entire fill. In particular, $437\,\mathrm{bar}$ should not be mistaken for the complete operating envelope of an H70 dispenser.
 
-This $437\,\mathrm{bar}$ state corresponds to the reference setting adopted in the final simulation files, rather than an additional storage-folder identifier or a mandatory condition specified by SAE~J2601. The reference values in the final OpenFOAM dictionaries are $\rho_{\mathrm{H}_2}=33.77\,\mathrm{kg\,m^{-3}}$ and $\nu_{\mathrm{H}_2}=2.709\times10^{-7}\,\mathrm{m^2\,s^{-1}}$, with the corresponding secondary nitrogen settings documented in Chapter~\ref{ch:doe}.
+The selected pair represents a specified design operating point, \emph{not} a pressure--temperature requirement universally imposed by SAE~J2601 or a claim that pressure remains constant throughout an entire fill. In particular, $437\,\mathrm{bar}$ should not be mistaken for the complete operating envelope of an H70 dispenser.
 
-At this state, hydrogen is a dense, high-pressure gas and its density cannot reliably be inferred from the ideal-gas equation alone. Both $\rho(p,T)$ and the dynamic viscosity $\mu(p,T)$ should be determined using a consistent real-fluid database or correlation, such as NIST REFPROP, before assigning the constant kinematic viscosity $\nu=\mu/\rho$ and the reference density used by OpenFOAM's force calculation \cite{nist_refprop,nist_refprop_online}. The reference pressure is \emph{not} imposed merely by setting the kinematic outlet pressure to zero in the incompressible solver; it is represented indirectly by selecting the thermodynamic-state-dependent fluid properties.
+This $437\,\mathrm{bar}$ state corresponds to the reference setting adopted in the final simulation files, rather than an additional storage-folder identifier or a mandatory condition specified by SAE~J2601, it is used because the current project continues the work done for a manufacturer that required this specific state of the fluid.
 
-The completed high-pressure, low-temperature calculations provide the principal application-oriented comparison for the EFV. Atmospheric-reference calculations can serve as a secondary sensitivity study, but are not interchangeable with cold, pressurized dispensing conditions. At the same imposed velocity and geometry, the mass flow rate $\dot m=\rho U A$ differs with density, while changes in kinematic viscosity alter the Reynolds number and potentially the computed flow structure. The numerical modelling implications are developed in Chapter~\ref{ch:numerical_setup}; the full high-pressure response analysis is treated separately from the established ambient-reference results.
+So, the reference values in the final OpenFOAM dictionaries are $\rho_{\mathrm{H}_2}=33.77\,\mathrm{kg\,m^{-3}}$ and $\nu_{\mathrm{H}_2}=2.709\times10^{-7}\,\mathrm{m^2\,s^{-1}}$, with the corresponding secondary nitrogen settings documented in Chapter~\ref{ch:doe}.
+
+At this state, Hydrogen is a dense, high-pressure gas and its density cannot reliably be inferred from the ideal-gas equation alone. Both $\rho(p,T)$ and the dynamic viscosity $\mu(p,T)$ should be determined using a consistent real-fluid database or correlation, such as NIST REFPROP, before assigning the constant kinematic viscosity $\nu=\mu/\rho$ and the reference density used by OpenFOAM's force calculation \cite{nist_refprop,nist_refprop_online}. It is important ot underline that the reference pressure is \emph{not} imposed by setting the kinematic outlet pressure to zero in the incompressible solver but is represented indirectly by selecting the fluid properties $\rho(p,T)$ $\And$ $\mu(p,T)$.
 
 \section{Operating Principle of a Passive Excess-Flow Valve}
 \label{sec:efv_principle}
@@ -65,7 +67,7 @@ During normal operation, the movable element remains away from its shut-off seat
 \end{equation}
 where $\mathbf{n}$ is the outward surface normal of the solid into the fluid, $p$ is static pressure and $\boldsymbol{\tau}$ is the viscous stress tensor; the pressure-force sign depends on the chosen normal orientation \cite{white2016,moukalled2016}. For a component that translates approximately along the valve axis, its axial component is the quantity most directly related to the tendency to close or open the flow passage.
 
-A well-designed EFV should exhibit an acceptable pressure loss in this state. A restrictive geometry may produce greater fluid load, but it can also increase pumping or compression demand and may affect the refuelling-system flow-control margin. The present study therefore evaluates both pressure difference and obturator load rather than treating force maximisation as the only design objective.
+A well-designed EFV should exhibit an acceptable pressure loss in this state. A restrictive geometry may produce greater fluid load, but it can also increase pumping or compression demand and may affect the Refueling-system flow-control margin. The present study therefore evaluates both pressure difference and obturator load rather than treating force maximisation as the only design objective.
 
 \subsection{Excess-flow condition and motion towards closure}
 
@@ -90,7 +92,7 @@ Closure becomes mechanically possible when the flow-induced load overcomes the e
 
 \subsection{Shut-off, residual flow and resetting}
 
-Depending on the valve design, seating may almost stop the gas flow or leave a calibrated residual leakage path. Some EFVs use a bleed-by passage to equalise pressure after the downstream fault has been removed, allowing the spring to return the element to the open position. Other designs require a deliberate manual reset. The resetting strategy and the magnitude of any bypass flow are therefore design-specific rather than universal properties of all EFVs \cite{honeywell_efv,linde_efv,teco_efv}. In a refuelling installation these details affect maintenance, fault recovery and the coordination between passive and actively controlled safety devices.
+Depending on the valve design, seating may almost stop the gas flow or leave a calibrated residual leakage path. Some EFVs use a bleed-by passage to equalise pressure after the downstream fault has been removed, allowing the spring to return the element to the open position. Other designs require a deliberate manual reset. The resetting strategy and the magnitude of any bypass flow are therefore design-specific rather than universal properties of all EFVs \cite{honeywell_efv,linde_efv,teco_efv}. In a Refueling installation these details affect maintenance, fault recovery and the coordination between passive and actively controlled safety devices.
 
 \section{Design Parameters and Fluid-Dynamic Trade-offs}
 \label{sec:efv_design_parameters}
@@ -131,9 +133,9 @@ Obturator position & Alters effective passage area and pressure distribution & C
 \label{tab:efv_design_tradeoffs}
 \end{table}
 
-\section{Scope of the CFD Study within the Refuelling Application}
+\section{Scope of the CFD Study within the Refueling Application}
 \label{sec:efv_cfd_scope}
 
 The present numerical investigation isolates a fixed obturator in a three-dimensional internal-flow domain. For each chosen gas, inlet velocity and geometry, it estimates the pressure-loss response, the axial force component and related flow-field quantities. These outputs are directly relevant to the fluid-dynamic part of an EFV design assessment and can inform selection among candidate hole configurations.
 
-The work does \emph{not} simulate a complete refuelling-station filling sequence. In particular, SAE~J2601 fuel-delivery temperatures and nominal pressure classes define an \emph{application context}, not proof that a steady, constant-density calculation using reference-state properties reproduces every refuelling condition \cite{sae_j2601}. A subsequent component qualification would also need to address the pressure and temperature rating, sealing behaviour, materials compatibility, transient response and the applicable test procedures of ISO~19880-3 \cite{iso19880_3}. This distinction permits useful CFD-based design comparisons without claiming that computational force predictions alone demonstrate an approved safety component.
+The work does \emph{not} simulate a complete Refueling-station filling sequence. In particular, SAE~J2601 fuel-delivery temperatures and nominal pressure classes define an \emph{application context}, not proof that a steady, constant-density calculation using reference-state properties reproduces every Refueling condition \cite{sae_j2601}. A subsequent component qualification would also need to address the pressure and temperature rating, sealing behaviour, materials compatibility, transient response and the applicable test procedures of ISO~19880-3 \cite{iso19880_3}. This distinction permits useful CFD-based design comparisons without claiming that computational force predictions alone demonstrate an approved safety component.
