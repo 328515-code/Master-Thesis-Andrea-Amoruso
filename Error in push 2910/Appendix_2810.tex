@@ -1,0 +1,220 @@
+\chapter{Codes and Automation Scripts}
+\label{ch:appendix_codes}
+
+\section{Illustrative DoE Case Generator (\texttt{doe\_generator.py})}
+\label{sec:app_doe_gen}
+The following illustrative example uses the factor levels and gas-property settings selected for the numerical study. It is a reconstruction for documentation, \emph{not} a claim that this is the exact script originally used to generate or submit the cases. The example requires a clean \texttt{CASE\_BASE} template containing the tokens \texttt{FLUX\_VALUE} and \texttt{NU\_VALUE}.
+
+\begin{lstlisting}[language=Python,caption={Illustrative Python generator for 24 cases with consistent gas properties.}, captionpos=b]
+from pathlib import Path
+import shutil
+import re
+
+fluids = {
+    "H2": {"nu": "1.05e-04", "rho": "0.0838"},
+    "N2": {"nu": "1.51e-05", "rho": "1.165"},
+}
+velocities = [5, 10, 15]
+geometries = {
+    "A": "3Fori_1p5mm.stl",
+    "B": "3Fori_3mm.stl",
+    "C": "6Fori_1p5mm.stl",
+    "D": "6Fori_3mm.stl",
+}
+
+base_case = Path("CASE_BASE")
+geometry_dir = Path("Geometrie_STL")
+output_dir = Path("DoE_Cases")
+output_dir.mkdir(parents=True, exist_ok=True)
+
+def replace_token(path, token, replacement):
+    text = path.read_text()
+    if token not in text:
+        raise ValueError(f"Missing token {token}: {path}")
+    path.write_text(text.replace(token, replacement))
+
+def set_active_density(path, density):
+    text = path.read_text()
+    # Match only an uncommented, active rhoInf entry.
+    new_text, n = re.subn(
+        r"(?m)^(\s*)rhoInf\s+[^;]+;",
+        lambda match: match.group(1) + f"rhoInf {density};",
+        text,
+    )
+    if n != 1:
+        raise ValueError(f"Expected one active rhoInf: {path}")
+    path.write_text(new_text)
+
+for gas, props in fluids.items():
+    for u in velocities:
+        for label, stl_name in geometries.items():
+            name = f"Sim_{gas}_Flux{u:02d}_Obt_{label}"
+            case = output_dir / gas / name
+            case.parent.mkdir(parents=True, exist_ok=True)
+            if case.exists():
+                raise FileExistsError(case)
+            shutil.copytree(base_case, case)
+            shutil.copyfile(
+                geometry_dir / stl_name,
+                case / "constant/geometry/wallObt.stl",
+            )
+            replace_token(
+                case / "0/include/initialConditions",
+                "FLUX_VALUE", str(u),
+            )
+            replace_token(
+                case / "constant/physicalProperties",
+                "NU_VALUE", props["nu"],
+            )
+            set_active_density(
+                case / "system/forces", props["rho"],
+            )
+print("Prepared 24 DoE cases; submission is a separate step.")
+\end{lstlisting}
+
+\section{SLURM Execution and Maintenance Scripts (Bash)}
+\label{sec:app_slurm_scripts}
+\begin{lstlisting}[language=bash, caption={Full meshing and solving SLURM submission script (\texttt{run\_aries.sh}).}, captionpos=b]
+#!/bin/bash
+#SBATCH --account=fluids
+#SBATCH --partition=high
+#SBATCH --time=23:59:59
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=52
+#SBATCH --mem=490g
+#SBATCH --job-name=CEDEM
+#SBATCH --exclusive
+#SBATCH --exclude=cnode[06,17,19]
+
+module load gcc-12.1.1/gcc
+module load gcc-12.1.1/ompi-4.1.5_nccl
+
+source $HOME/OpenFOAM-10/etc/bashrc
+
+TOTAL_TASKS=$((SLURM_NTASKS_PER_NODE * SLURM_NNODES))
+echo "numberOfSubdomains $TOTAL_TASKS;" > system/numProcs
+
+blockMesh
+surfaceFeatures
+decomposePar -copyZero -force
+mpirun -np $TOTAL_TASKS snappyHexMesh -overwrite -parallel > out_mesh
+mpirun -np $TOTAL_TASKS simpleFoam -parallel > out_run
+\end{lstlisting} %
+
+\section{Remote Post-Processing Extraction (\texttt{download\_postprocessing.py})}
+\label{sec:app_scp_script}
+The following example illustrates directory-preserving retrieval of post-processing results for the two gases. The paths are generic placeholders to be configured for the execution environment, rather than a record of where the simulation files were stored. The same retrieval structure can be applied to every case of the factorial design.
+
+\begin{lstlisting}[language=Python,caption={Illustrative SCP retrieval of each case's post-processing output.}, captionpos=b]
+from pathlib import Path
+import subprocess
+
+user_and_host = "fluids11@hpc.unimo.lan"
+remote_root = "/path/to/DoE_Cases"
+local_root = Path("DoE_Cases")
+
+for gas in ("Hydrogen", "Nitrogen"):
+    folder = local_root / gas
+    for case in sorted(folder.glob("Sim_*")):
+        remote = (
+            f"{user_and_host}:{remote_root}/{gas}/"
+            f"{case.name}/postProcessing"
+        )
+        subprocess.run(
+            ["scp", "-r", remote, str(case)],
+            check=True,
+        )
+\end{lstlisting}
+
+\section{Batch Plotly Report and Master Dashboard Generator (\texttt{generate\_reports.py})}
+\label{sec:app_plotly_script}
+\begin{lstlisting}[language=Python, caption={Illustrative parsing functions from the Plotly reporting workflow (extract; not a complete executable report generator).}, captionpos=b]
+import os
+import re
+import plotly.graph_objects as go
+
+def parse_scalar_data(filepath):
+    times, values = [], []
+    with open(filepath, 'r') as f:
+        for line in f:
+            if line.startswith('#') or not line.strip():
+                continue
+            parts = line.split()
+            if len(parts) >= 2:
+                times.append(float(parts[0]))
+                values.append(float(parts[1]))
+    return times, values
+
+def parse_vector_data(filepath):
+    times, x, y, z = [], [], [], []
+    with open(filepath, 'r') as f:
+        for line in f:
+            if line.startswith('#') or not line.strip():
+                continue
+            parts = line.replace('(', '').replace(')', '').split()
+            if len(parts) >= 4:
+                times.append(float(parts[0]))
+                x.append(float(parts[1]))
+                y.append(float(parts[2]))
+                z.append(float(parts[3]))
+    return times, x, y, z
+
+def parse_yplus(filepath):
+    data = {}
+    with open(filepath, 'r') as f:
+        for line in f:
+            if line.startswith('#') or not line.strip():
+                continue
+            parts = line.split()
+            if len(parts) >= 5:
+                t = float(parts[0])
+                patch = parts[1]
+                avg_yplus = float(parts[4])
+                if patch not in data:
+                    data[patch] = {'time': [], 'avg': []}
+                data[patch]['time'].append(t)
+                data[patch]['avg'].append(avg_yplus)
+    return data
+
+def parse_forces(filepath):
+    times, fx, fy, fz = [], [], [], []
+    regex = re.compile(r"([0-9\.eE+-]+)\s+\(\(([^\)]+)\)\s+\(([^\)]+)\)\)")
+    with open(filepath, 'r') as f:
+        for line in f:
+            if line.startswith('#') or not line.strip():
+                continue
+            match = regex.search(line)
+            if match:
+                t = float(match.group(1))
+                p_force = [float(v) for v in match.group(2).split()]
+                v_force = [float(v) for v in match.group(3).split()]
+                times.append(t)
+                fx.append(p_force[0] + v_force[0])
+                fy.append(p_force[1] + v_force[1])
+                fz.append(p_force[2] + v_force[2])
+    return times, fx, fy, fz
+
+local_base_dir = "DoE_Cases"
+sim_folders = [f for f in os.listdir(local_base_dir) 
+               if os.path.isdir(os.path.join(local_base_dir, f)) and f.startswith("Sim_")]
+dashboard_links = []
+
+for case in sorted(sim_folders):
+    case_path = os.path.join(local_base_dir, case)
+    pp_dir = os.path.join(case_path, "postProcessing")
+    if not os.path.exists(pp_dir):
+        continue
+
+    file_in_p   = os.path.join(pp_dir, "inlet_pressure_avg", "0", "surfaceFieldValue.dat")
+    file_out_p  = os.path.join(pp_dir, "outlet_pressure_avg", "0", "surfaceFieldValue.dat")
+    file_flux   = os.path.join(pp_dir, "inlet_volume_flux", "0", "surfaceFieldValue.dat")
+    file_yplus  = os.path.join(pp_dir, "yPlus1", "0", "yPlus.dat")
+    file_forces = os.path.join(pp_dir, "forceCoeffs_Obt", "0", "forces.dat")
+    
+    t_in_p, in_p = parse_scalar_data(file_in_p)
+    t_out_p, out_p = parse_scalar_data(file_out_p)
+    t_flux, f_x, f_y, f_z = parse_vector_data(file_flux)
+    yplus_data = parse_yplus(file_yplus)
+    t_forces, fx, fy, fz = parse_forces(file_forces)
+    # Figures generated and saved to CFD_Report_<case>.html (see Chapter 3)
+\end{lstlisting} %

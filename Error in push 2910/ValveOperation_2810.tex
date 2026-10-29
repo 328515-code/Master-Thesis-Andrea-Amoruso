@@ -1,0 +1,137 @@
+\chapter{Excess-Flow Valves and Their Role in Hydrogen Refuelling}
+\label{ch:efv_operation}
+
+\section{Hydrogen Refuelling Infrastructure and Safety Functions}
+\label{sec:refuelling_context}
+
+The design of an excess-flow valve (EFV) needs to be considered in the context of the system in which it operates. A gaseous hydrogen refuelling station typically brings together a hydrogen supply, compression and buffer-storage equipment, temperature-control devices, and a dispensing unit connected to the vehicle through a hose and nozzle. ISO~19880-1 defines general safety and performance requirements for gaseous hydrogen fuelling stations, including these principal subsystems \cite{iso19880_1}. The station must deliver the intended flow during a normal fill while retaining the ability to limit or isolate releases following a malfunction.
+
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{\input{Figures/EFV_station_location.tex}}
+\caption{Conceptual hydrogen-refuelling flow path and the selected location of the investigated EFV downstream of the pre-cooler, near the dispenser. This location is specified by the industrial application; the figure is illustrative and does not prescribe a station layout required by ISO~19880-1 \cite{iso19880_1,nrel_csd2014}.}
+\label{fig:station_efv_location}
+\end{figure}
+
+For light-duty vehicle refuelling, SAE~J2601 specifies fuelling protocols for the H35 and H70 nominal pressure classes, corresponding to $35$ and $70\,\mathrm{MPa}$, and identifies fuel-delivery temperature categories T20, T30 and T40. The T40 designation refers to a nominal fuel-delivery temperature of $-40\,^{\circ}\mathrm{C}$. The fuelling protocol constrains quantities such as mass-flow rate, pressure-rise rate, delivery temperature and end pressure; these are system-level operating limits rather than boundary conditions automatically reproduced by a valve-scale CFD model \cite{sae_j2601}. In practice, the gas pressure and temperature change during a filling event. Their values must therefore be specified for the operating point being investigated.
+
+An EFV is one element of a wider protective arrangement. ISO~19880-3, which addresses valve safety performance for gaseous hydrogen fuelling stations, includes EFVs among several distinct valve categories, alongside check valves, flow-control valves, breakaway devices, pressure safety valves and actuated shut-off valves \cite{iso19880_3}. An EFV limits abnormal \emph{forward} flow; a check valve prevents reverse flow, while an emergency shut-off function responds to a commanded or detected hazardous condition. A hose breakaway device addresses the specific mechanical separation of the dispenser connection. These functions are complementary and should not be represented as interchangeable \cite{iso19880_1,iso19880_3,h2tools_valves}.
+
+From a component-design perspective, the relevant questions are not limited to whether a valve can shut off flow. The engineer must also consider the pressure loss in normal service, the repeatability of its response, the influence of gas properties, and whether the required hydrodynamic force can be generated at the intended excess-flow condition. These competing requirements motivate the geometrical and fluid-dynamic comparisons developed in the following chapters.
+
+\section{EFV Installation Point and Reference Operating State}
+\label{sec:efv_reference_state}
+
+For the industrial application addressed in this thesis, the excess-flow valve is located \emph{downstream of the pre-cooling heat exchanger, in the high-pressure delivery line close to the dispenser}, as indicated in Figure~\ref{fig:station_efv_location}. This component position is a project requirement provided for the present design; it must not be interpreted as a statement that ISO~19880-3 requires every gaseous-hydrogen station to place its EFV at this exact location. The standard establishes requirements and test methods for high-pressure hydrogen-station valves, including excess-flow valves, and distinguishes several valve functions \cite{iso19880_3}.
+
+Pre-cooling is relevant to fast vehicle refuelling because compression of the gas in the on-board storage system raises its temperature during filling. SAE~J2601 addresses H35 ($35\,\mathrm{MPa}$ nominal working pressure) and H70 ($70\,\mathrm{MPa}$) vehicle storage and defines the T40 delivery-temperature category. Pre-cooling stations are commonly arranged so that a heat exchanger conditions the hydrogen before it passes towards the dispenser \cite{sae_j2601,elgowainy2017,iso19880_1}. Consequently, ambient-temperature hydrogen properties are not representative of the selected valve's intended cold delivery-line condition.
+
+A representative reference state for this component-level investigation is therefore selected as
+\begin{equation}
+  p_{\mathrm{ref}}=430\,\mathrm{bar}=43.0\,\mathrm{MPa},
+  \qquad
+  T_{\mathrm{ref}}=-40\,^{\circ}\mathrm{C}=233.15\,\mathrm{K}.
+  \label{eq:efv_reference_state}
+\end{equation}
+The pressure is treated as \emph{absolute} in the thermophysical-property evaluation; if the industrial pressure specification is instead given in bar gauge, the absolute pressure must first be established. The selected pair represents a specified design operating point, \emph{not} a pressure--temperature requirement universally imposed by SAE~J2601 or a claim that pressure remains constant throughout an entire fill. In particular, $430\,\mathrm{bar}$ should not be mistaken for the complete operating envelope of an H70 dispenser.
+
+At this state, hydrogen is a dense, high-pressure gas and its density cannot reliably be inferred from the ideal-gas equation alone. Both $\rho(p,T)$ and the dynamic viscosity $\mu(p,T)$ should be determined using a consistent real-fluid database or correlation, such as NIST REFPROP, before assigning the constant kinematic viscosity $\nu=\mu/\rho$ and the reference density used by OpenFOAM's force calculation \cite{nist_refprop,nist_refprop_online}. The reference pressure is \emph{not} imposed merely by setting the kinematic outlet pressure to zero in the incompressible solver; it is represented indirectly by selecting the thermodynamic-state-dependent fluid properties.
+
+The high-pressure, low-temperature calculations are intended to provide the principal application-oriented comparison for the EFV. Atmospheric-reference calculations can serve as a secondary sensitivity study, but are not interchangeable with cold, pressurized dispensing conditions. At the same imposed velocity and geometry, the mass flow rate $\dot m=\rho U A$ differs with density, while changes in kinematic viscosity alter the Reynolds number and potentially the computed flow structure. The numerical modelling implications are developed in Chapter~\ref{ch:numerical_setup}; the full high-pressure response analysis is treated separately from the established ambient-reference results.
+
+\section{Operating Principle of a Passive Excess-Flow Valve}
+\label{sec:efv_principle}
+
+An excess-flow valve is intended to shut off or restrict gas flow automatically when the flow exceeds a design threshold \cite{iso19880_3}. The principle of a representative spring-loaded design is the competition between the hydrodynamic load acting on a movable element and the force maintaining it in its normal, open position. Honeywell's technical description of spring-loaded EFVs, for example, identifies the transition that occurs when the force produced by the flow exceeds the opposing spring force \cite{honeywell_efv}. The following explanation gives a physical model useful for interpreting the present CFD study; exact component details and reset mechanisms depend on the particular valve construction.
+
+
+\begin{figure}[htbp]
+\centering
+\resizebox{\textwidth}{!}{\input{Figures/EFV_operating_principle.tex}}
+\caption{Conceptual spring-loaded EFV states: (a) normal flow, with the obturator away from the seat, and (b) increased hydrodynamic loading tending to move it towards closure. Arrows and geometry are illustrative rather than a dimensional reproduction of the investigated hardware; the hydrodynamic force must be compared with the mechanical force opposing motion \cite{iso19880_3,white2016}.}
+\label{fig:efv_open_closing}
+\end{figure}
+
+\subsection{Normal-flow condition}
+
+During normal operation, the movable element remains away from its shut-off seat, leaving flow passages through or around the obturator. Fluid acceleration near these passages produces a pressure redistribution and viscous stresses on their walls. The resulting total force is obtained from integration over the wetted obturator surface $S_{\mathrm{obt}}$:
+\begin{equation}
+\mathbf{F}_{\mathrm{fluid}}=
+\int_{S_{\mathrm{obt}}}\left[-p\,\mathbf{n}+\boldsymbol{\tau}\cdot\mathbf{n}\right]\mathrm{d}S,
+\label{eq:efv_surface_force}
+\end{equation}
+where $\mathbf{n}$ is the outward surface normal of the solid into the fluid, $p$ is static pressure and $\boldsymbol{\tau}$ is the viscous stress tensor; the pressure-force sign depends on the chosen normal orientation \cite{white2016,moukalled2016}. For a component that translates approximately along the valve axis, its axial component is the quantity most directly related to the tendency to close or open the flow passage.
+
+A well-designed EFV should exhibit an acceptable pressure loss in this state. A restrictive geometry may produce greater fluid load, but it can also increase pumping or compression demand and may affect the refuelling-system flow-control margin. The present study therefore evaluates both pressure difference and obturator load rather than treating force maximisation as the only design objective.
+
+\subsection{Excess-flow condition and motion towards closure}
+
+If a downstream line failure creates an increased flow demand, the velocity in the open passages can rise. The distribution of pressure and shear over the obturator changes, potentially increasing the hydrodynamic force directed towards the seat. For a simplified translating mechanism, a one-dimensional dynamic balance may be written as
+\begin{equation}
+m\ddot{x}=
+F_{\mathrm{fluid},x}(x,\dot{x},Q)
+-F_0-kx-F_{\mathrm{friction}}-F_{\mathrm{other}},
+\label{eq:efv_force_balance}
+\end{equation}
+where positive $x$ is defined here as the direction of closure, $F_0$ is a preload, $k$ is the spring stiffness, and the remaining terms represent friction and any additional relevant mechanical loads. This expression is a conceptual balance, not a calibrated motion model for the present valve. The direction used here must be reconciled with the global streamwise $x$ axis used to report CFD forces.
+
+
+\begin{figure}[htbp]
+\centering
+\resizebox{0.83\textwidth}{!}{\input{Figures/EFV_force_balance.tex}}
+\caption{Illustrative axial free-body diagram for a spring-loaded obturator: fluid force acts in the positive closing direction, opposed by preload and spring force. The displayed ordinary differential equation is conceptual; a fixed-obturator CFD run supplies a load for the imposed geometry and does not solve the transient displacement. Adapted conceptually from the force-balance framework \cite{white2016,moukalled2016}.}
+\label{fig:efv_force_balance}
+\end{figure}
+
+Closure becomes mechanically possible when the flow-induced load overcomes the effective opposing forces at the relevant position. Once the element approaches its seat, the effective passage area, local flow field and pressure distribution change. Consequently, the actual trip point is coupled to obturator displacement: it cannot be inferred from a single fixed-position CFD force without mechanical information and a suitable motion analysis \cite{white2016,moukalled2016}.
+
+\subsection{Shut-off, residual flow and resetting}
+
+Depending on the valve design, seating may almost stop the gas flow or leave a calibrated residual leakage path. Some EFVs use a bleed-by passage to equalise pressure after the downstream fault has been removed, allowing the spring to return the element to the open position. Other designs require a deliberate manual reset. The resetting strategy and the magnitude of any bypass flow are therefore design-specific rather than universal properties of all EFVs \cite{honeywell_efv,linde_efv,teco_efv}. In a refuelling installation these details affect maintenance, fault recovery and the coordination between passive and actively controlled safety devices.
+
+\section{Design Parameters and Fluid-Dynamic Trade-offs}
+\label{sec:efv_design_parameters}
+
+For an obturator with $n$ nominally circular holes of diameter $d$, the total geometric passage area is
+\begin{equation}
+A_{\mathrm{holes}}=n\frac{\pi d^2}{4}.
+\label{eq:efv_open_area}
+\end{equation}
+At a prescribed flow rate, changing $n$ or $d$ alters the average velocity required through the passages; contraction and local separation can raise velocities above a simple area-based estimate. Accordingly, the pressure field and the axial hydrodynamic force depend not only on the total area but also on hole distribution, surrounding wall shape and local flow structure \cite{crane410,white2016}. This motivates studying hole count and hole diameter as separate factors.
+
+A convenient nominal description of the pressure loss is
+\begin{equation}
+K=\frac{\Delta p}{\tfrac{1}{2}\rho U_{\mathrm{in}}^2},
+\label{eq:efv_loss_coefficient}
+\end{equation}
+where $U_{\mathrm{in}}$ is the reference inlet velocity. Likewise, a dimensionless axial-force coefficient can be formed using a specified reference area $A_{\mathrm{ref}}$:
+\begin{equation}
+C_{F,x}=\frac{F_x}{\tfrac{1}{2}\rho U_{\mathrm{in}}^2 A_{\mathrm{ref}}}.
+\label{eq:efv_force_coefficient}
+\end{equation}
+These coefficients help distinguish geometric effects from changes in operating flow, provided that reference quantities and density conventions are consistent across the cases \cite{white2016}.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}p{0.24\textwidth}p{0.35\textwidth}p{0.30\textwidth}@{}}
+\toprule
+\textbf{Design consideration} & \textbf{Fluid-dynamic implication} & \textbf{Engineering implication}\\
+\midrule
+Number and diameter of holes & Changes effective restriction, local velocity and force distribution & Balances normal-flow loss with available actuation load\\
+Spring preload and stiffness & Determines opposing mechanical load & Influences response threshold and reset capability\\
+Upstream gas state & Sets density, viscosity and potentially compressibility & Changes pressure drop and hydrodynamic force scaling\\
+Obturator position & Alters effective passage area and pressure distribution & Couples steady forces to the transient closing mechanism\\
+\bottomrule
+\end{tabular}
+\caption{Principal design variables affecting a spring-loaded EFV; qualitative relationships derived from the force balance and fluid-mechanics framework \cite{white2016,crane410}.}
+\label{tab:efv_design_tradeoffs}
+\end{table}
+
+\section{Scope of the CFD Study within the Refuelling Application}
+\label{sec:efv_cfd_scope}
+
+The present numerical investigation isolates a fixed obturator in a three-dimensional internal-flow domain. For each chosen gas, inlet velocity and geometry, it estimates the pressure-loss response, the axial force component and related flow-field quantities. These outputs are directly relevant to the fluid-dynamic part of an EFV design assessment and can inform selection among candidate hole configurations.
+
+The work does \emph{not} simulate a complete refuelling-station filling sequence. In particular, SAE~J2601 fuel-delivery temperatures and nominal pressure classes define an \emph{application context}, not proof that a steady, constant-density calculation using reference-state properties reproduces every refuelling condition \cite{sae_j2601}. A subsequent component qualification would also need to address the pressure and temperature rating, sealing behaviour, materials compatibility, transient response and the applicable test procedures of ISO~19880-3 \cite{iso19880_3}. This distinction permits useful CFD-based design comparisons without claiming that computational force predictions alone demonstrate an approved safety component.
