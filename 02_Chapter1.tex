@@ -1,12 +1,12 @@
 \chapter{Numerical Model and CFD Setup}
 \label{ch:numerical_setup}
 
-This chapter describes the mathematical model, computational domain, boundary conditions, discretization and HPC workflow adopted for the excess flow valve simulations. The purpose is to document the computational choices and their physical meaning in enough detail for an engineering reader to reproduce the workflow. The valve-scale model represents a component of a hydrogen refuelling system rather than a complete dispensing installation (Chapter~\ref{ch:efv_operation}).
+This chapter describes the mathematical model, computational domain, boundary conditions, discretization and HPC workflow adopted for the excess flow valve CFD simulations. The purpose is to document the computational choices and their physical meaning in enough detail for an engineering reader to reproduce the workflow, using a model which represents a component of the hydrogen refuelling, not the complete dispensing installation (Chapter~\ref{ch:efv_operation}).
 
-\section{Governing Equations and Modeling Assumptions}
+\section{Governing equations and their modeling}
 \label{sec:governing_equations}
 
-The numerical model represents three-dimensional, steady, single-phase flow around a fixed obturator. The OpenFOAM 10 solver \texttt{simpleFoam} solves an incompressible, constant-density Reynolds-averaged Navier--Stokes (RANS) system \cite{openfoam_user,moukalled2016}. \\
+The numerical model represents three dimensional, steady, single-phase flow around a fixed obturator. The OpenFOAM 10 solver \texttt{simpleFoam} solves an incompressible, constant density Reynolds-averaged Navier--Stokes (RANS) system \cite{openfoam_user,moukalled2016}. \\
 Under the assumed constant-density, steady-flow conditions and neglecting body forces, the continuity equation is
 \begin{equation}
     \nabla\cdot\mathbf{U}=0,
@@ -19,20 +19,21 @@ where $\mathbf{U}$ is the Reynolds-averaged velocity. A schematic eddy-viscosity
     \left(\nabla\mathbf{U}+(\nabla\mathbf{U})^{T}\right)\right],
     \label{eq:momentum}
 \end{equation}
-where $P$ is the kinematic pressure, $\nu=\mu/\rho$ is the molecular kinematic viscosity and $\nu_t$ is the turbulent eddy viscosity. Here the isotropic part of the modeled Reynolds stress is understood to be incorporated into the modified pressure; the equation summarizes the physical closure rather than reproducing every discrete term implemented by \texttt{simpleFoam} \cite{menter1994,openfoam_user}. The solved pressure field has dimensions of $\mathrm{m^2\,s^{-2}}$; conversion to a pressure difference in pascals requires multiplication by an appropriate density.
+where $P$ is the kinematic pressure, $\nu=\mu/\rho$ is the molecular kinematic viscosity and $\nu_t$ is the turbulent eddy viscosity. The solved pressure field has dimensions of $\mathrm{m^2\,s^{-2}}$; conversion to a pressure difference in pascals requires multiplication by an appropriate density.
 
-The \texttt{constant/momentumTransport} dictionary selects a RANS formulation with the $k$--$\omega$ Shear Stress Transport (SST) model \cite{menter1994}. 
+The selected RANS turbulet model is the $k$--$\omega$ Shear Stress Transport (SST) \cite{menter1994}. 
 
-The SST closure blends $k$--$\omega$ behavior near walls with an outer-flow $k$--$\epsilon$ formulation; it was selected to provide a RANS description of adverse pressure gradients and separation at a tractable computational cost \cite{menter1994}. This is a modeling choice rather than a guarantee of accuracy. At lower inlet Reynolds numbers the assumed turbulence state can become especially influential, so the results must be interpreted with reference to Reynolds number, imposed turbulence quantities and mesh resolution.
+The SST closure blends $k$--$\omega$ behavior near walls with an outer-flow $k$--$\epsilon$ formulation; it was selected to provide a RANS description of adverse pressure gradients and separation that will be present for sure in the problem object of the study, with a reasonable computational cost \cite{menter1994}.
 
-The working-fluid kinematic viscosity is defined in \texttt{constant/physicalProperties} using the constant-viscosity model:
+The working-fluid kinematic viscosity is defined using the constant viscosity model:
 \begin{lstlisting}[language=C++,caption={Parameterized constant-viscosity entry used in the OpenFOAM setup.}, captionpos=b]
 viscosityModel constant;
 nu [0 2 -1 0 0 0 0] NU_VALUE;
 \end{lstlisting}
-The template placeholder illustrated here is replaced for each gas as described in Chapter~\ref{ch:doe}. The original ambient-reference cases used $\nu_{\mathrm{H}_2}=1.05\times10^{-4}$ and $\nu_{\mathrm{N}_2}=1.51\times10^{-5}\,\mathrm{m^2\,s^{-1}}$. For the final high-pressure and low-temperature simulations, these entries are replaced by the gas-specific values $\nu_{\mathrm{H}_2}=2.709\times10^{-7}$ and $\nu_{\mathrm{N}_2}=7.932\times10^{-8}\,\mathrm{m^2\,s^{-1}}$. These are the active fluid-property settings verified in the final submitted case dictionaries. The inlet turbulence fields are initialized with the initial turbulence quantities $k=10^{-6}\,\mathrm{m^2\,s^{-2}}$ and $\omega=10\,\mathrm{s^{-1}}$. These quantities are numerical inlet conditions; a physical justification requires knowledge of the upstream turbulence state. Sensitivity checks, rather than an unsupported claim of universality, are used to assess their influence on the integrated responses.
 
-\subsection*{Assessment of the incompressible approximation}
+The template placeholder illustrated here is replaced for each gas as described in Chapter~\ref{ch:doe}. The original ambient-reference cases used $\nu_{\mathrm{H}_2}=1.05\times10^{-4}\mathrm{m^2\,s^{-1}}$ and $\nu_{\mathrm{N}_2}=1.51\times10^{-5}\,\mathrm{m^2\,s^{-1}}$. For the final high-pressure and low-temperature simulations, these entries are replaced by the gas-specific values $\nu_{\mathrm{H}_2}=2.709\times10^{-7}\mathrm{m^2\,s^{-1}}$ and $\nu_{\mathrm{N}_2}=7.932\times10^{-8}\,\mathrm{m^2\,s^{-1}}$. These are the active fluid-property settings verified in the final submitted case dictionaries. The inlet turbulence fields are initialized with the initial turbulence quantities $k=10^{-6}\,\mathrm{m^2\,s^{-2}}$ and $\omega=10\,\mathrm{s^{-1}}$. These quantities are numerical inlet conditions; a physical justification requires knowledge of the upstream turbulence state. Sensitivity checks, rather than an unsupported claim of universality, are used to assess their influence on the integrated responses.
+
+\subsection{Assessment of the incompressible approximation}
 The common guideline $Ma\lesssim0.3$ refers to the \emph{local} Mach number, $Ma=|\mathbf{U}|/c$, rather than only the inlet value \cite{anderson2017}. Velocity increases within the obturator passages may therefore lead to local compressibility effects even when the imposed inlet velocity is moderate. For illustration, if all inlet flow passed through the nominal holes of obturator A, continuity would give an average passage velocity approximately nine times the inlet velocity; this estimate is not a computed maximum because other flow paths and contraction effects must be examined. The eventual validity assessment should include a local-velocity check against gas sound speed. The incompressible approximation is an explicit scope condition of the present model and is assessed through the characteristic velocities and pressure variations of the investigated geometries.
 
 \section{Thermodynamic Reference State for the Hydrogen Dispenser}
