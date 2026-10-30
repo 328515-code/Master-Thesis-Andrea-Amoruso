@@ -10,10 +10,10 @@
 \draw[densely dotted] (0.0,0.75)--(7.0,0.75);
 \node[textnode] at (0.65,0.34) {$p_{\mathrm{in}}$};
 \node[textnode] at (6.40,0.34) {$p_{\mathrm{out}}$};
-\draw[->,thick] (3.7,-1.1)--(5.3,-1.1)
+\draw[->,thick] (2.5,-1.1)--(5.3,-1.1)
  node[midway,below,font=\footnotesize] {$+x$ towards seat};
-\node[draw,rounded corners,inner sep=5pt,fill=black!3,textnode] at (3.6,-2.45)
+\node[draw,rounded corners,inner sep=5pt,fill=black!3,textnode] at (3.6,-2.3)
  {$m\ddot{x}=F_{\mathrm{fluid},x}-F_0-kx-F_{\mathrm{other}}$};
 \node[textnode] at (3.6,-3.2)
- {Fixed-obturator CFD provides a load at prescribed position,\\not the transient displacement $x(t)$.};
+ {CFD provides a load at prescribed position, not modeling the transient making $\ddot{x}=0$};
 \end{tikzpicture}
