@@ -21,9 +21,8 @@ where $\mathbf{U}$ is the Reynolds-averaged velocity. A schematic eddy-viscosity
 \end{equation}
 where $P$ is the kinematic pressure, $\nu=\mu/\rho$ is the molecular kinematic viscosity and $\nu_t$ is the turbulent eddy viscosity. The solved pressure field has dimensions of $\mathrm{m^2\,s^{-2}}$; conversion to a pressure difference in pascals requires multiplication by an appropriate density.
 
-The selected RANS turbulet model is the $k$--$\omega$ Shear Stress Transport (SST) \cite{menter1994}. 
-
-The SST closure blends $k$--$\omega$ behavior near walls with an outer-flow $k$--$\epsilon$ formulation; it was selected to provide a RANS description of adverse pressure gradients and separation that will be present for sure in the problem object of the study, with a reasonable computational cost \cite{menter1994}.
+The selected RANS turbulet model is the $k$--$\omega$ Shear Stress Transport (SST) \cite{menter1994}, which blends $k$--$\omega$ behavior near walls with an outer-flow $k$--$\epsilon$ formulation.
+It was selected to provide a RANS description of adverse pressure gradients and separation, that will be present for sure in the problem object of the study, with a reasonable computational cost \cite{menter1994}.
 
 The working-fluid kinematic viscosity is defined using the constant viscosity model:
 \begin{lstlisting}[language=C++,caption={Parameterized constant-viscosity entry used in the OpenFOAM setup.}, captionpos=b]
@@ -31,17 +30,19 @@ viscosityModel constant;
 nu [0 2 -1 0 0 0 0] NU_VALUE;
 \end{lstlisting}
 
-The template placeholder illustrated here is replaced for each gas as described in Chapter~\ref{ch:doe}. The original ambient-reference cases used $\nu_{\mathrm{H}_2}=1.05\times10^{-4}\mathrm{m^2\,s^{-1}}$ and $\nu_{\mathrm{N}_2}=1.51\times10^{-5}\,\mathrm{m^2\,s^{-1}}$. For the final high-pressure and low-temperature simulations, these entries are replaced by the gas-specific values $\nu_{\mathrm{H}_2}=2.709\times10^{-7}\mathrm{m^2\,s^{-1}}$ and $\nu_{\mathrm{N}_2}=7.932\times10^{-8}\,\mathrm{m^2\,s^{-1}}$. These are the active fluid-property settings verified in the final submitted case dictionaries. The inlet turbulence fields are initialized with the initial turbulence quantities $k=10^{-6}\,\mathrm{m^2\,s^{-2}}$ and $\omega=10\,\mathrm{s^{-1}}$. These quantities are numerical inlet conditions; a physical justification requires knowledge of the upstream turbulence state. Sensitivity checks, rather than an unsupported claim of universality, are used to assess their influence on the integrated responses.
+The template placeholder \texttt{NU\_VALUE} illustrated here is then replaced for each gas as described in Chapter~\ref{ch:doe}. The original ambient reference value of the two gasses is $\nu_{\mathrm{H}_2}=1.05\times10^{-4}\mathrm{m^2\,s^{-1}}$ and $\nu_{\mathrm{N}_2}=1.51\times10^{-5}\,\mathrm{m^2\,s^{-1}}$. For the final high-pressure and low-temperature simulations, these entries are replaced by the gas-specific values $\nu_{\mathrm{H}_2}=2.709\times10^{-7}\mathrm{m^2\,s^{-1}}$ and $\nu_{\mathrm{N}_2}=7.932\times10^{-8}\,\mathrm{m^2\,s^{-1}}$, values obtained from the real gas equation at pressure and temperature conditions explained at Chapter \ref{ch:efv_operation}.
+
+The inlet turbulence fields are initialized with the initial turbulence quantities $k=10^{-6}\,\mathrm{m^2\,s^{-2}}$ and $\omega=10\,\mathrm{s^{-1}}$. These quantities are numerical inlet conditions; a physical justification requires knowledge of the upstream turbulence state. Sensitivity checks are used to assess their influence on the integrated responses.
 
 \subsection{Assessment of the incompressible approximation}
-The common guideline $Ma\lesssim0.3$ refers to the \emph{local} Mach number, $Ma=|\mathbf{U}|/c$, rather than only the inlet value \cite{anderson2017}. Velocity increases within the obturator passages may therefore lead to local compressibility effects even when the imposed inlet velocity is moderate. For illustration, if all inlet flow passed through the nominal holes of obturator A, continuity would give an average passage velocity approximately nine times the inlet velocity; this estimate is not a computed maximum because other flow paths and contraction effects must be examined. The eventual validity assessment should include a local-velocity check against gas sound speed. The incompressible approximation is an explicit scope condition of the present model and is assessed through the characteristic velocities and pressure variations of the investigated geometries, process done in the chapter \ref{ch:results}
+The common guideline $Ma\lesssim0.3$ refers to the \emph{local} Mach number, $Ma=|\mathbf{U}|/c$, rather than only the inlet value \cite{anderson2017}. Velocity increases within the obturator passages may therefore lead to local compressibility effects even when the imposed inlet velocity is moderate. For illustration, if all inlet flow passed through the nominal holes of obturator A, continuity would give an average passage velocity approximately nine times the inlet velocity; this estimate is not a computed maximum because other flow paths and contraction effects must be examined. The eventual validity assessment should include a local-velocity check against gas sound speed. The incompressible approximation is an explicit scope condition of the present model and is assessed through the characteristic velocities and pressure variations of the investigated geometries, process done in the chapter \ref{ch:results}.
 
 \section{Thermodynamic Reference State for the Hydrogen Dispenser}
 \label{sec:cfd_highpressure_state}
 
-The component considered in this work is intended for installation downstream of the pre-cooler and near the hydrogen dispenser (Section~\ref{sec:efv_reference_state}). The chosen application-oriented design condition is nominally $437\,\mathrm{bar}$ absolute and $233\,\mathrm{K}$ (approximately $-40\,^{\circ}\mathrm{C}$); it represents a specified operating point of a pressurized, pre-cooled delivery line, not the entire time-dependent fuelling history. Pre-cooling and the permitted delivery-temperature range are relevant to station design and the fueling procedure, as discussed in the SAE~J2601 protocol and the literature \cite{sae_j2601,elgowainy2017}.
+The component considered in this work is intended for installation downstream of the pre-cooler and near the hydrogen dispenser (Section~\ref{sec:efv_reference_state}). The chosen application-oriented design condition is nominally $437\,\mathrm{bar}$ absolute and $233\,\mathrm{K}$ (approximately $-40\,^{\circ}\mathrm{C}$) and it represents a specified operating point of a pressurized, pre-cooled delivery line. Pre-cooling and the permitted delivery temperature range are relevant to station design and the fueling procedure, as discussed in the SAE~J2601 protocol and the literature \cite{sae_j2601,elgowainy2017}.
 
-In a constant-density solver, the effect of this state enters through the evaluated fluid properties, rather than through an imposed uniform absolute pressure offset. For the gas under consideration, the input density $\rho_{\mathrm{ref}}$ and dynamic viscosity $\mu_{\mathrm{ref}}$ are evaluated at the same pressure and temperature and are converted to $\nu_{\mathrm{ref}}=\mu_{\mathrm{ref}}/\rho_{\mathrm{ref}}$ before the flow calculation. Reference fluid databases such as NIST REFPROP provide the thermodynamic and transport quantities required at the selected state \cite{nist_refprop_online}. A separate numerical case must use its corresponding $\nu_{\mathrm{ref}}$; changing only \texttt{rhoInf} would rescale forces without incorporating a Reynolds-number change.
+In a constant-density solver, the effect of this state enters through the evaluated fluid properties, rather than through an imposed uniform absolute pressure offset. For the gas under consideration, the input density $\rho_{\mathrm{ref}}$ and dynamic viscosity $\mu_{\mathrm{ref}}$ are evaluated at the same pressure and temperature and are converted to $\nu_{\mathrm{ref}}=\mu_{\mathrm{ref}}/\rho_{\mathrm{ref}}$ before the flow calculation. Reference fluid databases such as NIST REFPROP provide the status quantities required at the selected state \cite{nist_refprop_online}. A separate numerical case must use its corresponding $\nu_{\mathrm{ref}}$; changing only \texttt{rhoInf} would rescale forces without incorporating a Reynolds-number change.
 
 \begin{equation}
 Re_{\mathrm{in}}=\frac{U_{\mathrm{in}}D_{\mathrm{in}}}{\nu_{\mathrm{ref}}},
@@ -49,19 +50,21 @@ Re_{\mathrm{in}}=\frac{U_{\mathrm{in}}D_{\mathrm{in}}}{\nu_{\mathrm{ref}}},
 Ma_{\mathrm{local}}=\frac{|\mathbf{U}|}{c(p,T)},
 \label{eq:highpressure_re_mach}
 \end{equation}
-where the local sound speed $c$ depends on the thermodynamic state. At high pressure, the absolute pressure itself does not automatically invalidate an incompressible model; the decisive questions concern the change of density across the valve and local flow acceleration. However, a rupture case with a large downstream pressure reduction can introduce strong compressibility, choked passages or other effects that a steady incompressible model cannot predict reliably \cite{anderson2017,white2016}.
+where the local sound speed $c$ depends on the thermodynamic state. 
 
-Accordingly, the present fixed-obturator, velocity-controlled simulations are interpreted as hydraulic comparisons at specified reference states. A complete evaluation of a station rupture sequence, mechanical obturator motion or a large pressure-ratio discharge would require additional physical modeling, potentially involving a compressible transient solver and mechanical coupling. This distinction is central to applying the CFD results appropriately in hydrogen refuelling engineering.
+At high pressure, the absolute pressure itself does not automatically invalidate an incompressible model; the decisive questions concern the change of density across the valve and local flow acceleration.
+
+The present fixed-obturator, velocity-controlled simulations are interpreted as hydraulic comparisons at specified reference states. To get a complete evaluation of a station rupture sequence, mechanical obturator motion or a large pressure-ratio discharge would require additional physical modeling,involving compressible transient solver and mechanical coupling. 
 
 \section{Computational Domain and Boundary Conditions}
 \label{sec:boundary_conditions}
 
-The fluid domain is bounded by five principal named surface patches: \texttt{inlet}, \texttt{outlet}, \texttt{wall1}, \texttt{wall2} and \texttt{wallObt}. These names describe boundary regions of a single computational domain, not five independent fluid domains. The stationary obturator is represented by the \texttt{wallObt} surface. The inlet and outlet planes are separated from the most restrictive obturator region to reduce artificial interactions between the imposed boundary conditions and the developing internal flow. The adequacy of those distances is a numerical modeling consideration, not a statement of a physically prescribed station layout.
+The fluid domain is bounded by five principal surface patches: \texttt{inlet}, \texttt{outlet}, \texttt{wall1}, \texttt{wall2} and \texttt{wallObt}. These names describe boundary regions of a single computational domain, not five independent fluid domains. The stationary obturator is represented by the \texttt{wallObt} surface. The inlet and outlet planes are separated from the most restrictive obturator region to reduce numerical interactions between the imposed boundary conditions and the developing internal flow. The adequacy of those distances is purely a numerical modeling consideration, not a statement of a physically prescribed station layout.
 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{Pics/Slice_ObtA.png}
-    \caption{Longitudinal section of the valve fluid domain, showing the inlet, outlet and wall regions.}
+    \caption{Longitudinal section of the CFD fluid domain, showing the inlet, outlet and wall regions}
     \label{fig:dominio}
 \end{figure}
 
@@ -86,7 +89,7 @@ Figure~\ref{fig:dominio} identifies the streamwise $x$ direction used for the pr
 
 \end{table}
 
-For the velocity field, an included \texttt{initialConditions} dictionary specifies the inlet vector at each operating point. At the outlet, the \texttt{inletOutlet} velocity condition permits a zero-gradient outflow and prescribes a value where local backflow can be detected. The outlet pressure is a zero \emph{reference kinematic pressure}, not a specification that the system operates at zero absolute pressure. The $k$, $\omega$ and turbulent-viscosity fields require their own inlet, outlet and wall conditions, implemented through the corresponding OpenFOAM dictionaries.
+For the velocity field, an included \texttt{initialConditions} dictionary specifies the inlet vector at each operating point. At the outlet, the \texttt{inletOutlet} velocity condition permits a zero-gradient outflow and prescribes a value where local backflow can be detected. The outlet pressure is set to zero \emph{reference kinematic pressure}, which should not be confused with a zero absolute pressure. At the walls instead a no-Slip condition $U=0$ is implemented.
 
 \begin{figure}[htbp]
     \centering
@@ -138,56 +141,59 @@ For the velocity field, an included \texttt{initialConditions} dictionary specif
 \subsection{Meaning of the Boundary Conditions}
 \label{sec:boundary_physical_interpretation}
 
-The inlet condition fixes the axial velocity rather than prescribing a mass-flow rate at an independently specified operating pressure. For the constant-density model, a given inlet velocity corresponds to a volume flow proportional to the inlet area. The reference outlet kinematic pressure establishes the datum for the pressure field: the pressure \emph{difference} is the relevant output, while its dimensional value is obtained by multiplying the kinematic difference by the chosen density.
+The inlet condition fixes the axial velocity rather than prescribing a mass flow rate at an independently specified operating pressure. For the constant density model, this translates into a volume flow proportional to the inlet area. Instead, the reference outlet kinematic pressure establishes the datum for the pressure field: the pressure \emph{difference} is the relevant output, while its dimensional value is obtained by multiplying the kinematic difference by the chosen density.
 
-All three wall patches use the no-slip velocity condition. For the fixed obturator considered here, that choice means the solid remains stationary relative to the fluid; it is not a dynamic-mesh model of the valve closing. At the outlet, the backflow-capable velocity condition is useful for handling local recirculation near the boundary but does not replace verification of the outlet's distance from the disturbed region. These distinctions are relevant when transferring the numerical results to hydrogen refuelling applications because the full station pressure history and the component-specific thermal state are not directly imposed by this local steady solver \cite{openfoam_user,sae_j2601}.
+All three wall patches use the no-slip velocity condition, meaning that the solid remains stationary relative to the fluid. At the outlet, the backflow capable velocity condition is useful for handling local recirculation near the boundary but does not replace verification of the outlet's distance from the disturbed region. These distinctions are relevant when transferring the numerical results to hydrogen refuelling applications because the full station pressure history and the component-specific thermal state are not directly imposed by this local steady solver \cite{openfoam_user,sae_j2601}.
 
 \section{Numerical Discretization and Execution Workflow}
 \label{sec:workflow_automation}
 
-OpenFOAM applies a finite-volume discretization of the steady equations. In the \texttt{fvSchemes} dictionary, velocity convection uses a bounded \texttt{linearUpwindV} scheme with a limited velocity gradient, while the transport of $k$ and $\omega$ uses \texttt{bounded upwind} schemes. Gradient interpolation is mainly linear, and Laplacian terms employ a corrected formulation. This combination is intended to limit nonphysical oscillations while retaining useful resolution of the flow field. Its performance is evaluated using residual behavior and monitored integral quantities rather than assuming convergence from the discretization scheme alone.
+OpenFOAM applies a finite-volume discretization of the steady equations. In the \texttt{fvSchemes} dictionary, velocity convection uses a bounded \texttt{linearUpwindV} scheme with a limited velocity gradient, while the transport of $k$ and $\omega$ uses \texttt{bounded upwind} schemes.
+Gradient interpolation is mainly linear, and Laplacian terms employ a corrected formulation. This combination is intended to limit nonphysical oscillations while retaining useful resolution of the flow field. Its performance is evaluated using residual behavior and monitored integral quantities.\\
 
-Pressure--velocity coupling is based on the SIMPLE algorithm \cite{openfoam_user,moukalled2016}. The \texttt{fvSolution} configuration specifies ten non-orthogonal correction passes and equation relaxation factors of $0.9$ for velocity and $0.5$ for both turbulence variables. The \texttt{controlDict} specifies \texttt{endTime 3000} and \texttt{deltaT 1}. Since \texttt{simpleFoam} solves a steady problem, these values set the solver's iteration sequence rather than a physical transient lasting $3000\,\mathrm{s}$. An iteration limit is a computational stopping setting; convergence is assessed using residuals and stabilized engineering outputs.
+Pressure--velocity coupling is based on the SIMPLE algorithm \cite{openfoam_user,moukalled2016}. \texttt{fvSolution} configuration specifies ten non-orthogonal correction passes and equation relaxation factors of $0.9$ for velocity and $0.5$ for both turbulence variables. \\
 
-Case execution is managed using Bash scripts that prepare the mesh, partition the domain and launch parallel meshing and solving on ARIES. The principal sequence is \texttt{blockMesh}, \texttt{surfaceFeatures}, \texttt{decomposePar}, parallel \texttt{snappyHexMesh} and parallel \texttt{simpleFoam}. Solver-only restarts are available without repeating the mesh stage. The generation of the complete factorial case set and subsequent retrieval of reduced outputs are addressed in Chapter~\ref{ch:doe}.
+The \texttt{controlDict} specifies \texttt{endTime 3000} and \texttt{deltaT 1}. Since \texttt{simpleFoam} solves a steady problem, these values set the iterations amount rather than a physical transient lasting $3000\,\mathrm{s}$. An iteration limit is a computational stopping setting; convergence is assessed using residuals and stabilized engineering outputs, with its evaluation performed with the final simulation data.\\
+
+Case execution is managed using Bash scripts that prepare the mesh, partition the domain and launch parallel meshing and solving on ARIES. The principal sequence is \texttt{blockMesh}, \texttt{surfaceFeatures}, \texttt{decomposePar}, parallel \texttt{snappyHexMesh} and parallel \texttt{simpleFoam}. The generation of the complete factorial case set and subsequent retrieval of reduced outputs are addressed in Chapter~\ref{ch:doe}.
 
 
-\subsection{Traceable Pre-processing and Solver Sequence}
+\subsection{Pre-processing and Solver Sequence}
 \label{sec:preprocessing_sequence}
 
-Each design point is treated as a self-contained computational case. Starting from a clean template avoids the accumulation of old mesh or field values when changing the obturator geometry. The geometry-specific \texttt{wallObt.stl} is copied into the corresponding case, and the fluid viscosity and inlet velocity are assigned before meshing. The processor decomposition is configured to match the SLURM task allocation, so that all subsequent mesh-generation and solution steps are consistent with the parallel execution environment.
+Each design point is treated as a self-contained computational case. The generation of each case started from a clean template, avoiding so the accumulation of old mesh or field values when changing the obturator geometry. The geometry-specific \texttt{wallObt.stl} is copied into each corresponding case, and the fluid viscosity and inlet velocity are assigned before meshing. The processor decomposition is configured to match the SLURM task allocation, so that all subsequent mesh-generation and solution steps are consistent with the parallel execution environment.
 
 \begin{table}[htbp]
 \centering
 \small
-\begin{tabular}{@{}p{0.16\textwidth}p{0.27\textwidth}p{0.46\textwidth}@{}}
+\begin{tabular}{@{}p{0.25\textwidth}p{0.3\textwidth}p{0.4\textwidth}@{}}
 \toprule
-\textbf{Stage} & \textbf{Utility or input} & \textbf{Purpose and resulting information}\\
+\textbf{Stage} & \textbf{Utility or input} & \textbf{Purpose and result}\\
 \midrule
-Case configuration & Python and OpenFOAM dictionaries & Assign gas properties, inlet velocity, obturator STL and a unique case identifier.\\
-Background mesh & \texttt{blockMesh} & Generate the structured bounding grid against which the curved valve walls will be resolved.\\
-Geometry features & \texttt{surfaceFeatures} & Extract edges required by the snapping and local refinement operations.\\
+Case configuration & Python and OpenFOAM dictionaries & Assign gas properties, inlet velocity, obturator STL and a case identifier.\\
+Background mesh & \texttt{blockMesh} & Generate the structured bounding grid against which the valve walls will be resolved.\\
+Geometry features & \texttt{surfaceFeatures} & Extract edges required for snapping and local refinement operations.\\
 Parallel preparation & \texttt{decomposePar} and \texttt{scotch} & Partition the domain and distribute the mesh tasks over MPI processes.\\
-Local meshing & \texttt{snappyHexMesh} & Castellate cells, snap the surface and request the near-wall layers.\\
+Local meshing & \texttt{snappyHexMesh} & Castellate cells, snap the surface and request the wall layers.\\
 Flow solution & \texttt{simpleFoam} & Solve the steady RANS equations and record integral flow quantities.\\
-Data reduction & OpenFOAM function objects and Python & Extract patch pressures, inlet flux, obturator force and $y^+$ histories.\\
+Data reduction & OpenFOAM functions and Python & Extract patch pressures, inlet flux, obturator force and $y^+$ histories.\\
 \bottomrule
 \end{tabular}
 \caption{Computational sequence used to prepare, solve and post-process each valve case. The OpenFOAM utilities and their roles follow the version-10 workflow \cite{openfoam_user}.}
 \label{tab:cfd_process}
 \end{table}
 
-The geometric refinement is concentrated around the obturator because this is where the narrow passages and strong gradients are expected. The meshing procedure has three distinguishable phases: castellated refinement, projection of boundary faces onto the imported geometry, and optional boundary-layer cell extrusion. These phases should not be conflated with the initial structured mesh count. The final computational grid contains a different distribution and number of cells than the \texttt{blockMesh} background grid \cite{openfoam_user}.
+The geometric refinement is concentrated around the obturator because this is where the narrow passages and strong gradients are expected. The meshing procedure has three distinguishable phases: castellated refinement, projection of boundary faces onto the imported geometry, and layers cell extrusion. Given these steps, the final computational grid will contain a different distribution and number of cells than the \texttt{blockMesh} background grid \cite{openfoam_user}.
 
-For an industrial handover, the essential reproducibility information consists of the CAD revision, the gas-property state, the active solver and meshing dictionaries, the processor allocation and the monitored response definitions. Keeping these elements together with each case allows changes in the geometry or setup to be traced to changes in the numerical outputs.
+The essential reproducibility information to recreate this setup consists of the CAD revision, the gas state properties, the active solver and meshing dictionaries, the processor allocation and the monitored response definitions. Keeping these elements together with each case allows changes in the geometry or setup to be traced to changes in the numerical outputs, creating so the base for the DoE structure.
 
 \section{Hybrid Mesh Generation Strategy}
 \label{sec:mesh_generation}
 
-The computational setup uses a structured hexahedral background grid generated by \texttt{blockMesh}, followed by local castellated refinement, surface snapping and layer generation using \texttt{snappyHexMesh} \cite{openfoam_user}. \\
-The initial box extends from $(-0.010,-0.0145,-0.0145)\,\mathrm{m}$ to $(0.175,0.0145,0.0145)\,\mathrm{m}$, with $370\times58\times58$ cells, giving $1{,}244{,}680$ \emph{background} cells with nominal spacing $\Delta x=\Delta y=\Delta z=0.5\,\mathrm{mm}$. This is not the final snapped-mesh cell count.
+As introduced in the previous pargraph, computational setup uses a structured hexahedral background grid generated by \texttt{blockMesh}, followed by local castellated refinement, surface snapping and layer generation using \texttt{snappyHexMesh} \cite{openfoam_user}. \\
+The initial box extends from $(-0.010,-0.0145,-0.0145)\,\mathrm{m}$ to $(0.175,0.0145,0.0145)\,\mathrm{m}$, with $370\times58\times58$ cells, giving $1{,}244{,}680$ \emph{background} cells with nominal spacing $\Delta x=\Delta y=\Delta z=0.5\,\mathrm{mm}$. This is just the initial block, not the final snapped-mesh cell count.
 
-The CAD definition is imported as triangulated STL surfaces named \texttt{inlet.stl}, \texttt{outlet.stl}, \texttt{wall1.stl}, \texttt{wall2.stl} and \texttt{wallObt.stl}, where the last one is replaced to generate the different obturator variants. Representative surface statistics for the obturator-A CAD files are provided in Table~\ref{tab:stl_stats}; these counts must not be assumed to be identical for all four obturators.
+The CAD geometry definition is imported as triangulated STL surfaces named \texttt{inlet.stl}, \texttt{outlet.stl}, \texttt{wall1.stl}, \texttt{wall2.stl} and \texttt{wallObt.stl}, in particular the last one is replaced in each case and then renamed to generate the different obturator variants. 
 
 \begin{table}[H]
 \centering
@@ -203,42 +209,44 @@ The CAD definition is imported as triangulated STL surfaces named \texttt{inlet.
 \texttt{wallObt.stl} & 10,715 & 5,637 & 2,897  \\ %
 \bottomrule
 \end{tabular}
-\caption{Representative CAD-surface statistics for the obturator-A geometry, processed by \texttt{surfaceFeatures}.} %
+\caption{Representative CAD-surface statistics processed by \texttt{surfaceFeatures}, for the \texttt{wallObt.stl} the A variant is considered} %
 \label{tab:stl_stats}
 \end{table}
 
-The \texttt{snappyHexMeshDict} specifies surface refinement level~1 for the inlet and outlet and level~2 for the two wall surfaces and the obturator. It also defines a cylindrical local refinement region near the obturator, with endpoints $(0.035,0,0)\,\mathrm{m}$ and $(0.046,0,0)\,\mathrm{m}$, radius $0.011\,\mathrm{m}$ and refinement level~2. These are requested refinement settings; the final realized cell distribution must be checked from the generated mesh.
+The \texttt{snappyHexMeshDict} specifies surface refinement level~1 for the inlet and outlet and level~2 for the two wall surfaces and the obturator. It also defines a cylindrical local refinement region near the obturator, with endpoints $(0.035,0,0)\,\mathrm{m}$ and $(0.046,0,0)\,\mathrm{m}$, radius $0.011\,\mathrm{m}$ and refinement level~2. These are requested refinement settings to being able to capture the phenomena occuring in this delicate section.
 
-The \texttt{addLayers} option is enabled with an expansion ratio of~2. Two prismatic layers are requested on the obturator surface. The specified expansion ratio is~2. Realized layer coverage and near-wall resolution are evaluated from the generated mesh and wall-distance diagnostic, since requested layers do not necessarily survive snapping and mesh-quality constraints.
+The \texttt{addLayers} option is enabled with an expansion ratio of~2. Two prismatic layers are requested on the obturator surface and the expansion ratio is~2. Realized layer coverage and near-wall resolution are evaluated from the generated mesh and wall distance diagnostic using the $y^+ > 30$ targe f, since requested layers do not necessarily survive snapping and mesh quality constraints.
 
-\section{HPC Infrastructure and Domain Decomposition}
+\section{HPC working and Domain decomposition}
 \label{sec:hpc_environment}
 
 The cases are prepared for execution on the ARIES High-Performance Computing (HPC) infrastructure provided by the University of Modena and Reggio Emilia \cite{hpc_aries}. SLURM manages the resource allocation; the case script requests one node with 52 MPI tasks. This is an allocation of MPI ranks and should not be equated with 52 physical cores. The \texttt{scotch} domain decomposition method is specified to distribute cells over the subdomains while limiting communication interfaces \cite{pellegrini1996}.
 
 The number of cells per subdomain and the processor-interface counts depend on the actual mesh and decomposition.
 
-\section{Numerical Verification and Current Limitations}
+\section{Numerical Verification and limitations}
 \label{sec:numerical_verification}
 
 Numerical quality is evaluated independently of the configured stopping iteration. The following independent checks will be pursued before the simulation data can be considered valid for the final design tool:
 \begin{itemize}
-    \item residual decay or stabilization together with a stable inlet--outlet pressure difference and axial force history;
-    \item conservation of volume or mass flux between inlet and outlet and the absence of nonphysical field values;
-    \item mesh quality, near-wall $y^+$ and a grid-sensitivity assessment of the principal integral responses;
-    \item sensitivity to turbulence boundary conditions and assessment of maximum \emph{local} Mach number in the narrow passages.
+    \item Residual decay or stabilization together with a stable inlet--outlet pressure difference and axial force history;
+    \item Conservation of volume or mass flux between inlet and outlet and the absence of nonphysical field values;
+    \item Mesh quality and near wall $y^+$ assessment of the principal integral responses;
+    \item Sensitivity to turbulence boundary conditions and assessment of maximum \emph{local} Mach number in the narrow passages.
 \end{itemize}
 
-Chapter~\ref{ch:results} details how the principal post-processing quantities are extracted, averaged and compared across the selected cases.
+Chapter~\ref{ch:results} will show how the principal post-processing quantities are extracted, averaged and compared across the selected cases.
 
 
 \subsection{Interpretation of the Monitored Quantities}
 
-Residual values indicate progress in the algebraic solution of the discretized equations, whereas the integrated pressure difference and obturator force indicate stability of the engineering outputs. Both types of evidence are useful. For the latter, a clearly defined terminal averaging interval makes the comparison reproducible. A mesh study should compare the sensitivity of $\Delta p$ and $F_x$ to refinement at a representative geometry and operating condition; the difference between two meshes is an estimate of numerical sensitivity, not necessarily an experimental error bound \cite{moukalled2016}.
+Residual values indicate progress in the algebraic solution of the discretized equations, whereas the integrated pressure difference and obturator force indicate stability of the engineering outputs, both datas are useful for the solution convergence evaluation and making so the comaprison between the different cases reproducible. 
 
-The dimensionless near-wall distance $y^+$ is interpreted together with the turbulence-model wall treatment, the actual layer count and local mesh distortion. Likewise, the incompressibility check should be performed on locally accelerated flow, as discussed in Section~\ref{sec:governing_equations}; inlet Mach number alone is not sufficient to characterize the region around the obturator holes \cite{anderson2017}. These checks establish the numerical context of a result before it is used in a design comparison.
+The dimensionless near-wall distance $y^+$ is interpreted together with the turbulence-model wall treatment, the actual layer count and local mesh distortion. Likewise, the incompressibility check should be performed on locally accelerated flow, as discussed in Section~\ref{sec:governing_equations}, since inlet Mach number alone is not sufficient to characterize the region around the obturator holes \cite{anderson2017}. These checks establish the numerical context of a result before it is used in the design comparison.
 
-\subsection*{Density convention in the force calculation}
-The \texttt{forces} function object uses \texttt{rho rhoInf} to dimensionalize the loads calculated from the incompressible solution. The final high-pressure case dictionaries prescribe $\rho_{\mathrm{H}_2}=33.77\,\mathrm{kg\,m^{-3}}$ and $\rho_{\mathrm{N}_2}=481.352\,\mathrm{kg\,m^{-3}}$ through the active \texttt{rhoInf} entries. The older ambient-reference configurations use their own, much smaller density values. Accordingly, the output force vectors are already dimensionalized in newtons by the force function object. Multiplying these vectors by gas density again would produce an incorrect result.
+\subsection{Density convention in the force calculation}
+The \texttt{forces} function used to extract the resulting force components values uses \texttt{rho rhoInf} to dimensionalize the loads calculated from the incompressible solution. The final high-pressure case dictionaries prescribe $\rho_{\mathrm{H}_2}=33.77\,\mathrm{kg\,m^{-3}}$ and $\rho_{\mathrm{N}_2}=481.352\,\mathrm{kg\,m^{-3}}$ through the active \texttt{rhoInf} parameter, as previously said, different from the ambient reference density values which are consistently smaller. Accordingly, the output force vectors are already dimensionalized in newtons by the force function object.\\
 
-The outlet kinematic pressure is prescribed as zero reference in \texttt{0/p}; this does not independently impose an absolute operating pressure. The choice of reference density and viscosity represents an assumed thermodynamic state.
+CI METTIAMOIù L'EQUAZIONE PER CALCOLARE LA FORZA MAGARI\\
+
+The outlet kinematic pressure is prescribed as zero reference in \texttt{0/p}; this does not impose an absolute operating pressure but is the choice of reference density and viscosity which represents a specific thermodynamic state.
