@@ -179,7 +179,7 @@ Flow solution & \texttt{simpleFoam} & Solve the steady RANS equations and record
 Data reduction & OpenFOAM functions and Python & Extract patch pressures, inlet flux, obturator force and $y^+$ histories.\\
 \bottomrule
 \end{tabular}
-\caption{Computational sequence used to prepare, solve and post-process each valve case. The OpenFOAM utilities and their roles follow the version-10 workflow \cite{openfoam_user}.}
+\caption{Computational sequence used to prepare, solve and post-process each valve case, in the OpenFOAM10 environment \cite{openfoam_user}.}
 \label{tab:cfd_process}
 \end{table}
 
@@ -246,7 +246,5 @@ The dimensionless near-wall distance $y^+$ is interpreted together with the turb
 
 \subsection{Density convention in the force calculation}
 The \texttt{forces} function used to extract the resulting force components values uses \texttt{rho rhoInf} to dimensionalize the loads calculated from the incompressible solution. The final high-pressure case dictionaries prescribe $\rho_{\mathrm{H}_2}=33.77\,\mathrm{kg\,m^{-3}}$ and $\rho_{\mathrm{N}_2}=481.352\,\mathrm{kg\,m^{-3}}$ through the active \texttt{rhoInf} parameter, as previously said, different from the ambient reference density values which are consistently smaller. Accordingly, the output force vectors are already dimensionalized in newtons by the force function object.\\
-
-CI METTIAMOIù L'EQUAZIONE PER CALCOLARE LA FORZA MAGARI\\
 
 The outlet kinematic pressure is prescribed as zero reference in \texttt{0/p}; this does not impose an absolute operating pressure but is the choice of reference density and viscosity which represents a specific thermodynamic state.

@@ -1,14 +1,14 @@
 \chapter{Results and Post-Processing}
 \label{ch:results}
 
-This chapter presents the integral fluid-dynamic results of the final high-pressure, low-temperature simulations. As the target application is an excess-flow valve (EFV) for hydrogen-vehicle refuelling, \emph{hydrogen is the primary working fluid}. Nitrogen is investigated as a supplementary industrial gas and its numerical response is discussed after the hydrogen findings. The full-factorial study comprises four obturator geometries, three inlet velocities ($5$, $10$ and $15\,\mathrm{m\,s^{-1}}$), and the two working gases.
+This chapter presents the integral fluid dynamic results of the final high pressure $437\,\mathrm{bar}$, low temperature $233\,\mathrm{K}$ (approximately $-40\,^{\circ}\mathrm{C}$) simulations. As the target application is an excess-flow valve (EFV) for hydrogen-vehicle refuelling, \emph{hydrogen is the primary working fluid}. Nitrogen is investigated as a supplementary industrial gas and its numerical response is discussed after the hydrogen findings. 
 
-The final simulation archive is identified with the nominal reference state $437\,\mathrm{bar}$ and $233\,\mathrm{K}$ (approximately $-40\,^{\circ}\mathrm{C}$). These values identify the chosen operating condition; the constant-density solver does not itself solve a real-gas equation of state. All values in the tables below are computed OpenFOAM responses, not experimental measurements.
+All values in the tables below are computed OpenFOAM responses, not experimental measurements.
 
 \section{Structure of OpenFOAM Post-Processing Data}
 \label{sec:postprocessing_structure}
 
-Each calculation writes five sets of numerical outputs: area-averaged kinematic pressure at the inlet and outlet, integrated inlet velocity, pressure and viscous loads on the obturator, and wall-distance data. The corresponding function-object locations are \texttt{inlet\_pressure\_avg}, \texttt{outlet\_pressure\_avg}, \texttt{inlet\_volume\_flux}, \texttt{forceCoeffs\_Obt} and \texttt{yPlus1}. Although the force output folder includes the term force coefficients, the active OpenFOAM function-object type is \texttt{forces}, not \texttt{forceCoeffs}.
+Each calculation writes five sets of numerical outputs: area-averaged kinematic pressure at the inlet and outlet, integrated inlet velocity, pressure and viscous loads on the obturator, and wall-distance data. The corresponding function-object locations are \texttt{inlet\_pressure\_avg}, \texttt{outlet\_pressure\_avg}, \texttt{inlet\_volume\_flux}, \texttt{forceCoeffs\_Obt} and \texttt{yPlus1}. Although the force output folder includes the term force coefficients, the active OpenFOAM function computes an actual force, not a coefficient.
 
 The solved pressure field is \emph{kinematic} pressure, expressed in $\mathrm{m^2\,s^{-2}}$. The dimensional pressure loss and axial force component are evaluated using
 \begin{equation}
@@ -16,14 +16,16 @@ The solved pressure field is \emph{kinematic} pressure, expressed in $\mathrm{m^
 \qquad F_x=F_{p,x}+F_{\nu,x},
 \label{eq:processed_responses}
 \end{equation}
-where $P_{\mathrm{in}}$ and $P_{\mathrm{out}}$ are area averages and $F_{p,x}$ and $F_{\nu,x}$ are the pressure and viscous contributions to the surface-integrated force. The output \texttt{forces.dat} already uses the gas-specific \texttt{rhoInf} and is expressed in newtons; it must \emph{not} be multiplied by density a second time. The global positive-$x$ force is distinct from a mechanically verified closing-direction force.
+the same equations introduced at Section \ref{sec:doe_analysis}. \\
 
-The submitted dictionaries give $\rho_{\mathrm{H}_2}=33.77\,\mathrm{kg\,m^{-3}}$, $\nu_{\mathrm{H}_2}=2.709\times10^{-7}\,\mathrm{m^2\,s^{-1}}$, $\rho_{\mathrm{N}_2}=481.352\,\mathrm{kg\,m^{-3}}$ and $\nu_{\mathrm{N}_2}=7.932\times10^{-8}\,\mathrm{m^2\,s^{-1}}$. The first quantity for each gas is the active force-reference density and the second is the viscosity used by the incompressible solver. The thermodynamic interpretation of these reference settings is discussed in Section~\ref{sec:doe_highpressure_state}.
+The global positive-$x$ force is distinct from a mechanically verified closing-direction force.
 
-\section{Data Reduction and Terminal Numerical Behaviour}
+The submitted dictionaries for the high pressure low temperature gases give $\rho_{\mathrm{H}_2}=33.77\,\mathrm{kg\,m^{-3}}$, $\nu_{\mathrm{H}_2}=2.709\times10^{-7}\,\mathrm{m^2\,s^{-1}}$, $\rho_{\mathrm{N}_2}=481.352\,\mathrm{kg\,m^{-3}}$ and $\nu_{\mathrm{N}_2}=7.932\times10^{-8}\,\mathrm{m^2\,s^{-1}}$, respectively for each gas we got density and viscosity used by the incompressible solver as discussed in Section~\ref{sec:doe_highpressure_state}.
+
+\section{Data reduction and terminal numerical behavior}
 \label{sec:plotly_dashboard}
 
-The \texttt{simpleFoam} output index represents solver iteration, not elapsed physical time. Twenty-three of the supplied configurations have pressure and force histories extending to iteration~3000. The updated nitrogen case with obturator A at $5\,\mathrm{m\,s^{-1}}$ contains records only through iteration~1372. To apply a reproducible comparison, the last 301 samples of each case were extracted: indices 2700--3000 for the 23 longer histories and 1072--1372 for the corrected nitrogen case. These are iteration indices, not elapsed physical seconds. For a numerical response $R_i$, the arithmetic mean and the coefficient of variation are
+The \texttt{simpleFoam} output index, representing solver iteration and not elapsed physical time, indicates to have pressure and force histories extending to iteration~3000. To apply a reproducible comparison, the last 301 samples of each case were extracted: indices 2700--3000. For a numerical response $R_i$, the arithmetic mean and the coefficient of variation are
 \begin{equation}
 \overline{R}=\frac{1}{N}\sum_{i=1}^{N}R_i,
 \qquad
@@ -32,19 +34,42 @@ The \texttt{simpleFoam} output index represents solver iteration, not elapsed ph
 {|\overline{R}|}\times100\%,\qquad N=301.
 \label{eq:terminal_average}
 \end{equation}
-This statistic measures variation within the selected terminal interval. Reaching the last iteration or observing a small CV does not independently prove residual convergence, mesh independence, or experimental validation \cite{moukalled2016,openfoam_user}.
+This statistic, measures variation within the selected terminal interval. Reaching the last iteration or observing a small CV does not independently prove residual convergence, mesh independence, or experimental validation \cite{moukalled2016,openfoam_user}.
 
-For hydrogen, the terminal-window CV ranges from approximately $0.83$--$10.25\%$ for pressure loss and $0.65$--$12.46\%$ for axial force. The largest variations occur for obturator B at $15\,\mathrm{m\,s^{-1}}$. In that case, comparing the final and initial 100 samples within the terminal window gives changes of approximately $11.6\%$ in mean pressure loss and $15.1\%$ in mean force. Obturator B at $10\,\mathrm{m\,s^{-1}}$ also exhibits appreciable variation. These cases are therefore reported as \emph{terminal-window estimates} rather than proven time-independent limits.
+For hydrogen, the terminal-window CV ranges from approximately $0.83$--$10.25\%$ for pressure loss and $0.65$--$12.46\%$ for axial force. The largest variations occur for obturator B at $15\,\mathrm{m\,s^{-1}}$. In that case, comparing the final and initial 100 samples within the terminal window gives changes of approximately $11.6\%$ in mean pressure loss and $15.1\%$ in mean force, data which is important to underline because for a different mesuaring interval different data could be observed. In particular the value of 300 iterations for this statistic computation has been chosen because it corresponds to the $10\%$ of the total iterations for the different simulations.
 
 \subsection{Inlet flow consistency and mass-flow interpretation}
 
-The integrated inlet area is approximately $A_{\mathrm{in,mesh}}=4.658925\times10^{-5}\,\mathrm{m^2}$. The inlet volumetric flow rates are approximately $2.32946\times10^{-4}$, $4.65893\times10^{-4}$ and $6.98839\times10^{-4}\,\mathrm{m^3\,s^{-1}}$ at inlet velocities of 5, 10 and $15\,\mathrm{m\,s^{-1}}$, respectively. These are based on the discretized patch rather than the ideal CAD inlet area. For the constant-density model, the reference mass-flow rate is
+Remembering the initial conditions imposed in the Chapter \ref{ch:doe}, we can campute the actual volume and mass flows for the two gases.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}cccc@{}}
+\toprule
+$U_{\mathrm{in}}$ [$\mathrm{m\,s^{-1}}$] &
+$Q$ [$\mathrm{m^3\,s^{-1}}$] &
+$\dot m_{\mathrm{N}_2}$ [$\mathrm{kg\,s^{-1}}$] &
+$\dot m_{\mathrm{H}_2}$ [$\mathrm{kg\,s^{-1}}$]\\
+\midrule
+5  & $2.33\times10^{-4}$ & $1.121\times10^{-1}$ & $7.867\times10^{-3}$\\
+10 & $4.66\times10^{-4}$ & $2.243\times10^{-1}$ & $1.573\times10^{-2}$\\
+15 & $6.99\times10^{-4}$ & $3.364\times10^{-1}$ & $2.360\times10^{-2}$\\
+\bottomrule
+\end{tabular}
+\caption{Actual reference parameter values for the selected inlet velocities ($-40\,^{\circ}\mathrm{C}$, $437\,\mathrm{bar}$).}
+\label{tab:mass flows}
+
+\end{table}
+
+$A_{\mathrm{in,mesh}}=4.658925\times10^{-5}\,\mathrm{m^2}$ is slightly lower than the one computed at Section \ref{sec:inlet velocities} since are based on the discretized patch rather than the ideal CAD inlet area. For the constant-density model, the reference mass-flow rate is
 \begin{equation}
 \dot m_{\mathrm{ref}}=\rho_{\mathrm{ref}} Q
 =\rho_{\mathrm{ref}}U_{\mathrm{in}}A_{\mathrm{in,mesh}}.
 \label{eq:mass_flow_highp}
 \end{equation}
-The hydrogen mass-flow rates at the three levels are therefore approximately $0.00787$, $0.01573$ and $0.02360\,\mathrm{kg\,s^{-1}}$. At the same imposed velocities, the corresponding nitrogen mass-flow rates are approximately $0.1121$, $0.2243$ and $0.3364\,\mathrm{kg\,s^{-1}}$. Thus equal-velocity gas comparisons are not equal-mass-flow refuelling comparisons.
+ 
+As already seen in previous chapters the equal velocity gas comparisons are not equal mass flow refueling comparisons.
 
 \section{Hydrogen: Primary High-Pressure CFD Results}
 \label{sec:fluid_trends}
