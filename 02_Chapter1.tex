@@ -215,7 +215,7 @@ The CAD geometry definition is imported as triangulated STL surfaces named \text
 
 The \texttt{snappyHexMeshDict} specifies surface refinement level~1 for the inlet and outlet and level~2 for the two wall surfaces and the obturator. It also defines a cylindrical local refinement region near the obturator, with endpoints $(0.035,0,0)\,\mathrm{m}$ and $(0.046,0,0)\,\mathrm{m}$, radius $0.011\,\mathrm{m}$ and refinement level~2. These are requested refinement settings to being able to capture the phenomena occuring in this delicate section.
 
-The \texttt{addLayers} option is enabled with an expansion ratio of~2. Two prismatic layers are requested on the obturator surface and the expansion ratio is~2. Realized layer coverage and near-wall resolution are evaluated from the generated mesh and wall distance diagnostic using the $y^+ > 30$ targe f, since requested layers do not necessarily survive snapping and mesh quality constraints.
+The \texttt{addLayers} option is enabled with an expansion ratio of~2. Two prismatic layers are requested on the obturator surface and the expansion ratio is~2. Realized layer coverage and near-wall resolution are evaluated from the generated mesh and wall distance diagnostic using the $y^+ > 30$ target, since requested layers do not necessarily survive snapping and mesh quality constraints.
 
 \section{HPC working and Domain decomposition}
 \label{sec:hpc_environment}
