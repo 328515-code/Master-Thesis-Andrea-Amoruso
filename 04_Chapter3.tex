@@ -20,7 +20,7 @@ the same equations introduced at Section \ref{sec:doe_analysis}. \\
 
 The global positive-$x$ force is distinct from a mechanically verified closing-direction force.
 
-The submitted dictionaries for the high pressure low temperature gases give $\rho_{\mathrm{H}_2}=33.77\,\mathrm{kg\,m^{-3}}$, $\nu_{\mathrm{H}_2}=2.709\times10^{-7}\,\mathrm{m^2\,s^{-1}}$, $\rho_{\mathrm{N}_2}=481.352\,\mathrm{kg\,m^{-3}}$ and $\nu_{\mathrm{N}_2}=7.932\times10^{-8}\,\mathrm{m^2\,s^{-1}}$, respectively for each gas we got density and viscosity used by the incompressible solver as discussed in Section~\ref{sec:doe_highpressure_state}.
+The submitted dictionaries for the high pressure low temperature give $\rho_{\mathrm{H}_2}=33.77\,\mathrm{kg\,m^{-3}}$, $\nu_{\mathrm{H}_2}=2.709\times10^{-7}\,\mathrm{m^2\,s^{-1}}$, $\rho_{\mathrm{N}_2}=481.352\,\mathrm{kg\,m^{-3}}$ and $\nu_{\mathrm{N}_2}=7.932\times10^{-8}\,\mathrm{m^2\,s^{-1}}$, respectively for each gas we got density and viscosity used by the incompressible solver as discussed in Section~\ref{sec:doe_highpressure_state}.
 
 \section{Data reduction and terminal numerical behavior}
 \label{sec:plotly_dashboard}
@@ -34,13 +34,44 @@ The \texttt{simpleFoam} output index, representing solver iteration and not elap
 {|\overline{R}|}\times100\%,\qquad N=301.
 \label{eq:terminal_average}
 \end{equation}
-This statistic, measures variation within the selected terminal interval. Reaching the last iteration or observing a small CV does not independently prove residual convergence, mesh independence, or experimental validation \cite{moukalled2016,openfoam_user}.
+This statistic measures variation within the selected terminal interval. Reaching the last iteration or observing a small CV does not independently prove residual convergence, mesh independence, or experimental validation \cite{moukalled2016,openfoam_user}.
 
-For hydrogen, the terminal-window CV ranges from approximately $0.83$--$10.25\%$ for pressure loss and $0.65$--$12.46\%$ for axial force. The largest variations occur for obturator B at $15\,\mathrm{m\,s^{-1}}$. In that case, comparing the final and initial 100 samples within the terminal window gives changes of approximately $11.6\%$ in mean pressure loss and $15.1\%$ in mean force, data which is important to underline because for a different mesuaring interval different data could be observed. In particular the value of 300 iterations for this statistic computation has been chosen because it corresponds to the $10\%$ of the total iterations for the different simulations.
+\begin{figure}[H]
+    \centering
+
+    % FIRST ROW: 2 images
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Pics/AVG_p exmple.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Pics/Volume flux example.png}
+    \end{subfigure}
+
+    \vspace{0.5cm}
+
+    % SECOND ROW: 2 images
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Pics/y+ exmple.png}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{Pics/forces example.png}
+    \end{subfigure}
+
+    \caption{Extract of the post processing outputs used to evaluate stability of the solution for every case simualated}
+    \label{fig:postprocessing_plots}
+\end{figure}
+
+For hydrogen, the terminal window CV ranges from approximately $0.83$--$10.25\%$ for pressure loss and $0.65$--$12.46\%$ for axial force. The largest variations occur for obturator B at $15\,\mathrm{m\,s^{-1}}$. In that case, comparing the final and initial 100 samples within the terminal window gives changes of approximately $11.6\%$ in mean pressure loss and $15.1\%$ in mean force, data which is important to underline because for a different mesuaring interval different data could be observed. In particular the value of 300 iterations for this statistic computation has been chosen because it corresponds to the $10\%$ of the total iterations for the different simulations.
 
 \subsection{Inlet flow consistency and mass-flow interpretation}
 
-Remembering the initial conditions imposed in the Chapter \ref{ch:doe}, we can campute the actual volume and mass flows for the two gases.
+Recalling the initial conditions imposed in the Chapter \ref{ch:doe}, we can compute the actual volume and mass flows for the two gasses.
 
 \begin{table}[htbp]
 \centering
