@@ -114,11 +114,56 @@ y^+=\frac{u_\tau \ y}{\nu}
 
 Where $y$ is the distance of the first layer cell centroid from the wall, $u_\tau$ is the friction velocity (a function of the wall stresses) and $\nu$ is the kinematic viscoity.
 
-Among the different simulations, the values respect the initial target $y^+ > 30$, implying so a near-wall turbulence modeling done with wall functions \cite{menter1994,openfoam_user,anderson2017}.
-The residuals also showed a stabilization in the extracted time steps, which implies a good quality simulation result.
-For both the gases, the greatest terminal fluctuation occurs with obturator B at high velocities. 
+The reported maxima are compatible with the use of wall functions, but maxima alone do not demonstrate that every wall cell satisfies the intended $y^+$ range \cite{menter1994,openfoam_user}. Terminal variations of integral responses must also be distinguished from solver-residual convergence and mesh independence. The greatest hydrogen terminal variation occurs for obturator B at the higher velocities. 
 
-Regarding the mach number verification ADD HERE THE LOCAL MACH NUMBER ANALYSIS \cite{anderson2017}.
+The inlet Mach number alone does not describe the acceleration through the obturator channels. The local Mach number is
+\begin{equation}
+M(\mathbf{x})=\frac{|\mathbf{u}(\mathbf{x})|}{a(\mathbf{x})},
+\qquad
+a^2=\left(\frac{\partial p_{\mathrm{abs}}}{\partial\rho}\right)_s,
+\label{eq:local_mach_results}
+\end{equation}
+where $a$ is the isentropic speed of sound and $p_{\mathrm{abs}}$ is thermodynamic absolute pressure, not the kinematic gauge-pressure field solved by \texttt{simpleFoam} \cite{anderson2017}. Because the present model does not solve an energy equation or a compressible equation of state, the following diagnostic uses a fixed reference sound speed:
+\begin{equation}
+a_{\mathrm{ref,H}_2}=1611.8\,\mathrm{m\,s^{-1}},
+\qquad M_{\mathrm{ref}}(\mathbf{x})=\frac{|\mathbf{u}(\mathbf{x})|}{a_{\mathrm{ref,H}_2}}.
+\label{eq:hydrogen_sound_speed}
+\end{equation}
+This value was evaluated at $T=233\,\mathrm{K}$ and $p_{\mathrm{abs}}=43.7\,\mathrm{MPa}$ using the normal-hydrogen Helmholtz equation of state of Leachman et al., implemented in CoolProp 8.0.0.\footnote{J. W. Leachman et al., \emph{Fundamental Equations of State for Parahydrogen, Normal Hydrogen, and Orthohydrogen}, J. Phys. Chem. Ref. Data 38, 721--748 (2009), \url{https://doi.org/10.1063/1.3160306}. Implementation: \url{https://coolprop.org/fluid_properties/fluids/Hydrogen.html}.} The same evaluation gives $\rho=33.790\,\mathrm{kg\,m^{-3}}$, close to the prescribed CFD value of $33.77\,\mathrm{kg\,m^{-3}}$; the CFD density is retained in all pressure and force calculations.
+
+For comparison, the calorically perfect ideal-gas estimate is $a_{\mathrm{ideal}}=\sqrt{\gamma R_{\mathrm{H}_2}T}=1159.9\,\mathrm{m\,s^{-1}}$, using $\gamma=1.4$ and $R_{\mathrm{H}_2}=4124.5\,\mathrm{J\,kg^{-1}\,K^{-1}}$. This ideal-gas value is not substituted for the real-gas sound speed at the high-pressure reference state.
+
+Table~\ref{tab:hydrogen_local_mach} distinguishes two measures at solver iteration 3000. $U_{\mathrm{ch,slice}}$ is the largest interpolated speed on the two longitudinal planes $y=0$ and $z=0$, restricted to the obturator region $0.035\leq x\leq0.046\,\mathrm{m}$. It samples the channel passages and their immediate exits but is not a maximum over every channel. $U_{\max,\mathrm{3D}}$ is obtained independently by scanning the original cell-centred velocity field over every processor subdomain. The latter supplies a domain-wide bound on the resolved cell-centred channel velocities and avoids treating a two-dimensional slice as a complete three-dimensional check.
+
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}cccccc@{}}
+\toprule
+$U_{\mathrm{in}}$ & Obt. & $U_{\mathrm{ch,slice}}$ & $M_{\mathrm{ch,slice}}$ & $U_{\max,\mathrm{3D}}$ & $M_{\max,\mathrm{3D}}$\\
+$[\mathrm{m\,s^{-1}}]$ & & $[\mathrm{m\,s^{-1}}]$ & $[-]$ & $[\mathrm{m\,s^{-1}}]$ & $[-]$\\
+\midrule
+5 & A & 47.02 & 0.0292 & 57.93 & 0.0359\\
+5 & B & 12.96 & 0.0080 & 15.93 & 0.0099\\
+5 & C & 23.61 & 0.0146 & 28.30 & 0.0176\\
+5 & D & 7.87 & 0.0049 & 15.17 & 0.0094\\
+10 & A & 94.31 & 0.0585 & 114.26 & 0.0709\\
+10 & B & 33.42 & 0.0207 & 40.35 & 0.0250\\
+10 & C & 49.98 & 0.0310 & 57.25 & 0.0355\\
+10 & D & 15.32 & 0.0095 & 32.80 & 0.0203\\
+15 & A & 140.98 & 0.0875 & 171.79 & 0.1066\\
+15 & B & 46.08 & 0.0286 & 61.22 & 0.0380\\
+15 & C & 73.28 & 0.0455 & 85.64 & 0.0531\\
+15 & D & 23.63 & 0.0147 & 56.43 & 0.0350\\
+\bottomrule
+\end{tabular}
+\caption{Hydrogen channel-region slice peaks and full-domain cell-centred maxima at iteration 3000. Mach numbers use the real-gas reference sound speed $a_{\mathrm{ref,H}_2}=1611.8\,\mathrm{m\,s^{-1}}$; these are final-field diagnostics, not terminal-window averages.}
+\label{tab:hydrogen_local_mach}
+\end{table}
+
+Obturator A gives the highest speeds at all three inlet conditions. At $15\,\mathrm{m\,s^{-1}}$, its channel-region slice reaches $140.98\,\mathrm{m\,s^{-1}}$ ($M_{\mathrm{ref}}=0.0875$), whereas the full volume reaches $171.79\,\mathrm{m\,s^{-1}}$ ($M_{\mathrm{ref}}=0.1066$). The latter is about 22\% higher, demonstrating the importance of the volume check. Even using the lower ideal-gas sound-speed estimate, the largest resolved Mach number is approximately 0.148. Both estimates remain below the usual $M\simeq0.3$ low-Mach screening threshold \cite{anderson2017}. This supports the low-Mach approximation for the resolved hydrogen velocity field at the stated reference temperature; it does not establish mesh independence, predict choking, or replace a compressible calculation with spatially varying temperature and thermodynamic properties.
+
 
 \section{Hydrogen: Primary High-Pressure CFD Results}
 \label{sec:fluid_trends}
@@ -228,7 +273,75 @@ At $15\,\mathrm{m\,s^{-1}}$, obturator A gives approximately $297.6\,\mathrm{kPa
 Pressure loss and Axial force increase strongly with inlet speed for every obturator, basically showing that the relationship between each configuration is linear setting just an offset for the different geometries. Their velocity dependence instead, is broadly consistent with the importance of dynamic pressure, proportional to $\rho \ U_{\mathrm{in}}^2$ as expected from theory, the interpolation of this data also underlines this trend.
 This plot has been fundamental to develop the Chapter \ref{ch:selection_tool} design tool.
 
-CONTOURS
+\subsection{Velocity and pressure contours through the obturator}
+\label{sec:hydrogen_contours}
+
+Figures~\ref{fig:h2_velocity_contours} and~\ref{fig:h2_pressure_contours} compare the four obturators at $U_{\mathrm{in}}=15\,\mathrm{m\,s^{-1}}$, where the geometric differences are most visible. They show the longitudinal plane $y=0$ at iteration 3000, with flow from left to right along the positive $x$ direction. The camera, spatial scale and colour limits are identical for all configurations. Velocity magnitude uses the Turbo map; pressure uses Coolwarm. The ranges, $0$--$140.98\,\mathrm{m\,s^{-1}}$ and $-224.23$--$299.35\,\mathrm{kPa}$, cover both longitudinal planes for all twelve hydrogen cases. The neutral Coolwarm colour denotes the midpoint of this range, not zero pressure.
+
+The displayed pressure is $p_g=\rho_{\mathrm{H}_2}P$, relative to the zero-pressure outlet. It is neither the absolute operating pressure nor a pointwise pressure-loss coefficient. Negative values therefore indicate pressure below the outlet reference, not negative absolute pressure. White areas are outside the cut fluid domain, including solid regions. Point values are interpolated from the cell-centred solution before slicing.
+
+\begingroup\emergencystretch=1em
+The narrow passages of A produce a concentrated high-speed jet and the strongest upstream-to-downstream pressure contrast. Configuration C, which has twice as many small holes, shows lower peak speeds and a more distributed acceleration pattern on this plane. B and D have larger holes and weaker velocity amplification and pressure contrasts on the common scale. The integral pressure-loss and axial-force ranking is also $A>C>B>D$. However, one section does not intersect every hole or capture all off-plane velocity maxima. In particular, Table~\ref{tab:hydrogen_local_mach} shows why the modest slice velocities of D must not be interpreted as its full-domain peak velocity.
+\par\endgroup
+
+Downstream of the passages, high-speed fluid enters a wider region and is surrounded by lower-speed fluid. This is consistent with jet development and mixing after the restriction. Velocity-magnitude contours alone cannot establish the direction of recirculation or identify vortices; those interpretations require vector, streamline or vorticity information. Likewise, a local static-pressure minimum is not the area-averaged inlet-to-outlet pressure loss used in Tables~\ref{tab:hydrogen_pressure} and~\ref{tab:hydrogen_force}.
+
+These final-iteration fields complement, rather than replace, the 301-sample integral averages. The elevated terminal variation of B at $15\,\mathrm{m\,s^{-1}}$ means that its displayed pattern should not be interpreted as a uniquely converged steady structure. ParaView also reports non-manifold triangulation warnings for the source meshes; small local contour omissions cannot be excluded. The contours are used for qualitative interpretation, while the full-domain Mach scan reads the original volume velocities independently of the slicing operation.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/H2_U15_A_y0_speed.png}
+\caption{Obturator A}
+\end{subfigure}\par\smallskip
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/H2_U15_B_y0_speed.png}
+\caption{Obturator B}
+\end{subfigure}\par\smallskip
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/H2_U15_C_y0_speed.png}
+\caption{Obturator C}
+\end{subfigure}\par\smallskip
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/H2_U15_D_y0_speed.png}
+\caption{Obturator D}
+\end{subfigure}\par\smallskip
+\caption{Hydrogen velocity magnitude on $y=0$ for the four obturators at $U_{\mathrm{in}}=15\,\mathrm{m\,s^{-1}}$, iteration 3000. All panels share the same camera and colour limits; the colour bar reports dimensional values.}
+\label{fig:h2_velocity_contours}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/H2_U15_A_y0_pressure_Pa.png}
+\caption{Obturator A}
+\end{subfigure}\par\smallskip
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/H2_U15_B_y0_pressure_Pa.png}
+\caption{Obturator B}
+\end{subfigure}\par\smallskip
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/H2_U15_C_y0_pressure_Pa.png}
+\caption{Obturator C}
+\end{subfigure}\par\smallskip
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/H2_U15_D_y0_pressure_Pa.png}
+\caption{Obturator D}
+\end{subfigure}\par\smallskip
+\caption{Hydrogen outlet-referenced pressure on $y=0$ for the four obturators at $U_{\mathrm{in}}=15\,\mathrm{m\,s^{-1}}$, iteration 3000. All panels share the same camera and colour limits; the colour bar reports dimensional values.}
+\label{fig:h2_pressure_contours}
+\end{figure}
+
+\clearpage
+
 
 \section{Nitrogen: Secondary Industrial-Gas Comparison}
 \label{sec:nitrogen_comparison}
@@ -269,12 +382,66 @@ $U_{\mathrm{in}}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} &
 
 The magnitude of the nitrogen loads is generally much greater than that of hydrogen at equal inlet velocity and geometry. At $15\,\mathrm{m\,s^{-1}}$ with obturator A, nitrogen gives approximately $4.23\,\mathrm{MPa}$ and $711.6\,\mathrm{N}$, compared with $0.298\,\mathrm{MPa}$ and $50.1\,\mathrm{N}$ for hydrogen. This difference is largely associated with the much higher nitrogen reference density, together with changes in the Reynolds number. It must not be interpreted as a comparison at equal mass-flow demand or as direct evidence about hydrogen refuelling performance.
 
-\section{Comparison Between Reference-State and Dispensing Conditions}
+\section{Dimensionless Comparison of Hydrogen and Nitrogen}
 \label{sec:results_operating_states}
+\label{sec:gas_coefficient_comparison}
 
-The earlier ambient-condition simulations provide a useful baseline, but the final high-pressure and low-temperature campaign is more representative of the specified EFV location downstream of the pre-cooler. The two states must be treated separately. In particular, changing the reference density in an already computed force history does not account for a different kinematic viscosity, Reynolds number or flow structure, and equal inlet velocity does not imply equal mass flow when density changes.
+To separate the dominant density and velocity scaling from the geometric response, the two gases are compared using the coefficients defined in Section~\ref{sec:doe_analysis}, Eq.~\eqref{eq:response_coefficients}:
+\begin{equation}
+\overline{P}_{loss}=\frac{\overline{\Delta p}}{\tfrac12\rho_{\mathrm{ref}}U_{\mathrm{in}}^2},
+\qquad
+\overline{C}_{F,x}=\frac{\overline{F}_x}{\tfrac12\rho_{\mathrm{ref}}U_{\mathrm{in}}^2A_{\mathrm{in}}}.
+\label{eq:mean_response_coefficients}
+\end{equation}
+For consistency with Eq.~\eqref{eq:inlet_area}, the force coefficient uses the nominal inlet area $A_{\mathrm{in}}=\pi(0.0039)^2=4.7783624\times10^{-5}\,\mathrm{m^2}$ for every case, rather than the slightly smaller discretized patch area used to report actual flow rates. The density is that of each gas's active dictionary. Because the denominators are fixed within a case, normalizing the terminal mean is equivalent to averaging the normalized samples. The calculations use the unrounded response values retained in the repository's audited response table; displayed coefficients are rounded to two decimals.
 
-The application operating point must also be distinguished from the transient refuelling history governed by station-level controls. SAE~J2601 establishes light-duty gaseous-hydrogen filling protocols and delivery-temperature categories; the CFD cases instead describe flow past fixed obturators at specific reference properties \cite{sae_j2601}. The resulting axial fluid force is a component of, rather than a complete solution to, the valve's mechanical actuation problem.
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}crrrrrr@{}}
+\toprule
+& \multicolumn{2}{c}{$5\,\mathrm{m\,s^{-1}}$} & \multicolumn{2}{c}{$10\,\mathrm{m\,s^{-1}}$} & \multicolumn{2}{c}{$15\,\mathrm{m\,s^{-1}}$}\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Obt. & $\mathrm{H}_2$ & $\mathrm{N}_2$ & $\mathrm{H}_2$ & $\mathrm{N}_2$ & $\mathrm{H}_2$ & $\mathrm{N}_2$\\
+\midrule
+A & 79.03 & 78.40$^{\dagger}$ & 78.51 & 78.02 & 78.34 & 78.02\\
+B & 8.16 & 8.74 & 9.29 & 8.59 & 9.16 & 8.61\\
+C & 21.95 & 21.73 & 22.27 & 21.88 & 22.04 & 21.76\\
+D & 4.07 & 4.14 & 4.07 & 4.13 & 4.09 & 4.14\\
+\bottomrule
+\end{tabular}
+\caption{Dimensionless mean pressure-loss coefficient $\overline{P}_{loss}$ for hydrogen and nitrogen. $\dagger$: corrected nitrogen A at $5\,\mathrm{m\,s^{-1}}$ uses iterations 1072--1372; all other means use iterations 2700--3000.}
+\label{tab:pressure_coefficients_gases}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{@{}crrrrrr@{}}
+\toprule
+& \multicolumn{2}{c}{$5\,\mathrm{m\,s^{-1}}$} & \multicolumn{2}{c}{$10\,\mathrm{m\,s^{-1}}$} & \multicolumn{2}{c}{$15\,\mathrm{m\,s^{-1}}$}\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Obt. & $\mathrm{H}_2$ & $\mathrm{N}_2$ & $\mathrm{H}_2$ & $\mathrm{N}_2$ & $\mathrm{H}_2$ & $\mathrm{N}_2$\\
+\midrule
+A & 278.42 & 276.38$^{\dagger}$ & 276.93 & 274.87 & 275.92 & 275.02\\
+B & 22.64 & 24.78 & 25.95 & 24.39 & 26.27 & 24.15\\
+C & 72.76 & 72.11 & 73.71 & 72.43 & 73.16 & 72.30\\
+D & 8.19 & 8.29 & 8.35 & 8.56 & 8.43 & 8.42\\
+\bottomrule
+\end{tabular}
+\caption{Dimensionless mean axial-force coefficient $\overline{C}_{F,x}$ for hydrogen and nitrogen. $\dagger$: corrected nitrogen A at $5\,\mathrm{m\,s^{-1}}$ uses iterations 1072--1372; all other means use iterations 2700--3000.}
+\label{tab:force_coefficients_gases}
+\end{table}
+
+The dimensional nitrogen responses are roughly fourteen times the hydrogen responses, but the normalized values are much closer: $\rho_{\mathrm{N}_2}/\rho_{\mathrm{H}_2}\simeq14.25$. Both tables retain the ordering $A>C>B>D$ for both gases at every inlet velocity. For A, C and D, paired gas differences are below approximately 2.5\% in both coefficients. This near-collapse indicates that the leading dimensional difference is density scaling within the present constant-property models. It does not imply identical thermodynamics or complete dynamic similarity.
+
+Obturator A has $\overline{P}_{loss}\simeq78$--$79$ and $\overline{C}_{F,x}\simeq275$--$278$, whereas D has approximately $4.07$--$4.14$ and $8.19$--$8.56$. Their weak velocity dependence is consistent with an approximately quadratic dependence of pressure loss and force on inlet speed. The large numerical force coefficients reflect normalization by the small inlet area; they are not efficiencies or mechanical closing-force ratios.
+
+Configuration B exhibits the largest differences. Its hydrogen pressure coefficient rises from 8.16 at $5\,\mathrm{m\,s^{-1}}$ to 9.29 at $10\,\mathrm{m\,s^{-1}}$, while nitrogen stays near 8.6--8.7. At $15\,\mathrm{m\,s^{-1}}$, the nitrogen pressure and force coefficients are approximately 6.0\% and 8.1\% below the hydrogen values. These departures should be considered alongside B's hydrogen terminal CV values of 10.25\% for pressure and 12.46\% for force at that velocity. Since normalization divides by a constant, it does not reduce the relative terminal variation; the observed gas difference cannot be attributed uniquely to a physical gas effect from these data alone.
+
+At equal inlet velocity and geometry, the Reynolds-number ratio is $Re_{\mathrm{N}_2}/Re_{\mathrm{H}_2}=\nu_{\mathrm{H}_2}/\nu_{\mathrm{N}_2}\simeq3.42$. Residual coefficient differences can therefore involve Reynolds-number effects as well as mesh, wall-treatment and iterative effects. The comparison also remains at approximately equal volumetric flow, not equal mass flow. Moreover, the largest nitrogen pressure loss is about 9.7\% of the nominal absolute reference pressure, compared with about 0.68\% for hydrogen; a successful hydrogen low-Mach check does not independently validate nitrogen's constant-density approximation.
+
+These coefficients support relative hydraulic screening of the stationary geometries. They do not convert the recorded positive-$x$ force into a verified closing force, establish a trip threshold, or describe the transient refuelling protocol. Ambient-reference results and the present cold high-pressure results must remain separate: rescaling density alone would omit the changes in viscosity and flow structure. Hydrogen remains the primary design fluid, with nitrogen providing a supplementary comparison of normalized response.
 
 \section{Implications for Excess-Flow Valve Design}
 \label{sec:results_efv_implications}
@@ -282,3 +449,4 @@ The application operating point must also be distinguished from the transient re
 The principal hydrogen result is a consistent trade-off: smaller effective passages increase both hydraulic resistance and positive-$x$ obturator loading. Therefore the configuration yielding the greatest force is not automatically the best valve, because the pressure-loss requirement during normal flow must also be met. An engineering choice requires the permissible loss, mechanical force balance, motion direction, spring properties and expected excess-flow conditions (Section~\ref{sec:efv_principle}).
 
 The nitrogen study supports the comparison of fluid-property effects but does not change the hydrogen-first objective of the work. The tabulated CFD responses provide the numerical foundation for a design comparison tool, which is described in Chapter~\ref{ch:selection_tool}. Implementing and testing that software is a separate final development activity, not an additional round of flow simulations.
+
