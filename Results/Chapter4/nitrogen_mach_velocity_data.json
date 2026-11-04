@@ -1,0 +1,988 @@
+[
+  {
+    "case": "Sim_N2_Flux05_Obt_A",
+    "time": "1000",
+    "rho": 481.352,
+    "processors": 52,
+    "max_cell_speed": 59.56594106743108,
+    "max_cell_location": [
+      "processor30",
+      28612
+    ],
+    "cell_count": 5780649,
+    "bounds": [
+      -0.0049600000493228436,
+      0.16747047007083893,
+      -0.0139999995008111,
+      0.013998419977724552,
+      -0.0139999995008111,
+      0.0139999995008111
+    ],
+    "slices": {
+      "y0": {
+        "channel_peak": 46.72217791120316,
+        "channel_peak_position": [
+          0.041983045637607574,
+          0.0,
+          -0.006749983876943588
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            46.72217791120316
+          ],
+          "pressure_Pa": [
+            -353641.475977539,
+            486064.92495312495
+          ]
+        }
+      },
+      "z0": {
+        "channel_peak": 33.315402790031996,
+        "channel_peak_position": [
+          0.041750598698854446,
+          -0.0018389213364571333,
+          0.0
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            33.315402790031996
+          ],
+          "pressure_Pa": [
+            -59123.85007409668,
+            486063.4559833984
+          ]
+        }
+      }
+    },
+    "channel_slice_peak_speed": 46.72217791120316
+  },
+  {
+    "case": "Sim_N2_Flux05_Obt_B",
+    "time": "3000",
+    "rho": 481.352,
+    "processors": 52,
+    "max_cell_speed": 17.3193870564538,
+    "max_cell_location": [
+      "processor11",
+      108921
+    ],
+    "cell_count": 5812704,
+    "bounds": [
+      -0.0049600000493228436,
+      0.16747047007083893,
+      -0.0139999995008111,
+      0.013998419977724552,
+      -0.0139999995008111,
+      0.0139999995008111
+    ],
+    "slices": {
+      "y0": {
+        "channel_peak": 12.841872576616144,
+        "channel_peak_position": [
+          0.04333553835749626,
+          0.0,
+          -0.0051194727420806885
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            12.841872576616144
+          ],
+          "pressure_Pa": [
+            -15957.55769177246,
+            57489.74244329834
+          ]
+        }
+      },
+      "z0": {
+        "channel_peak": 12.08234137718319,
+        "channel_peak_position": [
+          0.04099912941455841,
+          -0.003696301020681858,
+          0.0
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            12.08234137718319
+          ],
+          "pressure_Pa": [
+            -12345.804579391479,
+            57489.74244329834
+          ]
+        }
+      }
+    },
+    "channel_slice_peak_speed": 12.841872576616144
+  },
+  {
+    "case": "Sim_N2_Flux05_Obt_C",
+    "time": "3000",
+    "rho": 481.352,
+    "processors": 52,
+    "max_cell_speed": 28.315421033049788,
+    "max_cell_location": [
+      "processor1",
+      109160
+    ],
+    "cell_count": 5795027,
+    "bounds": [
+      -0.0049600000493228436,
+      0.16747047007083893,
+      -0.0139999995008111,
+      0.013998419977724552,
+      -0.0139999995008111,
+      0.0139999995008111
+    ],
+    "slices": {
+      "y0": {
+        "channel_peak": 23.895655496832703,
+        "channel_peak_position": [
+          0.042435258626937866,
+          0.0,
+          0.005241332110017538
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            23.895655496832703
+          ],
+          "pressure_Pa": [
+            -82146.1532512207,
+            137978.46082446288
+          ]
+        }
+      },
+      "z0": {
+        "channel_peak": 16.850168443608293,
+        "channel_peak_position": [
+          0.04028565436601639,
+          -0.0006045213085599244,
+          0.0
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            16.850168443608293
+          ],
+          "pressure_Pa": [
+            -23788.793218322753,
+            137978.62241113282
+          ]
+        }
+      }
+    },
+    "channel_slice_peak_speed": 23.895655496832703
+  },
+  {
+    "case": "Sim_N2_Flux05_Obt_D",
+    "time": "3000",
+    "rho": 481.352,
+    "processors": 52,
+    "expected_processors": 52,
+    "complete_processor_set": true,
+    "fields": {
+      "k": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "nut": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -1 0 0 0 0]"
+      },
+      "omega": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 -1 0 0 0 0]"
+      },
+      "p": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "phi": {
+        "class": "surfaceScalarField",
+        "dimensions": "[0 3 -1 0 0 0 0]"
+      },
+      "U": {
+        "class": "volVectorField",
+        "dimensions": "[0 1 -1 0 0 0 0]"
+      },
+      "yPlus": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 0 0 0 0 0]"
+      }
+    },
+    "max_cell_speed": 20.921922376327263,
+    "max_cell_location": [
+      "processor48",
+      104705
+    ],
+    "cell_count": 5859255,
+    "bounds": [
+      -0.0049600000493228436,
+      0.16747047007083893,
+      -0.0139999995008111,
+      0.013998419977724552,
+      -0.0139999995008111,
+      0.0139999995008111
+    ],
+    "slices": {
+      "y0": {
+        "channel_peak": 8.163978568067852,
+        "channel_peak_position": [
+          0.04333553835749626,
+          0.0,
+          -0.0051194727420806885
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            8.163978568067852
+          ],
+          "pressure_Pa": [
+            -7432.175210632324,
+            30667.581825988767
+          ]
+        }
+      },
+      "z0": {
+        "channel_peak": 6.4158270505346575,
+        "channel_peak_position": [
+          0.035374999046325684,
+          -0.013892789371311665,
+          0.0
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            8.043207039746846
+          ],
+          "pressure_Pa": [
+            -6830.016058425903,
+            30667.910507965087
+          ]
+        }
+      }
+    },
+    "channel_slice_peak_speed": 8.163978568067852
+  },
+  {
+    "case": "Sim_N2_Flux10_Obt_A",
+    "time": "3000",
+    "rho": 481.352,
+    "processors": 52,
+    "fields": {
+      "k": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "nut": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -1 0 0 0 0]"
+      },
+      "omega": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 -1 0 0 0 0]"
+      },
+      "p": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "phi": {
+        "class": "surfaceScalarField",
+        "dimensions": "[0 3 -1 0 0 0 0]"
+      },
+      "U": {
+        "class": "volVectorField",
+        "dimensions": "[0 1 -1 0 0 0 0]"
+      },
+      "yPlus": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 0 0 0 0 0]"
+      }
+    },
+    "max_cell_speed": 114.7798325175731,
+    "max_cell_location": [
+      "processor30",
+      18512
+    ],
+    "cell_count": 5780749,
+    "bounds": [
+      -0.0049600000493228436,
+      0.16747047007083893,
+      -0.0139999995008111,
+      0.013998419977724552,
+      -0.0139999995008111,
+      0.0139999995008111
+    ],
+    "slices": {
+      "y0": {
+        "channel_peak": 93.34973500269103,
+        "channel_peak_position": [
+          0.042435262352228165,
+          0.0,
+          -0.005241334903985262
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            93.34973500269103
+          ],
+          "pressure_Pa": [
+            -1361147.818703125,
+            1886316.6002597655
+          ]
+        }
+      },
+      "z0": {
+        "channel_peak": 75.7890484811484,
+        "channel_peak_position": [
+          0.041999995708465576,
+          0.001844042562879622,
+          0.0
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            75.7890484811484
+          ],
+          "pressure_Pa": [
+            -171695.54668188476,
+            1886308.2565117187
+          ]
+        }
+      }
+    },
+    "channel_slice_peak_speed": 93.34973500269103
+  },
+  {
+    "case": "Sim_N2_Flux10_Obt_B",
+    "time": "3000",
+    "rho": 481.352,
+    "processors": 52,
+    "fields": {
+      "k": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "nut": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -1 0 0 0 0]"
+      },
+      "omega": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 -1 0 0 0 0]"
+      },
+      "p": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "phi": {
+        "class": "surfaceScalarField",
+        "dimensions": "[0 3 -1 0 0 0 0]"
+      },
+      "U": {
+        "class": "volVectorField",
+        "dimensions": "[0 1 -1 0 0 0 0]"
+      },
+      "yPlus": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 0 0 0 0 0]"
+      }
+    },
+    "max_cell_speed": 37.655996064214484,
+    "max_cell_location": [
+      "processor50",
+      74121
+    ],
+    "cell_count": 5812653,
+    "bounds": [
+      -0.0049600000493228436,
+      0.16747047007083893,
+      -0.0139999995008111,
+      0.013998419977724552,
+      -0.0139999995008111,
+      0.0139999995008111
+    ],
+    "slices": {
+      "y0": {
+        "channel_peak": 30.579085742665566,
+        "channel_peak_position": [
+          0.04333553835749626,
+          0.0,
+          -0.0051194727420806885
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            30.579085742665566
+          ],
+          "pressure_Pa": [
+            -151783.57390014647,
+            254302.36883935545
+          ]
+        }
+      },
+      "z0": {
+        "channel_peak": 26.516119971052127,
+        "channel_peak_position": [
+          0.042375002056360245,
+          -0.003450890304520726,
+          0.0
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            26.516119971052127
+          ],
+          "pressure_Pa": [
+            -47559.76048901367,
+            254306.48195458984
+          ]
+        }
+      }
+    },
+    "channel_slice_peak_speed": 30.579085742665566
+  },
+  {
+    "case": "Sim_N2_Flux10_Obt_C",
+    "time": "3000",
+    "rho": 481.352,
+    "processors": 52,
+    "fields": {
+      "k": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "nut": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -1 0 0 0 0]"
+      },
+      "omega": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 -1 0 0 0 0]"
+      },
+      "p": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "phi": {
+        "class": "surfaceScalarField",
+        "dimensions": "[0 3 -1 0 0 0 0]"
+      },
+      "U": {
+        "class": "volVectorField",
+        "dimensions": "[0 1 -1 0 0 0 0]"
+      },
+      "yPlus": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 0 0 0 0 0]"
+      }
+    },
+    "max_cell_speed": 56.452516827024255,
+    "max_cell_location": [
+      "processor28",
+      80987
+    ],
+    "cell_count": 5795110,
+    "bounds": [
+      -0.0049600000493228436,
+      0.16747047007083893,
+      -0.0139999995008111,
+      0.013998419977724552,
+      -0.0139999995008111,
+      0.0139999995008111
+    ],
+    "slices": {
+      "y0": {
+        "channel_peak": 49.36599108204307,
+        "channel_peak_position": [
+          0.042529668658971786,
+          0.0,
+          0.005244951229542494
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            49.36599108204307
+          ],
+          "pressure_Pa": [
+            -323452.06215966796,
+            554879.516899414
+          ]
+        }
+      },
+      "z0": {
+        "channel_peak": 36.62056486834652,
+        "channel_peak_position": [
+          0.040283869951963425,
+          0.00023170044005382806,
+          0.0
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            36.62056486834652
+          ],
+          "pressure_Pa": [
+            -132742.5973383789,
+            554883.0424267577
+          ]
+        }
+      }
+    },
+    "channel_slice_peak_speed": 49.36599108204307
+  },
+  {
+    "case": "Sim_N2_Flux10_Obt_D",
+    "time": "3000",
+    "rho": 481.352,
+    "processors": 52,
+    "fields": {
+      "k": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "nut": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -1 0 0 0 0]"
+      },
+      "omega": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 -1 0 0 0 0]"
+      },
+      "p": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "phi": {
+        "class": "surfaceScalarField",
+        "dimensions": "[0 3 -1 0 0 0 0]"
+      },
+      "U": {
+        "class": "volVectorField",
+        "dimensions": "[0 1 -1 0 0 0 0]"
+      },
+      "yPlus": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 0 0 0 0 0]"
+      }
+    },
+    "max_cell_speed": 41.53914615227352,
+    "max_cell_location": [
+      "processor36",
+      109689
+    ],
+    "cell_count": 5859060,
+    "bounds": [
+      -0.0049600000493228436,
+      0.16747047007083893,
+      -0.0139999995008111,
+      0.013998419977724552,
+      -0.0139999995008111,
+      0.0139999995008111
+    ],
+    "slices": {
+      "y0": {
+        "channel_peak": 15.645635074063648,
+        "channel_peak_position": [
+          0.04333553835749626,
+          0.0,
+          0.005119475536048412
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            15.772859577710058
+          ],
+          "pressure_Pa": [
+            -26733.363233551023,
+            122933.3022644043
+          ]
+        }
+      },
+      "z0": {
+        "channel_peak": 12.60302150781171,
+        "channel_peak_position": [
+          0.044499997049570084,
+          0.003563734469935298,
+          0.0
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            16.057507457746915
+          ],
+          "pressure_Pa": [
+            -27307.153826019286,
+            122933.3022644043
+          ]
+        }
+      }
+    },
+    "channel_slice_peak_speed": 15.645635074063648
+  },
+  {
+    "case": "Sim_N2_Flux15_Obt_A",
+    "time": "3000",
+    "rho": 481.352,
+    "processors": 52,
+    "fields": {
+      "k": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "nut": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -1 0 0 0 0]"
+      },
+      "omega": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 -1 0 0 0 0]"
+      },
+      "p": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "phi": {
+        "class": "surfaceScalarField",
+        "dimensions": "[0 3 -1 0 0 0 0]"
+      },
+      "U": {
+        "class": "volVectorField",
+        "dimensions": "[0 1 -1 0 0 0 0]"
+      },
+      "yPlus": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 0 0 0 0 0]"
+      }
+    },
+    "max_cell_speed": 176.79111290264007,
+    "max_cell_location": [
+      "processor36",
+      85066
+    ],
+    "cell_count": 5780540,
+    "bounds": [
+      -0.0049600000493228436,
+      0.16747047007083893,
+      -0.0139999995008111,
+      0.013998419977724552,
+      -0.0139999995008111,
+      0.0139999995008111
+    ],
+    "slices": {
+      "y0": {
+        "channel_peak": 140.61379950830292,
+        "channel_peak_position": [
+          0.04152672737836838,
+          0.0,
+          -0.007374805398285389
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            140.61379950830292
+          ],
+          "pressure_Pa": [
+            -3300125.3384140623,
+            4272714.4470156245
+          ]
+        }
+      },
+      "z0": {
+        "channel_peak": 116.27953816363058,
+        "channel_peak_position": [
+          0.042124997824430466,
+          -0.001840504352003336,
+          0.0
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            116.27953816363058
+          ],
+          "pressure_Pa": [
+            -416417.2508955078,
+            4272714.4470156245
+          ]
+        }
+      }
+    },
+    "channel_slice_peak_speed": 140.61379950830292
+  },
+  {
+    "case": "Sim_N2_Flux15_Obt_B",
+    "time": "3000",
+    "rho": 481.352,
+    "processors": 52,
+    "expected_processors": 52,
+    "complete_processor_set": true,
+    "fields": {
+      "k": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "nut": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -1 0 0 0 0]"
+      },
+      "omega": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 -1 0 0 0 0]"
+      },
+      "p": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "phi": {
+        "class": "surfaceScalarField",
+        "dimensions": "[0 3 -1 0 0 0 0]"
+      },
+      "U": {
+        "class": "volVectorField",
+        "dimensions": "[0 1 -1 0 0 0 0]"
+      },
+      "yPlus": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 0 0 0 0 0]"
+      }
+    },
+    "max_cell_speed": 65.57590271855283,
+    "max_cell_location": [
+      "processor10",
+      362
+    ],
+    "cell_count": 5812690,
+    "bounds": [
+      -0.0049600000493228436,
+      0.16747047007083893,
+      -0.0139999995008111,
+      0.013998419977724552,
+      -0.0139999995008111,
+      0.0139999995008111
+    ],
+    "slices": {
+      "y0": {
+        "channel_peak": 47.558346216326875,
+        "channel_peak_position": [
+          0.04333553835749626,
+          0.0,
+          -0.0051194727420806885
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            47.558346216326875
+          ],
+          "pressure_Pa": [
+            -348902.31522509764,
+            522709.726234375
+          ]
+        }
+      },
+      "z0": {
+        "channel_peak": 36.225971509942106,
+        "channel_peak_position": [
+          0.04349999874830246,
+          -0.002831118879839778,
+          0.0
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            36.225971509942106
+          ],
+          "pressure_Pa": [
+            -92099.68646264648,
+            522701.5000039062
+          ]
+        }
+      }
+    },
+    "channel_slice_peak_speed": 47.558346216326875
+  },
+  {
+    "case": "Sim_N2_Flux15_Obt_C",
+    "time": "3000",
+    "rho": 481.352,
+    "processors": 52,
+    "expected_processors": 52,
+    "complete_processor_set": true,
+    "fields": {
+      "k": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "nut": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -1 0 0 0 0]"
+      },
+      "omega": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 -1 0 0 0 0]"
+      },
+      "p": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "phi": {
+        "class": "surfaceScalarField",
+        "dimensions": "[0 3 -1 0 0 0 0]"
+      },
+      "U": {
+        "class": "volVectorField",
+        "dimensions": "[0 1 -1 0 0 0 0]"
+      },
+      "yPlus": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 0 0 0 0 0]"
+      }
+    },
+    "max_cell_speed": 85.68233776663902,
+    "max_cell_location": [
+      "processor20",
+      83708
+    ],
+    "cell_count": 5795107,
+    "bounds": [
+      -0.0049600000493228436,
+      0.16747047007083893,
+      -0.0139999995008111,
+      0.013998419977724552,
+      -0.0139999995008111,
+      0.0139999995008111
+    ],
+    "slices": {
+      "y0": {
+        "channel_peak": 71.45485729033379,
+        "channel_peak_position": [
+          0.041641101241111755,
+          0.0,
+          0.0069999550469219685
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            71.45485729033379
+          ],
+          "pressure_Pa": [
+            -734652.2083124999,
+            1248236.6946054688
+          ]
+        }
+      },
+      "z0": {
+        "channel_peak": 54.28205181771738,
+        "channel_peak_position": [
+          0.04016099497675896,
+          0.00035445537650957704,
+          0.0
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            54.28205181771738
+          ],
+          "pressure_Pa": [
+            -244989.43863598633,
+            1248249.7390566405
+          ]
+        }
+      }
+    },
+    "channel_slice_peak_speed": 71.45485729033379
+  },
+  {
+    "case": "Sim_N2_Flux15_Obt_D",
+    "time": "3000",
+    "rho": 481.352,
+    "processors": 52,
+    "expected_processors": 52,
+    "complete_processor_set": true,
+    "fields": {
+      "k": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "nut": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -1 0 0 0 0]"
+      },
+      "omega": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 -1 0 0 0 0]"
+      },
+      "p": {
+        "class": "volScalarField",
+        "dimensions": "[0 2 -2 0 0 0 0]"
+      },
+      "phi": {
+        "class": "surfaceScalarField",
+        "dimensions": "[0 3 -1 0 0 0 0]"
+      },
+      "U": {
+        "class": "volVectorField",
+        "dimensions": "[0 1 -1 0 0 0 0]"
+      },
+      "yPlus": {
+        "class": "volScalarField",
+        "dimensions": "[0 0 0 0 0 0 0]"
+      }
+    },
+    "max_cell_speed": 61.809968012945426,
+    "max_cell_location": [
+      "processor45",
+      42647
+    ],
+    "cell_count": 5859073,
+    "bounds": [
+      -0.0049600000493228436,
+      0.16747047007083893,
+      -0.0139999995008111,
+      0.013998419977724552,
+      -0.0139999995008111,
+      0.0139999995008111
+    ],
+    "slices": {
+      "y0": {
+        "channel_peak": 23.292707237268235,
+        "channel_peak_position": [
+          0.042965829372406006,
+          0.0,
+          -0.004979040008038282
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            23.34518636585395
+          ],
+          "pressure_Pa": [
+            -67244.99779345703,
+            278440.15621289064
+          ]
+        }
+      },
+      "z0": {
+        "channel_peak": 19.235918574963108,
+        "channel_peak_position": [
+          0.035374999046325684,
+          -0.01389293186366558,
+          0.0
+        ],
+        "ranges": {
+          "speed": [
+            0.0,
+            24.11735784041762
+          ],
+          "pressure_Pa": [
+            -73270.60143908691,
+            278446.8253354492
+          ]
+        }
+      }
+    },
+    "channel_slice_peak_speed": 23.292707237268235
+  }
+]

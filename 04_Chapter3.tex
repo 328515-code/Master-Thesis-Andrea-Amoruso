@@ -135,7 +135,7 @@ Values obtained at $T=233\,\mathrm{K}$ and $p_{\mathrm{abs}}=43.7\,\mathrm{MPa}$
 
 The usage of this database was necessary because by using the ideal gas formulations the sound speed value would have been much smaller $a_{\mathrm{ideal}}=1159.9\,\mathrm{m\,s^{-1}}$, showing so a erroneous data.
 
-Tables ~\ref{tab:hydrogen_local_mach1,tab:hydrogen_local_mach2,tab:hydrogen_local_mach3} distinguishes two measures at solver iteration 3000. $U_{\mathrm{ch,slice}}$ is the largest interpolated speed on the two longitudinal planes $y=0$ and $z=0$, restricted to the obturator region $0.035\leq x\leq0.046\,\mathrm{m}$. It samples the channel passages and their immediate exits but is not a maximum over every channel. $U_{\max,\mathrm{3D}}$ is obtained independently by scanning the original cell centered velocity field over every processor subdomain. The latter supplies a domain-wide bound on the resolved cell centered channel velocities evaluating velocity also at different domain positions.
+Tables ~\ref{tab:hydrogen_local_mach1}--\ref{tab:hydrogen_local_mach3} distinguishes two measures at solver iteration 3000. $U_{\mathrm{ch,slice}}$ is the largest interpolated speed on the two longitudinal planes $y=0$ and $z=0$, restricted to the obturator region $0.035\leq x\leq0.046\,\mathrm{m}$. It samples the channel passages and their immediate exits but is not a maximum over every channel. $U_{\max,\mathrm{3D}}$ is obtained independently by scanning the original cell centered velocity field over every processor subdomain. The latter supplies a domain-wide bound on the resolved cell centered channel velocities evaluating velocity also at different domain positions.
 
 \begin{table}[htbp]
 \centering
@@ -191,8 +191,54 @@ Tables ~\ref{tab:hydrogen_local_mach1,tab:hydrogen_local_mach2,tab:hydrogen_loca
 \end{table}
 
 Obturator A gives the highest speeds at all three inlet conditions as expected. At $15\,\mathrm{m\,s^{-1}}$, its channel-region slice reaches $140.98\,\mathrm{m\,s^{-1}}$ ($M_{\mathrm{ref}}=0.0875$), whereas the full volume reaches $171.79\,\mathrm{m\,s^{-1}}$ ($M_{\mathrm{ref}}=0.1066$), being so about 22\% higher, demonstrating the importance of the volume check. 
-As shown in the Tables \ref{tab:hydrogen_local_mach1,tab:hydrogen_local_mach2,tab:hydrogen_local_mach3} estimated values remain below the usual $Ma\simeq0.3$ compressibility threshold \cite{anderson2017}. This supports the low Mach approximation for the resolved hydrogen velocity field at the stated reference temperature.
+As shown in the Tables \ref{tab:hydrogen_local_mach1}--\ref{tab:hydrogen_local_mach3} estimated values remain below the usual $Ma\simeq0.3$ compressibility threshold \cite{anderson2017}. This supports the low Mach approximation for the resolved hydrogen velocity field at the stated reference temperature.
 
+
+
+\clearpage
+\subsection{Nitrogen local Mach-number check}
+\label{sec:nitrogen_mach}
+
+The same velocity-based diagnostic is applied to nitrogen using
+\begin{equation}
+a_{\mathrm{ref,N}_2}=593.37\,\mathrm{m\,s^{-1}},
+\qquad Ma_{\mathrm{ref,N}_2}(\mathbf{x})=\frac{|\mathbf{u}(\mathbf{x})|}{a_{\mathrm{ref,N}_2}}.
+\label{eq:nitrogen_sound_speed}
+\end{equation}
+This reference sound speed is evaluated at $T=233\,\mathrm{K}$ and $p_{\mathrm{abs}}=43.7\,\mathrm{MPa}$ with the nitrogen Helmholtz equation of state of Span et al., as implemented in CoolProp 8.0.0 (HEOS backend).\footnote{R. Span et al., \emph{A Reference Equation of State for the Thermodynamic Properties of Nitrogen for Temperatures from 63.151 to 1000 K and Pressures to 2200 MPa}, J. Phys. Chem. Ref. Data 29, 1361--1433 (2000), \url{https://doi.org/10.1063/1.1349047}. Implementation: \url{https://coolprop.org/fluid_properties/fluids/Nitrogen.html}.} The corresponding density is $481.632\,\mathrm{kg\,m^{-3}}$, close to the prescribed CFD density of $481.352\,\mathrm{kg\,m^{-3}}$. The prescribed value is retained for dimensional pressure conversion.
+
+Table~\ref{tab:nitrogen_local_mach} uses the same channel-region limits and two longitudinal planes as the hydrogen check, together with an independent scan of the complete cell-centred velocity field. The iteration column identifies the latest complete saved volume. In particular, nitrogen A at $5\,\mathrm{m\,s^{-1}}$ has a saved volume at iteration 1000: these velocity diagnostics do not represent iteration 1372 or the integral averaging interval 1072--1372 used in Section~\ref{sec:nitrogen_comparison}.
+
+\begin{table}[htbp]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}ccrrrrr@{}}
+\toprule
+$U_{\mathrm{in}}$ & Obt. & Iter. & $U_{\mathrm{ch,slice}}$ & $Ma_{\mathrm{ch,slice}}$ & $U_{\max,\mathrm{3D}}$ & $Ma_{\max,\mathrm{3D}}$\\
+$[\mathrm{m\,s^{-1}}]$ & & & $[\mathrm{m\,s^{-1}}]$ & $[-]$ & $[\mathrm{m\,s^{-1}}]$ & $[-]$\\
+\midrule
+5 & A & 1000 & 46.72 & 0.0787 & 59.57 & 0.1004\\
+5 & B & 3000 & 12.84 & 0.0216 & 17.32 & 0.0292\\
+5 & C & 3000 & 23.90 & 0.0403 & 28.32 & 0.0477\\
+5 & D & 3000 & 8.16 & 0.0138 & 20.92 & 0.0353\\
+10 & A & 3000 & 93.35 & 0.1573 & 114.78 & 0.1934\\
+10 & B & 3000 & 30.58 & 0.0515 & 37.66 & 0.0635\\
+10 & C & 3000 & 49.37 & 0.0832 & 56.45 & 0.0951\\
+10 & D & 3000 & 15.65 & 0.0264 & 41.54 & 0.0700\\
+15 & A & 3000 & 140.61 & 0.2370 & 176.79 & 0.2979\\
+15 & B & 3000 & 47.56 & 0.0801 & 65.58 & 0.1105\\
+15 & C & 3000 & 71.45 & 0.1204 & 85.68 & 0.1444\\
+15 & D & 3000 & 23.29 & 0.0393 & 61.81 & 0.1042\\
+\bottomrule
+\end{tabular}
+\caption{Nitrogen channel-region slice peaks and full-domain cell-centred maxima at the latest complete saved iteration. All Mach numbers use the fixed nitrogen reference sound speed.}
+\label{tab:nitrogen_local_mach}
+\end{table}
+
+The largest resolved nitrogen speed is $176.79\,\mathrm{m\,s^{-1}}$, giving $Ma_{\max,\mathrm{3D}}=0.2979$ for obturator A at $15\,\mathrm{m\,s^{-1}}$. Nitrogen has a lower reference sound speed than hydrogen, so similar passage velocities produce larger Mach numbers. All available tabulated reference Mach numbers remain below $0.3$, although the largest value is close to that usual screening threshold. This is a reference-state screening check, not a compressible solution: local sound-speed changes and thermodynamic density changes are not calculated by the solver. In addition, the largest nitrogen inlet-to-outlet pressure loss is approximately $9.7\%$ of the reference absolute pressure (Section~\ref{sec:gas_coefficient_comparison}). The Mach check alone therefore does not establish that constant density is accurate throughout the nitrogen flow.
+
+\par
 
 \section{Hydrogen: Primary High-Pressure CFD Results}
 \label{sec:fluid_trends}
@@ -410,6 +456,77 @@ $U_{\mathrm{in}}$ [$\mathrm{m\,s^{-1}}$] & \textbf{Obt.\ A} & \textbf{Obt.\ B} &
 \end{table}
 
 The magnitude of the nitrogen loads is generally much greater than that of hydrogen at equal inlet velocity and geometry. At $15\,\mathrm{m\,s^{-1}}$ with obturator A, nitrogen gives approximately $4.23\,\mathrm{MPa}$ and $711.6\,\mathrm{N}$, compared with $0.298\,\mathrm{MPa}$ and $50.1\,\mathrm{N}$ for hydrogen. This difference is largely associated with the much higher nitrogen reference density, together with changes in the Reynolds number. It must not be interpreted as a comparison at equal mass-flow demand or as direct evidence about hydrogen refuelling performance.
+
+
+\begingroup\emergencystretch=1em
+\subsection{Nitrogen velocity and pressure contours}
+\label{sec:nitrogen_contours}
+
+Figures~\ref{fig:n2_velocity_contours} and~\ref{fig:n2_pressure_contours} show the four nitrogen configurations at $U_{\mathrm{in}}=15\,\mathrm{m\,s^{-1}}$, iteration 3000, on the longitudinal plane $y=0$. Flow is from left to right along positive $x$. The common camera and spatial scale match the hydrogen presentation. Velocity magnitude uses Turbo and pressure uses Coolwarm, with fixed limits across all nitrogen configurations. The limits also cover the $z=0$ slices and all three inlet speeds, including the iteration-1000 volume of A at $5\,\mathrm{m\,s^{-1}}$.
+
+The nitrogen colour ranges are $0$--$140.61\,\mathrm{m\,s^{-1}}$ and $-3300.13$--$4272.71\,\mathrm{kPa}$. These numerical limits differ from the hydrogen limits; equal colours in the two gas figure sets do not imply equal values. Pressure is obtained from the kinematic OpenFOAM field as $p_g=\rho_{\mathrm{N}_2}P$, using $\rho_{\mathrm{N}_2}=481.352\,\mathrm{kg\,m^{-3}}$, and is referenced to the zero-pressure outlet. Negative plotted values indicate pressure below the outlet reference, not negative absolute pressure. As for hydrogen, cell-centred values are interpolated to mesh points before slicing.
+
+ParaView reports isolated non-manifold cells that cannot be contoured; the slice plots can therefore contain small local omissions. The full-domain velocity maxima are scanned independently from the original cell fields and do not depend on this contour operation.
+
+The slices allow the acceleration through the restrictions and the downstream redistribution of velocity to be compared at one imposed inlet condition. The narrow passages of A produce the strongest velocity amplification and pressure contrast; C also shows concentrated acceleration through its smaller holes, whereas B and D have weaker contrasts on this plane. This is consistent with the integral pressure-loss ordering $A>C>B>D$ in Table~\ref{tab:nitrogen_pressure}. A single longitudinal plane does not intersect every passage, so this visual comparison must be read together with the full-volume maxima in Table~\ref{tab:nitrogen_local_mach}.
+
+The much larger dimensional pressure contrasts than in hydrogen are consistent with the higher nitrogen density. A local pressure minimum in a jet is distinct from the area-averaged inlet-to-outlet pressure loss, and the saved contours are not terminal averages. Velocity magnitude alone cannot determine the direction of recirculation. These figures therefore complement the integral responses and the dimensionless comparison without establishing convergence or validating the constant-density assumption.
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/N2_U15_A_y0_speed.png}
+\caption{Obturator A}
+\end{subfigure}\par\smallskip
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/N2_U15_B_y0_speed.png}
+\caption{Obturator B}
+\end{subfigure}\par\smallskip
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/N2_U15_C_y0_speed.png}
+\caption{Obturator C}
+\end{subfigure}\par\smallskip
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/N2_U15_D_y0_speed.png}
+\caption{Obturator D}
+\end{subfigure}\par\smallskip
+\caption{Nitrogen velocity magnitude on $y=0$ for the four obturators at $U_{\mathrm{in}}=15\,\mathrm{m\,s^{-1}}$, iteration 3000. Fixed colour limits are shared within this nitrogen figure set.}
+\label{fig:n2_velocity_contours}
+\end{figure}
+
+\begin{figure}[p]
+\centering
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/N2_U15_A_y0_pressure_Pa.png}
+\caption{Obturator A}
+\end{subfigure}\par\smallskip
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/N2_U15_B_y0_pressure_Pa.png}
+\caption{Obturator B}
+\end{subfigure}\par\smallskip
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/N2_U15_C_y0_pressure_Pa.png}
+\caption{Obturator C}
+\end{subfigure}\par\smallskip
+\begin{subfigure}{0.96\textwidth}
+\centering
+\includegraphics[width=\linewidth]{Results/Chapter4/N2_U15_D_y0_pressure_Pa.png}
+\caption{Obturator D}
+\end{subfigure}\par\smallskip
+\caption{Nitrogen outlet-referenced pressure on $y=0$ for the four obturators at $U_{\mathrm{in}}=15\,\mathrm{m\,s^{-1}}$, iteration 3000. Fixed colour limits are shared within this nitrogen figure set.}
+\label{fig:n2_pressure_contours}
+\end{figure}
+
+\clearpage
+
+\endgroup
 
 \section{Dimensionless Comparison of Hydrogen and Nitrogen}
 \label{sec:results_operating_states}
