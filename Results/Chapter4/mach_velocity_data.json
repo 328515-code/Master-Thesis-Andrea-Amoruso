@@ -1,0 +1,230 @@
+[
+  {
+    "case": "Sim_H2_Flux05_Obt_A",
+    "velocity": 5,
+    "obturator": "A",
+    "iteration": "3000",
+    "volume_cells": 5780686,
+    "max_cell_speed": 57.92955255154867,
+    "max_cell_location": [
+      "processor36",
+      103987
+    ],
+    "channel_slice_peak_speed": 47.01690149313164,
+    "channel_slice_peak_xyz": [
+      0.04198301210999489,
+      0.0,
+      -0.005749719683080912
+    ],
+    "channel_slice_peak_plane": "y0"
+  },
+  {
+    "case": "Sim_H2_Flux05_Obt_B",
+    "velocity": 5,
+    "obturator": "B",
+    "iteration": "3000",
+    "volume_cells": 5812570,
+    "max_cell_speed": 15.93153571710706,
+    "max_cell_location": [
+      "processor36",
+      1718
+    ],
+    "channel_slice_peak_speed": 12.959998940808443,
+    "channel_slice_peak_xyz": [
+      0.041749950498342514,
+      -0.003329422092065215,
+      0.0
+    ],
+    "channel_slice_peak_plane": "z0"
+  },
+  {
+    "case": "Sim_H2_Flux05_Obt_C",
+    "velocity": 5,
+    "obturator": "C",
+    "iteration": "3000",
+    "volume_cells": 5795077,
+    "max_cell_speed": 28.302997254826604,
+    "max_cell_location": [
+      "processor10",
+      24402
+    ],
+    "channel_slice_peak_speed": 23.608843693185552,
+    "channel_slice_peak_xyz": [
+      0.04198307543992996,
+      0.0,
+      -0.006624989677220583
+    ],
+    "channel_slice_peak_plane": "y0"
+  },
+  {
+    "case": "Sim_H2_Flux05_Obt_D",
+    "velocity": 5,
+    "obturator": "D",
+    "iteration": "3000",
+    "volume_cells": 5859194,
+    "max_cell_speed": 15.17087524410365,
+    "max_cell_location": [
+      "processor45",
+      51638
+    ],
+    "channel_slice_peak_speed": 7.872538109371461,
+    "channel_slice_peak_xyz": [
+      0.0433066226541996,
+      0.0,
+      0.005112978629767895
+    ],
+    "channel_slice_peak_plane": "y0"
+  },
+  {
+    "case": "Sim_H2_Flux10_Obt_A",
+    "velocity": 10,
+    "obturator": "A",
+    "iteration": "3000",
+    "volume_cells": 5780932,
+    "max_cell_speed": 114.25741020228891,
+    "max_cell_location": [
+      "processor20",
+      94090
+    ],
+    "channel_slice_peak_speed": 94.31364951260971,
+    "channel_slice_peak_xyz": [
+      0.04198306053876877,
+      1.3234889800848443e-23,
+      -0.0058748298324644566
+    ],
+    "channel_slice_peak_plane": "y0"
+  },
+  {
+    "case": "Sim_H2_Flux10_Obt_B",
+    "velocity": 10,
+    "obturator": "B",
+    "iteration": "3000",
+    "volume_cells": 5812681,
+    "max_cell_speed": 40.350281345156326,
+    "max_cell_location": [
+      "processor28",
+      55925
+    ],
+    "channel_slice_peak_speed": 33.41768298370315,
+    "channel_slice_peak_xyz": [
+      0.04333553835749626,
+      0.0,
+      -0.0051194727420806885
+    ],
+    "channel_slice_peak_plane": "y0"
+  },
+  {
+    "case": "Sim_H2_Flux10_Obt_C",
+    "velocity": 10,
+    "obturator": "C",
+    "iteration": "3000",
+    "volume_cells": 5794991,
+    "max_cell_speed": 57.25197305046591,
+    "max_cell_location": [
+      "processor11",
+      110737
+    ],
+    "channel_slice_peak_speed": 49.97586560208547,
+    "channel_slice_peak_xyz": [
+      0.042529668658971786,
+      0.0,
+      0.005244951229542494
+    ],
+    "channel_slice_peak_plane": "y0"
+  },
+  {
+    "case": "Sim_H2_Flux10_Obt_D",
+    "velocity": 10,
+    "obturator": "D",
+    "iteration": "3000",
+    "volume_cells": 5859217,
+    "max_cell_speed": 32.796547276009974,
+    "max_cell_location": [
+      "processor27",
+      66864
+    ],
+    "channel_slice_peak_speed": 15.32040702839475,
+    "channel_slice_peak_xyz": [
+      0.04333553835749626,
+      0.0,
+      0.005119475536048412
+    ],
+    "channel_slice_peak_plane": "y0"
+  },
+  {
+    "case": "Sim_H2_Flux15_Obt_A",
+    "velocity": 15,
+    "obturator": "A",
+    "iteration": "3000",
+    "volume_cells": 5780621,
+    "max_cell_speed": 171.78741205909384,
+    "max_cell_location": [
+      "processor8",
+      59128
+    ],
+    "channel_slice_peak_speed": 140.9807253958359,
+    "channel_slice_peak_xyz": [
+      0.041983023285865784,
+      0.0,
+      -0.006374985910952091
+    ],
+    "channel_slice_peak_plane": "y0"
+  },
+  {
+    "case": "Sim_H2_Flux15_Obt_B",
+    "velocity": 15,
+    "obturator": "B",
+    "iteration": "3000",
+    "volume_cells": 5812546,
+    "max_cell_speed": 61.21872384323377,
+    "max_cell_location": [
+      "processor18",
+      47693
+    ],
+    "channel_slice_peak_speed": 46.08144670291493,
+    "channel_slice_peak_xyz": [
+      0.04333553835749626,
+      0.0,
+      -0.0051194727420806885
+    ],
+    "channel_slice_peak_plane": "y0"
+  },
+  {
+    "case": "Sim_H2_Flux15_Obt_C",
+    "velocity": 15,
+    "obturator": "C",
+    "iteration": "3000",
+    "volume_cells": 5795110,
+    "max_cell_speed": 85.63714687998295,
+    "max_cell_location": [
+      "processor21",
+      15217
+    ],
+    "channel_slice_peak_speed": 73.27703912322143,
+    "channel_slice_peak_xyz": [
+      0.042529668658971786,
+      0.0,
+      0.005244951229542494
+    ],
+    "channel_slice_peak_plane": "y0"
+  },
+  {
+    "case": "Sim_H2_Flux15_Obt_D",
+    "velocity": 15,
+    "obturator": "D",
+    "iteration": "3000",
+    "volume_cells": 5858950,
+    "max_cell_speed": 56.42984650189461,
+    "max_cell_location": [
+      "processor47",
+      77281
+    ],
+    "channel_slice_peak_speed": 23.625987323662876,
+    "channel_slice_peak_xyz": [
+      0.04333553835749626,
+      0.0,
+      0.005119475536048412
+    ],
+    "channel_slice_peak_plane": "y0"
+  }
+]
