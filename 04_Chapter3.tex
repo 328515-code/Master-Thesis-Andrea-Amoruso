@@ -114,55 +114,84 @@ y^+=\frac{u_\tau \ y}{\nu}
 
 Where $y$ is the distance of the first layer cell centroid from the wall, $u_\tau$ is the friction velocity (a function of the wall stresses) and $\nu$ is the kinematic viscoity.
 
-The reported maxima are compatible with the use of wall functions, but maxima alone do not demonstrate that every wall cell satisfies the intended $y^+$ range \cite{menter1994,openfoam_user}. Terminal variations of integral responses must also be distinguished from solver-residual convergence and mesh independence. The greatest hydrogen terminal variation occurs for obturator B at the higher velocities. 
+The reported maxima are compatible with the use of wall functions, but alone do not demonstrate that every wall cell satisfies the intended $y^+$ range and this doesn't represent issues for the simulation  \cite{menter1994,openfoam_user}.
 
-The inlet Mach number alone does not describe the acceleration through the obturator channels. The local Mach number is
+As already said, the inlet Mach number alone does not describe the acceleration through the obturator channels. So in order to check the validity of the incompressibility assumption, the local Mach number has to be evaluated at the obturator for each simulation since this is the domain zone with the smallest section area.
+The local Mach can be computed as:
 \begin{equation}
-M(\mathbf{x})=\frac{|\mathbf{u}(\mathbf{x})|}{a(\mathbf{x})},
+Ma(\mathbf{x})=\frac{|\mathbf{u}(\mathbf{x})|}{a(\mathbf{x})},
 \qquad
 a^2=\left(\frac{\partial p_{\mathrm{abs}}}{\partial\rho}\right)_s,
 \label{eq:local_mach_results}
 \end{equation}
-where $a$ is the isentropic speed of sound and $p_{\mathrm{abs}}$ is thermodynamic absolute pressure, not the kinematic gauge-pressure field solved by \texttt{simpleFoam} \cite{anderson2017}. Because the present model does not solve an energy equation or a compressible equation of state, the following diagnostic uses a fixed reference sound speed:
+where $a$ is the speed of sound and $p_{\mathrm{abs}}$ is the thermodynamic absolute pressure \cite{anderson2017}. Because the present model does not solve an energy equation or a compressible equation of state, the following diagnostic uses a fixed reference sound speed:
 \begin{equation}
-a_{\mathrm{ref,H}_2}=1611.8\,\mathrm{m\,s^{-1}},
-\qquad M_{\mathrm{ref}}(\mathbf{x})=\frac{|\mathbf{u}(\mathbf{x})|}{a_{\mathrm{ref,H}_2}}.
+a_{\mathrm{ref,H}_2} \approx 1611.8\,\mathrm{m\,s^{-1}},
+\qquad Ma_{\mathrm{ref}}(\mathbf{x})=\frac{|\mathbf{u}(\mathbf{x})|}{a_{\mathrm{ref,H}_2}}.
 \label{eq:hydrogen_sound_speed}
 \end{equation}
-This value was evaluated at $T=233\,\mathrm{K}$ and $p_{\mathrm{abs}}=43.7\,\mathrm{MPa}$ using the normal-hydrogen Helmholtz equation of state of Leachman et al., implemented in CoolProp 8.0.0.\footnote{J. W. Leachman et al., \emph{Fundamental Equations of State for Parahydrogen, Normal Hydrogen, and Orthohydrogen}, J. Phys. Chem. Ref. Data 38, 721--748 (2009), \url{https://doi.org/10.1063/1.3160306}. Implementation: \url{https://coolprop.org/fluid_properties/fluids/Hydrogen.html}.} The same evaluation gives $\rho=33.790\,\mathrm{kg\,m^{-3}}$, close to the prescribed CFD value of $33.77\,\mathrm{kg\,m^{-3}}$; the CFD density is retained in all pressure and force calculations.
+Values obtained at $T=233\,\mathrm{K}$ and $p_{\mathrm{abs}}=43.7\,\mathrm{MPa}$ using the REFPROP tool used also for determining the fluid viscosity and density.
+% normal-hydrogen Helmholtz equation of state of Leachman et al., implemented in CoolProp 8.0.0.\footnote{J. W. Leachman et al., \emph{Fundamental Equations of State for Parahydrogen, Normal Hydrogen, and Orthohydrogen}, J. Phys. Chem. Ref. Data 38, 721--748 (2009), \url{https://doi.org/10.1063/1.3160306}. Implementation: \url{https://coolprop.org/fluid_properties/fluids/Hydrogen.html}.} The same evaluation gives $\rho=33.790\,\mathrm{kg\,m^{-3}}$, close to the prescribed CFD value of $33.77\,\mathrm{kg\,m^{-3}}$; the CFD density is retained in all pressure and force calculations.
 
-For comparison, the calorically perfect ideal-gas estimate is $a_{\mathrm{ideal}}=\sqrt{\gamma R_{\mathrm{H}_2}T}=1159.9\,\mathrm{m\,s^{-1}}$, using $\gamma=1.4$ and $R_{\mathrm{H}_2}=4124.5\,\mathrm{J\,kg^{-1}\,K^{-1}}$. This ideal-gas value is not substituted for the real-gas sound speed at the high-pressure reference state.
+The usage of this database was necessary because by using the ideal gas formulations the sound speed value would have been much smaller $a_{\mathrm{ideal}}=1159.9\,\mathrm{m\,s^{-1}}$, showing so a erroneous data.
 
-Table~\ref{tab:hydrogen_local_mach} distinguishes two measures at solver iteration 3000. $U_{\mathrm{ch,slice}}$ is the largest interpolated speed on the two longitudinal planes $y=0$ and $z=0$, restricted to the obturator region $0.035\leq x\leq0.046\,\mathrm{m}$. It samples the channel passages and their immediate exits but is not a maximum over every channel. $U_{\max,\mathrm{3D}}$ is obtained independently by scanning the original cell-centred velocity field over every processor subdomain. The latter supplies a domain-wide bound on the resolved cell-centred channel velocities and avoids treating a two-dimensional slice as a complete three-dimensional check.
+Tables ~\ref{tab:hydrogen_local_mach1,tab:hydrogen_local_mach2,tab:hydrogen_local_mach3} distinguishes two measures at solver iteration 3000. $U_{\mathrm{ch,slice}}$ is the largest interpolated speed on the two longitudinal planes $y=0$ and $z=0$, restricted to the obturator region $0.035\leq x\leq0.046\,\mathrm{m}$. It samples the channel passages and their immediate exits but is not a maximum over every channel. $U_{\max,\mathrm{3D}}$ is obtained independently by scanning the original cell centered velocity field over every processor subdomain. The latter supplies a domain-wide bound on the resolved cell centered channel velocities evaluating velocity also at different domain positions.
 
 \begin{table}[htbp]
 \centering
 \small
 \setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}cccccc@{}}
+\begin{tabular}{@{}ccccc@{}}
 \toprule
-$U_{\mathrm{in}}$ & Obt. & $U_{\mathrm{ch,slice}}$ & $M_{\mathrm{ch,slice}}$ & $U_{\max,\mathrm{3D}}$ & $M_{\max,\mathrm{3D}}$\\
-$[\mathrm{m\,s^{-1}}]$ & & $[\mathrm{m\,s^{-1}}]$ & $[-]$ & $[\mathrm{m\,s^{-1}}]$ & $[-]$\\
+ Obt. & $U_{\mathrm{ch,slice}}$ & $Ma_{\mathrm{ch,slice}}$ & $U_{\max,\mathrm{3D}}$ & $Ma_{\max,\mathrm{3D}}$\\
+ & $[\mathrm{m\,s^{-1}}]$ & $[-]$ & $[\mathrm{m\,s^{-1}}]$ & $[-]$\\
 \midrule
-5 & A & 47.02 & 0.0292 & 57.93 & 0.0359\\
-5 & B & 12.96 & 0.0080 & 15.93 & 0.0099\\
-5 & C & 23.61 & 0.0146 & 28.30 & 0.0176\\
-5 & D & 7.87 & 0.0049 & 15.17 & 0.0094\\
-10 & A & 94.31 & 0.0585 & 114.26 & 0.0709\\
-10 & B & 33.42 & 0.0207 & 40.35 & 0.0250\\
-10 & C & 49.98 & 0.0310 & 57.25 & 0.0355\\
-10 & D & 15.32 & 0.0095 & 32.80 & 0.0203\\
-15 & A & 140.98 & 0.0875 & 171.79 & 0.1066\\
-15 & B & 46.08 & 0.0286 & 61.22 & 0.0380\\
-15 & C & 73.28 & 0.0455 & 85.64 & 0.0531\\
-15 & D & 23.63 & 0.0147 & 56.43 & 0.0350\\
+ A & 47.02 & 0.0292 & 57.93 & 0.0359\\
+ B & 12.96 & 0.0080 & 15.93 & 0.0099\\
+ C & 23.61 & 0.0146 & 28.30 & 0.0176\\
+ D & 7.87 & 0.0049 & 15.17 & 0.0094\\
 \bottomrule
 \end{tabular}
-\caption{Hydrogen channel-region slice peaks and full-domain cell-centred maxima at iteration 3000. Mach numbers use the real-gas reference sound speed $a_{\mathrm{ref,H}_2}=1611.8\,\mathrm{m\,s^{-1}}$; these are final-field diagnostics, not terminal-window averages.}
-\label{tab:hydrogen_local_mach}
+\caption{$H_2$ channel region slice peaks and domain maxima velocity at iteration 3000, at $5\ ms^{-1}$}
+\label{tab:hydrogen_local_mach1}
+
+\vspace{1cm}
+
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+ Obt. & $U_{\mathrm{ch,slice}}$ & $Ma_{\mathrm{ch,slice}}$ & $U_{\max,\mathrm{3D}}$ & $Ma_{\max,\mathrm{3D}}$\\
+ & $[\mathrm{m\,s^{-1}}]$ & $[-]$ & $[\mathrm{m\,s^{-1}}]$ & $[-]$\\
+\midrule
+ A & 94.31 & 0.0585 & 114.26 & 0.0709\\
+ B & 33.42 & 0.0207 & 40.35 & 0.0250\\
+ C & 49.98 & 0.0310 & 57.25 & 0.0355\\
+ D & 15.32 & 0.0095 & 32.80 & 0.0203\\
+\bottomrule
+\end{tabular}
+\caption{$H_2$ channel region slice peaks and domain maxima velocity at iteration 3000, at $10\ ms^{-1}$}
+\label{tab:hydrogen_local_mach2}
+
+\vspace{1cm}
+
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+ Obt. & $U_{\mathrm{ch,slice}}$ & $Ma_{\mathrm{ch,slice}}$ & $U_{\max,\mathrm{3D}}$ & $Ma_{\max,\mathrm{3D}}$\\
+ & $[\mathrm{m\,s^{-1}}]$ & $[-]$ & $[\mathrm{m\,s^{-1}}]$ & $[-]$\\
+\midrule
+ A & 140.98 & 0.0875 & 171.79 & 0.1066\\
+ B & 46.08 & 0.0286 & 61.22 & 0.0380\\
+ C & 73.28 & 0.0455 & 85.64 & 0.0531\\
+ D & 23.63 & 0.0147 & 56.43 & 0.0350\\
+\bottomrule
+\end{tabular}
+\caption{$H_2$ channel region slice peaks and domain maxima velocity at iteration 3000, at $15\ ms^{-1}$}
+\label{tab:hydrogen_local_mach3}
+
+
 \end{table}
 
-Obturator A gives the highest speeds at all three inlet conditions. At $15\,\mathrm{m\,s^{-1}}$, its channel-region slice reaches $140.98\,\mathrm{m\,s^{-1}}$ ($M_{\mathrm{ref}}=0.0875$), whereas the full volume reaches $171.79\,\mathrm{m\,s^{-1}}$ ($M_{\mathrm{ref}}=0.1066$). The latter is about 22\% higher, demonstrating the importance of the volume check. Even using the lower ideal-gas sound-speed estimate, the largest resolved Mach number is approximately 0.148. Both estimates remain below the usual $M\simeq0.3$ low-Mach screening threshold \cite{anderson2017}. This supports the low-Mach approximation for the resolved hydrogen velocity field at the stated reference temperature; it does not establish mesh independence, predict choking, or replace a compressible calculation with spatially varying temperature and thermodynamic properties.
+Obturator A gives the highest speeds at all three inlet conditions as expected. At $15\,\mathrm{m\,s^{-1}}$, its channel-region slice reaches $140.98\,\mathrm{m\,s^{-1}}$ ($M_{\mathrm{ref}}=0.0875$), whereas the full volume reaches $171.79\,\mathrm{m\,s^{-1}}$ ($M_{\mathrm{ref}}=0.1066$), being so about 22\% higher, demonstrating the importance of the volume check. 
+As shown in the Tables \ref{tab:hydrogen_local_mach1,tab:hydrogen_local_mach2,tab:hydrogen_local_mach3} estimated values remain below the usual $Ma\simeq0.3$ compressibility threshold \cite{anderson2017}. This supports the low Mach approximation for the resolved hydrogen velocity field at the stated reference temperature.
 
 
 \section{Hydrogen: Primary High-Pressure CFD Results}
@@ -199,10 +228,10 @@ The plots reported below \ref{fig:H2-Forcev vs Pressure - VEL}, are referred to 
     \label{fig:H2-Forcev vs Pressure - VEL}
 \end{figure}
 
-At each investigated inlet velocity, both response magnitudes follow the order A, C, B, D from largest to smallest. This trend is qualitatively consistent with the nominal total hole areas shown in the Table \ref{tab:obturator_variants}: a more restrictive passage produces stronger acceleration, pressure redistribution, and integrated loading. The precise force nonetheless depends on the three-dimensional pressure and shear distributions and not solely on the nominal area \cite{white2016,crane410}, creating an almost linear trend if reaordered.
-From the plots is evident that the trends are almost identical, this occurs because the force is composed of a viscous and a pressure term \ref{eq:doe_responses}. Due to the valve geometry, the pressure term is expected to be the biggest one given the section area changes and the corners presence, creating a trend which is almost the same for pressure and force.
+At each investigated inlet velocity, both response magnitudes follow the order A, C, B, D from largest to smallest. This trend is qualitatively consistent with the nominal total hole areas shown in the Table \ref{tab:obturator_variants}: a more restrictive passage produces stronger acceleration, pressure redistribution, and integrated loading. The precise force depends on the three-dimensional pressure and shear distributions and not solely on the nominal area \cite{white2016,crane410}, but still the visible trend is almost linear if reordered, following the obturator section area values.
+From the plots is evident that the Force and pressure trends are almost identical, this occurs because the force is composed of a viscous and a pressure term \ref{eq:doe_responses}. Due to the valve geometry, the pressure term is expected to be the biggest one given the section area changes and the corners presence, creating a trend which is almost the same for pressure and force.
 
-Tables~\ref{tab:hydrogen_pressure} and~\ref{tab:hydrogen_force} give the hydrogen pressure losses and total positive-$x$ obturator forces obtained from the common terminal interval, showing with numbers the treds of the Figure \ref{fig:H2-Forcev vs Pressure - VEL}.\\
+Tables~\ref{tab:hydrogen_pressure} and~\ref{tab:hydrogen_force} give the hydrogen pressure losses and total positive-$x$ obturator forces obtained from the common terminal interval, showing with numbers the trends of the Figure \ref{fig:H2-Forcev vs Pressure - VEL}.\\
 
 \begin{table}[htbp]
 \centering
@@ -276,17 +305,17 @@ This plot has been fundamental to develop the Chapter \ref{ch:selection_tool} de
 \subsection{Velocity and pressure contours through the obturator}
 \label{sec:hydrogen_contours}
 
-Figures~\ref{fig:h2_velocity_contours} and~\ref{fig:h2_pressure_contours} compare the four obturators at $U_{\mathrm{in}}=15\,\mathrm{m\,s^{-1}}$, where the geometric differences are most visible. They show the longitudinal plane $y=0$ at iteration 3000, with flow from left to right along the positive $x$ direction. The camera, spatial scale and colour limits are identical for all configurations. Velocity magnitude uses the Turbo map; pressure uses Coolwarm. The ranges, $0$--$140.98\,\mathrm{m\,s^{-1}}$ and $-224.23$--$299.35\,\mathrm{kPa}$, cover both longitudinal planes for all twelve hydrogen cases. The neutral Coolwarm colour denotes the midpoint of this range, not zero pressure.
+Figures~\ref{fig:h2_velocity_contours} and~\ref{fig:h2_pressure_contours} compare the four obturators at $U_{\mathrm{in}}=15\,\mathrm{m\,s^{-1}}$, where the geometric differences are most visible. They show the longitudinal plane $y=0$ at iteration 3000, with flow from left to right along the positive $x$ direction. The camera, spatial scale and colour limits are identical for all configurations for comparison purposes. Velocity magnitude and pressure use different colormaps to better visualize the associated quantity. The ranges, $0$--$140.98\,\mathrm{m\,s^{-1}}$ and $-224.23$--$299.35\,\mathrm{kPa}$, cover both longitudinal planes for all twelve hydrogen cases. 
 
-The displayed pressure is $p_g=\rho_{\mathrm{H}_2}P$, relative to the zero-pressure outlet. It is neither the absolute operating pressure nor a pointwise pressure-loss coefficient. Negative values therefore indicate pressure below the outlet reference, not negative absolute pressure. White areas are outside the cut fluid domain, including solid regions. Point values are interpolated from the cell-centred solution before slicing.
+The displayed pressure is $p_g=\rho_{\mathrm{H}_2}P$, relative to the zero-pressure outlet, it is not the absolute operating pressure. Therefore, negative values indicate pressure below the outlet reference, not negative absolute pressure. Point values are interpolated from the cell centered solution before slicing.
 
-\begingroup\emergencystretch=1em
-The narrow passages of A produce a concentrated high-speed jet and the strongest upstream-to-downstream pressure contrast. Configuration C, which has twice as many small holes, shows lower peak speeds and a more distributed acceleration pattern on this plane. B and D have larger holes and weaker velocity amplification and pressure contrasts on the common scale. The integral pressure-loss and axial-force ranking is also $A>C>B>D$. However, one section does not intersect every hole or capture all off-plane velocity maxima. In particular, Table~\ref{tab:hydrogen_local_mach} shows why the modest slice velocities of D must not be interpreted as its full-domain peak velocity.
+\begingroup \emergencystretch = 1em
+The narrow passages of A produce a concentrated high-speed jet and the strongest upstream to downstream pressure contrast as expected. Configuration C, which has twice as many small holes, shows lower peak speeds and a more distributed acceleration pattern on this plane. B and D have larger holes and weaker velocity amplification and pressure contrasts. As seen at Figure \ref{fig:H2-Forcev vs Pressure - VEL} pressure loss and axial force ranking $A>C>B>D$ is visible also by looking at the simulation contours. By using one section, it does not intersect every hole or capture all off-plane velocity maxima. In particular, Table~\ref{tab:hydrogen_local_mach3} shows why the modest slice velocities of D must not be interpreted as its domain peak velocity.
 \par\endgroup
 
-Downstream of the passages, high-speed fluid enters a wider region and is surrounded by lower-speed fluid. This is consistent with jet development and mixing after the restriction. Velocity-magnitude contours alone cannot establish the direction of recirculation or identify vortices; those interpretations require vector, streamline or vorticity information. Likewise, a local static-pressure minimum is not the area-averaged inlet-to-outlet pressure loss used in Tables~\ref{tab:hydrogen_pressure} and~\ref{tab:hydrogen_force}.
+Downstream of the passages, high-speed fluid enters a wider region and is surrounded by lower-speed fluid, consistently with jet development and mixing after the restriction. Velocity magnitude contours alone cannot establish the direction of recirculation or identify vortices. Likewise, a local static-pressure minimum is not the area-averaged inlet-to-outlet pressure loss used in Tables~\ref{tab:hydrogen_pressure} and~\ref{tab:hydrogen_force}.\\
 
-These final-iteration fields complement, rather than replace, the 301-sample integral averages. The elevated terminal variation of B at $15\,\mathrm{m\,s^{-1}}$ means that its displayed pattern should not be interpreted as a uniquely converged steady structure. ParaView also reports non-manifold triangulation warnings for the source meshes; small local contour omissions cannot be excluded. The contours are used for qualitative interpretation, while the full-domain Mach scan reads the original volume velocities independently of the slicing operation.
+These final-iteration fields complement, rather than replace, the integral averages.  The contours are used for qualitative graphical interpretation and also for visual verification if abnormal phenomena occur in the domain. The data that will be used for the successive design tool at Chapter \ref{ch:selection_tool} are the integral averages.
 
 \begin{figure}[p]
 \centering
@@ -310,7 +339,7 @@ These final-iteration fields complement, rather than replace, the 301-sample int
 \includegraphics[width=\linewidth]{Results/Chapter4/H2_U15_D_y0_speed.png}
 \caption{Obturator D}
 \end{subfigure}\par\smallskip
-\caption{Hydrogen velocity magnitude on $y=0$ for the four obturators at $U_{\mathrm{in}}=15\,\mathrm{m\,s^{-1}}$, iteration 3000. All panels share the same camera and colour limits; the colour bar reports dimensional values.}
+\caption{Hydrogen velocity magnitude on $y=0$ for the four obturators at $U_{\mathrm{in}}=15\,\mathrm{m\,s^{-1}}$, iteration 3000}
 \label{fig:h2_velocity_contours}
 \end{figure}
 
@@ -336,7 +365,7 @@ These final-iteration fields complement, rather than replace, the 301-sample int
 \includegraphics[width=\linewidth]{Results/Chapter4/H2_U15_D_y0_pressure_Pa.png}
 \caption{Obturator D}
 \end{subfigure}\par\smallskip
-\caption{Hydrogen outlet-referenced pressure on $y=0$ for the four obturators at $U_{\mathrm{in}}=15\,\mathrm{m\,s^{-1}}$, iteration 3000. All panels share the same camera and colour limits; the colour bar reports dimensional values.}
+\caption{Hydrogen outlet-referenced pressure on $y=0$ for the four obturators at $U_{\mathrm{in}}=15\,\mathrm{m\,s^{-1}}$, iteration 3000}
 \label{fig:h2_pressure_contours}
 \end{figure}
 
