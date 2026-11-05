@@ -1,220 +1,293 @@
-\chapter{Codes and Automation Scripts}
+\chapter{Reproducibility Reference}
 \label{ch:appendix_codes}
 
-\section{Illustrative DoE Case Generator (\texttt{doe\_generator.py})}
-\label{sec:app_doe_gen}
-The following illustrative example uses the factor levels and high-pressure gas-property settings from the final numerical study (nominal $437\,\mathrm{bar}$ and $233\,\mathrm{K}$). It is included for reproducibility of the case-generation logic and gives priority to hydrogen as the intended vehicle-refuelling gas. Nitrogen is treated as a complementary fluid. It is a reconstruction for documentation, \emph{not} a claim that this is the exact script originally used to generate or submit the cases. The example requires a clean \texttt{CASE\_BASE} template containing the tokens \texttt{FLUX\_VALUE} and \texttt{NU\_VALUE}.
+This appendix records the data and conventions needed to reproduce Chapter~\ref{ch:selection_tool}. Its numerical tables derive from the archived application inputs. The automation examples document the workflow; they are illustrative reconstructions, not original submission scripts.
 
-\begin{lstlisting}[language=Python,caption={Illustrative Python generator for 24 cases with consistent gas properties.}, captionpos=b]
+\section{Case Definitions and Unit Conventions}
+\label{sec:app_case_catalogue}
+
+The 24 cases combine two gases, inlet velocities of $5$, $10$ and $15\,\mathrm{m\,s^{-1}}$, and the four geometries below, all at one fixed obturator position. Total hole area denotes the nominal CAD passages, not the inlet area or an effective discharge area.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}crrr@{}}
+\toprule
+Obt. & Hole count & Diameter [mm] & Total hole area [mm$^2$]\\
+\midrule
+A & 3 & 1.5 & 5.301\\
+B & 3 & 3.0 & 21.206\\
+C & 6 & 1.5 & 10.603\\
+D & 6 & 3.0 & 42.412\\
+\bottomrule
+\end{tabular}
+\caption{Geometry identifiers used in the data bundle and application.}
+\label{tab:app_geometries}
+\end{table}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Quantity & Hydrogen & Nitrogen\\
+\midrule
+$\rho_{\mathrm{ref}}$ [kg m$^{-3}$] & 33.77 & 481.352\\
+$\nu$ [m$^2$ s$^{-1}$] & $2.709\times10^{-7}$ & $7.932\times10^{-8}$\\
+$a_{\mathrm{ref}}$ [m s$^{-1}$] & 1611.7774 & 593.3679\\
+Sampled mass-flow interval [g s$^{-1}$] & 7.8666--23.5998 & 112.1291--336.3874\\
+\bottomrule
+\end{tabular}
+\caption{Reference inputs at $233\,\mathrm{K}$ and $437\,\mathrm{bar}$ absolute.}
+\label{tab:app_properties}
+\end{table}
+
+Mass flow uses the discretized inlet area,
+$A_{\mathrm{in,mesh}}=4.658925\times10^{-5}\,\mathrm{m^2}$, so that
+$\dot m=\rho_{\mathrm{ref}}A_{\mathrm{in,mesh}}U_{\mathrm{in}}$.
+The force coefficient uses the nominal CAD inlet area,
+$A_{\mathrm{in}}=4.7783624\times10^{-5}\,\mathrm{m^2}$. These areas must not be interchanged.
+
+
+
+\clearpage
+\section{Audited Integral Responses}
+\label{sec:app_response_data}
+
+OpenFOAM pressure $P$ is kinematic pressure [m$^2$/s$^2$]; $\Delta p=\rho_{\mathrm{ref}}(P_{\mathrm{in}}-P_{\mathrm{out}})$ gives pascals, divided by $1000$ for the stored kPa values. Force [N] sums pressure and viscous contributions along positive $x$. Input g/s is converted to kg/s. Solver iteration is not physical time.
+
+Table~\ref{tab:app_responses} pairs all 24 means with their terminal variability; the application uses the archived CSV precision.
+
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}ccrrrrr@{}}
+\toprule
+Gas & Obt. & $U_{\mathrm{in}}$ & $\overline{\Delta p}$ & $CV_p$ & $\overline F_x$ & $CV_F$\\
+ & & [m/s] & [kPa] & [\%] & [N] & [\%]\\
+\midrule
+$\mathrm{H}_2$ & A & 5 & 33.3603 & 1.207 & 5.61600 & 1.041\\
+$\mathrm{H}_2$ & B & 5 & 3.4452 & 3.670 & 0.45659 & 5.388\\
+$\mathrm{H}_2$ & C & 5 & 9.2652 & 0.828 & 1.46754 & 0.945\\
+$\mathrm{H}_2$ & D & 5 & 1.7187 & 1.090 & 0.16510 & 2.327\\
+$\mathrm{H}_2$ & A & 10 & 132.5717 & 0.871 & 22.34357 & 0.654\\
+$\mathrm{H}_2$ & B & 10 & 15.6783 & 7.021 & 2.09374 & 9.152\\
+$\mathrm{H}_2$ & C & 10 & 37.6005 & 1.349 & 5.94689 & 1.203\\
+$\mathrm{H}_2$ & D & 10 & 6.8642 & 1.445 & 0.67394 & 1.589\\
+$\mathrm{H}_2$ & A & 15 & 297.6059 & 0.890 & 50.08882 & 0.797\\
+$\mathrm{H}_2$ & B & 15 & 34.8079 & 10.246 & 4.76831 & 12.461\\
+$\mathrm{H}_2$ & C & 15 & 83.7263 & 1.312 & 13.28058 & 1.500\\
+$\mathrm{H}_2$ & D & 15 & 15.5538 & 1.530 & 1.53056 & 1.075\\
+\midrule
+$\mathrm{N}_2$ & A & 5 & 471.7202 & 0.759 & 79.46193 & 0.723\\
+$\mathrm{N}_2$ & B & 5 & 52.6064 & 5.950 & 7.12505 & 6.846\\
+$\mathrm{N}_2$ & C & 5 & 130.7352 & 0.950 & 20.73213 & 1.005\\
+$\mathrm{N}_2$ & D & 5 & 24.8982 & 2.722 & 2.38325 & 2.253\\
+$\mathrm{N}_2$ & A & 10 & 1877.8568 & 0.682 & 316.11603 & 0.585\\
+$\mathrm{N}_2$ & B & 10 & 206.7925 & 3.737 & 28.05129 & 4.887\\
+$\mathrm{N}_2$ & C & 10 & 526.5023 & 0.742 & 83.29393 & 0.649\\
+$\mathrm{N}_2$ & D & 10 & 99.2955 & 1.990 & 9.84416 & 2.359\\
+$\mathrm{N}_2$ & A & 15 & 4225.0602 & 0.874 & 711.63456 & 0.935\\
+$\mathrm{N}_2$ & B & 15 & 466.2998 & 4.599 & 62.49197 & 6.284\\
+$\mathrm{N}_2$ & C & 15 & 1178.5172 & 0.750 & 187.09046 & 0.804\\
+$\mathrm{N}_2$ & D & 15 & 224.3500 & 1.979 & 21.79912 & 1.960\\
+\bottomrule
+\end{tabular}
+\caption{Terminal integral responses and population-based coefficients of variation.}
+\label{tab:app_responses}
+\end{table}
+
+The standard window is iterations 2700--3000 inclusive ($N=301$). Nitrogen A at $5\,\mathrm{m\,s^{-1}}$ instead uses iterations 1072--1372, also with $N=301$. For a response $R$, the reported statistic is
+\[
+CV_R=\frac{100}{|\overline R|}
+\sqrt{\frac{1}{N}\sum_{i=1}^{N}(R_i-\overline R)^2}.
+\]
+These iterative variations are not uncertainty bounds. The tool recovers force error bars as $\sigma_F=|\overline F_x|CV_F/100$.
+
+\clearpage
+\section{Field Diagnostics and Contour Conventions}
+\label{sec:app_field_diagnostics}
+
+Integral means and saved-volume diagnostics have different sampling histories. All hydrogen fields and all nitrogen fields except A at $5\,\mathrm{m\,s^{-1}}$ are evaluated at iteration 3000. For that exception, the latest complete velocity volume is iteration 1000, the integral history ends at 1372 and the archived wall diagnostic is at 1300. These three indices must remain distinct.
+
+The velocity maximum used by the tool is obtained from the original cell-centred field across all processor subdomains. A maximum from an interpolated longitudinal slice is a different quantity. The channel-region slice diagnostic is restricted to $0.035\leq x\leq0.046\,\mathrm{m}$ on $y=0$ and $z=0$; neither plane intersects every channel.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{@{}ccrrr@{}}
+\toprule
+Gas & Obt. & $\alpha=\max(U_{\max,3D}/U_{\mathrm{in}})$ & $\dot m_{0.3}$ [g/s] & Max. observed $Ma$\\
+\midrule
+$\mathrm{H}_2$ & A & 11.58591 & 65.66 & 0.1066\\
+$\mathrm{H}_2$ & B & 4.08125 & 186.40 & 0.0380\\
+$\mathrm{H}_2$ & C & 5.72520 & 132.88 & 0.0531\\
+$\mathrm{H}_2$ & D & 3.76199 & 202.22 & 0.0350\\
+\midrule
+$\mathrm{N}_2$ & A & 11.91319 & 335.09 & 0.2979\\
+$\mathrm{N}_2$ & B & 4.37173 & 913.15 & 0.1105\\
+$\mathrm{N}_2$ & C & 5.71216 & 698.87 & 0.1444\\
+$\mathrm{N}_2$ & D & 4.18438 & 954.03 & 0.1042\\
+\bottomrule
+\end{tabular}
+\caption{Velocity-amplification envelopes and projected Mach boundaries. The last column is the largest observed value across the three saved volumes.}
+\label{tab:app_mach_envelopes}
+\end{table}
+
+The projection is $Ma_{\mathrm{est}}=\alpha\dot m/(\rho A_{\mathrm{in,mesh}}a_{\mathrm{ref}})$.
+The nitrogen A boundary is slightly below its largest sampled mass flow, even though its observed maximum is $0.2979$: the largest amplification ratio comes from the lower-velocity case. This envelope is more restrictive than using only the final high-velocity point, but is not a guaranteed bound at uncomputed conditions.
+
+For contour comparison, camera, planes and spatial scale are fixed. Within each gas, one common range covers all geometries and speeds: hydrogen uses $0$--$140.98\,\mathrm{m\,s^{-1}}$ and $-224.23$--$299.35\,\mathrm{kPa}$; nitrogen uses $0$--$140.61\,\mathrm{m\,s^{-1}}$ and $-3300.13$--$4272.71\,\mathrm{kPa}$. Equal colours across gases therefore need not represent equal values. The plotted pressure is outlet-referenced, not absolute pressure. Cells are interpolated before slicing, whereas the volume-maximum scan retains the original cell values. Processing one case at a time limits memory demand without changing these conventions.
+
+The archived sound-speed JSON files identify CoolProp 8.0.0 and its HEOS hydrogen and nitrogen models as the evaluation source. Their densities are approximately $33.7903$ and $481.6319\,\mathrm{kg\,m^{-3}}$; the prescribed CFD densities in Table~\ref{tab:app_properties}, rather than these independently evaluated densities, are used for pressure, force and mass-flow conversion.
+
+\clearpage
+\section[Reproducing the Response Fit]{Independent Reproduction of the Response Fit}
+\label{sec:app_plotly_script}
+
+The executable implementation is provided in \path{design_tool/model.py}, with plotting separated into \path{design_tool/charts.py}. A compact independent check is more useful here than a duplicate listing of the complete interface. For either force or pressure loss, let $R_i$ be the three terminal means. Minimizing $\sum_i(R_i-k_RU_i^2)^2$ gives
+\[
+k_R=\frac{\sum_i U_i^2R_i}{\sum_i U_i^4},\qquad
+\widehat R(\dot m)=k_R\left(\frac{\dot m}{\rho A_{\mathrm{in,mesh}}}\right)^2.
+\]
+The same procedure is applied independently to each gas and obturator. It fits the available means with equal weights and does not force the parabola through all three points. The archived maximum relative force-fit mismatch is about $15.65\%$ for hydrogen B; for the other seven pairs it is below $2.82\%$.
+
+\begin{lstlisting}[language=Python,numbers=none,caption={Independent hydrogen A check, run from the repository root.}]
+import csv
+from pathlib import Path
+
+source = Path("design_tool/data")
+with (source / "final_high_pressure_responses.csv").open() as f:
+    rows = [r for r in csv.DictReader(f)
+            if r["gas"] == "H2" and r["obturator"] == "A"]
+u = [float(r["velocity_m_s"]) for r in rows]
+force = [float(r["mean_axial_force_N"]) for r in rows]
+drop = [float(r["mean_pressure_drop_kPa"]) for r in rows]
+def fit(values):
+    return sum(v*v*y for v, y in zip(u, values)) / sum(v**4 for v in u)
+
+rho, area = 33.77, 4.658925e-5
+mass = 15.0 / 1000.0  # g/s to kg/s
+speed = mass / (rho * area)
+print("Force [N]:", fit(force) * speed**2)
+print("Pressure loss [kPa]:", fit(drop) * speed**2)
+\end{lstlisting}
+
+At $15\,\mathrm{g\,s^{-1}}$ hydrogen, this gives $U_{\mathrm{in}}\simeq9.534\,\mathrm{m\,s^{-1}}$, $\widehat F_x\simeq20.249\,\mathrm{N}$ and $\widehat{\Delta p}\simeq120.28\,\mathrm{kPa}$ for A. Its projected Mach number is approximately $0.0685$, below $0.3$, and the selected mass flow lies within the sampled interval. The calculation reproduces a fitted CFD load; interpreting it as a spring requirement still requires the mechanical closing direction and the remaining force balance.
+
+For a reproducibility check, retain the original CSV precision, use the meshed inlet area and convert the input to kg/s before evaluation. A fit using rounded chapter tables, a nominal inlet area or an unconverted g/s input will produce a different result. The application tests additionally exercise boundary handling, invalid inputs, file integrity and exported status information.
+
+\clearpage
+\section{Illustrative Case Preparation}
+\label{sec:app_doe_gen}
+
+The following generator documents the 24-case factor combinations and preserves the template. It is an illustrative reconstruction, not the original submitted script. The clean template must contain the tokens \texttt{FLUX\_VALUE}, \texttt{NU\_VALUE} and \texttt{RHO\_VALUE} in the indicated files. The density token must replace the active force-function \texttt{rhoInf} value, not a commented entry. The geometry names below follow the documented A--D mapping and must match the supplied STL files.
+
+\begin{lstlisting}[language=Python,numbers=none,basicstyle=\ttfamily\footnotesize,caption={Illustrative case generation with explicit template checks.}]
+from itertools import product
 from pathlib import Path
 import shutil
-import re
 
-fluids = {
-    "H2": {"nu": "2.709e-07", "rho": "33.77"},
-    "N2": {"nu": "7.932e-08", "rho": "481.352"},
-}
-velocities = [5, 10, 15]
-geometries = {
-    "A": "3Fori_1p5mm.stl",
-    "B": "3Fori_3mm.stl",
-    "C": "6Fori_1p5mm.stl",
-    "D": "6Fori_3mm.stl",
-}
-
-base_case = Path("CASE_BASE")
-geometry_dir = Path("Geometrie_STL")
-output_dir = Path("DoE_Cases")
-output_dir.mkdir(parents=True, exist_ok=True)
-
-def replace_token(path, token, replacement):
-    text = path.read_text()
-    if token not in text:
-        raise ValueError(f"Missing token {token}: {path}")
-    path.write_text(text.replace(token, replacement))
-
-def set_active_density(path, density):
-    text = path.read_text()
-    # Match only an uncommented, active rhoInf entry.
-    new_text, n = re.subn(
-        r"(?m)^(\s*)rhoInf\s+[^;]+;",
-        lambda match: match.group(1) + f"rhoInf {density};",
-        text,
-    )
-    if n != 1:
-        raise ValueError(f"Expected one active rhoInf: {path}")
-    path.write_text(new_text)
-
-for gas, props in fluids.items():
-    for u in velocities:
-        for label, stl_name in geometries.items():
-            name = f"Sim_{gas}_Flux{u:02d}_Obt_{label}"
-            case = output_dir / gas / name
-            case.parent.mkdir(parents=True, exist_ok=True)
-            if case.exists():
-                raise FileExistsError(case)
-            shutil.copytree(base_case, case)
-            shutil.copyfile(
-                geometry_dir / stl_name,
-                case / "constant/geometry/wallObt.stl",
-            )
-            replace_token(
-                case / "0/include/initialConditions",
-                "FLUX_VALUE", str(u),
-            )
-            replace_token(
-                case / "constant/physicalProperties",
-                "NU_VALUE", props["nu"],
-            )
-            set_active_density(
-                case / "system/forces", props["rho"],
-            )
-print("Prepared 24 DoE cases; submission is a separate step.")
+fluids = {"H2": ("33.77", "2.709e-07"),
+          "N2": ("481.352", "7.932e-08")}
+shapes = {"A": "3Fori_1p5mm.stl", "B": "3Fori_3mm.stl",
+          "C": "6Fori_1p5mm.stl", "D": "6Fori_3mm.stl"}
+base, stls = Path("CASE_BASE"), Path("Geometrie_STL")
+target = Path("DoE_Cases")
+for gas, speed, obt in product(fluids, (5, 10, 15), shapes):
+    rho, nu = fluids[gas]
+    edits = {
+        "0/include/initialConditions": ("FLUX_VALUE", str(speed)),
+        "constant/physicalProperties": ("NU_VALUE", nu),
+        "system/forces": ("RHO_VALUE", rho),
+    }
+    # Validate inputs before creating this case.
+    texts = {}
+    for name, (token, value) in edits.items():
+        text = (base / name).read_text()
+        if text.count(token) != 1:
+            raise ValueError(f"Expected one {token}: {name}")
+        texts[name] = text.replace(token, value)
+    shape = stls / shapes[obt]
+    if not shape.is_file():
+        raise FileNotFoundError(shape)
+    case = target / gas / f"Sim_{gas}_Flux{speed:02d}_Obt_{obt}"
+    if case.exists():
+        raise FileExistsError(case)
+    shutil.copytree(base, case)
+    for name, text in texts.items():
+        (case / name).write_text(text)
+    shutil.copyfile(shape, case / "constant/geometry/wallObt.stl")
 \end{lstlisting}
 
-\section{SLURM Execution and Maintenance Scripts (Bash)}
+Case creation alone does not establish a valid mesh or solution. Before submission, inspect patch names, the active force density and the geometry assignment; retain the meshing log and mesh-quality checks for each generated case. The executable design tool uses audited results from the completed campaign and does not invoke this illustrative generator.
+
+\clearpage
+\section{Execution and Result Retrieval}
 \label{sec:app_slurm_scripts}
-\begin{lstlisting}[language=bash, caption={Full meshing and solving SLURM submission script (\texttt{run\_aries.sh}).}, captionpos=b]
-#!/bin/bash
-#SBATCH --account=fluids
-#SBATCH --partition=high
-#SBATCH --time=23:59:59
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=52
-#SBATCH --mem=490g
-#SBATCH --job-name=CEDEM
-#SBATCH --exclusive
-#SBATCH --exclude=cnode[06,17,19]
 
-module load gcc-12.1.1/gcc
-module load gcc-12.1.1/ompi-4.1.5_nccl
+The sequence below summarizes the meshing and solving stages for a fresh OpenFOAM~10 case. It is an execution outline, not a portable SLURM submission file: the account, partition, modules, memory and wall-time requests depend on the cluster configuration. Here \texttt{NPROCS} must match \texttt{numberOfSubdomains} in the case's decomposition configuration. Run it only inside a generated case, retaining each log separately.
 
-source $HOME/OpenFOAM-10/etc/bashrc
+\begin{lstlisting}[language=bash,numbers=none,caption={Illustrative parallel execution sequence after environment setup.}]
+set -euo pipefail
+: "${NPROCS:?Set NPROCS to the decomposition count}"
+blockMesh > log.blockMesh 2>&1
+surfaceFeatures > log.surfaceFeatures 2>&1
+decomposePar -copyZero > log.decomposePar 2>&1
+mpirun -np "$NPROCS" snappyHexMesh -overwrite -parallel \
+  > log.snappyHexMesh 2>&1
+mpirun -np "$NPROCS" checkMesh -parallel > log.checkMesh 2>&1
+# Review mesh quality before running the following solver step.
+mpirun -np "$NPROCS" simpleFoam -parallel > log.simpleFoam 2>&1
+\end{lstlisting}
 
-TOTAL_TASKS=$((SLURM_NTASKS_PER_NODE * SLURM_NNODES))
-echo "numberOfSubdomains $TOTAL_TASKS;" > system/numProcs
-
-blockMesh
-surfaceFeatures
-decomposePar -copyZero -force
-mpirun -np $TOTAL_TASKS snappyHexMesh -overwrite -parallel > out_mesh
-mpirun -np $TOTAL_TASKS simpleFoam -parallel > out_run
-\end{lstlisting} %
-
-\section{Remote Post-Processing Extraction (\texttt{download\_postprocessing.py})}
+\subsection{Directory-Preserving Retrieval}
 \label{sec:app_scp_script}
-The following example illustrates directory-preserving retrieval of post-processing results for the two gases. The paths are generic placeholders to be configured for the execution environment, rather than a record of where the simulation files were stored. The same retrieval structure can be applied to every case of the factorial design.
 
-\begin{lstlisting}[language=Python,caption={Illustrative SCP retrieval of each case's post-processing output.}, captionpos=b]
+The example below reads a configured remote case root from the environment and copies integral histories into a separate local archive. It uses the same illustrative naming convention as the generator. Actual remote directories must be verified before running it. Retrieval is sequential and an existing local case directory causes the example to stop, avoiding an accidental mixture of two transfers.
+
+\begin{lstlisting}[language=Python,numbers=none,caption={Illustrative retrieval of integral histories.}]
+from itertools import product
 from pathlib import Path
+import os
 import subprocess
 
-user_and_host = "fluids11@hpc.unimo.lan"
-remote_root = "/path/to/DoE_Cases"
-local_root = Path("DoE_Cases")
-
-for gas in ("Hydrogen", "Nitrogen"):
-    folder = local_root / gas
-    for case in sorted(folder.glob("Sim_*")):
-        remote = (
-            f"{user_and_host}:{remote_root}/{gas}/"
-            f"{case.name}/postProcessing"
-        )
-        subprocess.run(
-            ["scp", "-r", remote, str(case)],
-            check=True,
-        )
+# Example format: user@host:/absolute/path/DoE_Cases
+remote = os.environ["EFV_REMOTE_ROOT"].rstrip("/")
+archive = Path("Retrieved_Results")
+for gas, speed, obt in product(("H2", "N2"), (5, 10, 15), "ABCD"):
+    name = f"Sim_{gas}_Flux{speed:02d}_Obt_{obt}"
+    case = archive / gas / name
+    case.mkdir(parents=True, exist_ok=False)
+    source = f"{remote}/{gas}/{name}/postProcessing"
+    subprocess.run(["scp", "-r", source, str(case)], check=True)
 \end{lstlisting}
 
-\section{Batch Plotly Report and Master Dashboard Generator (\texttt{generate\_reports.py})}
-\label{sec:app_plotly_script}
-\begin{lstlisting}[language=Python, caption={Illustrative parsing functions from the Plotly reporting workflow (extract; not a complete executable report generator).}, captionpos=b]
-import os
-import re
-import plotly.graph_objects as go
+Integral histories alone are insufficient for contours or a volume-wide velocity maximum. Those operations also require the complete mesh and the selected velocity and pressure fields for every processor subdomain. Complete and verify the transfer before post-processing; missing subdomains can invalidate a maximum or prevent the mesh from loading. Preserve source simulations and write all derived outputs to a separate directory.
 
-def parse_scalar_data(filepath):
-    times, values = [], []
-    with open(filepath, 'r') as f:
-        for line in f:
-            if line.startswith('#') or not line.strip():
-                continue
-            parts = line.split()
-            if len(parts) >= 2:
-                times.append(float(parts[0]))
-                values.append(float(parts[1]))
-    return times, values
+\clearpage
+\section{Running and Auditing the Design Tool}
+\label{sec:app_tool_operation}
 
-def parse_vector_data(filepath):
-    times, x, y, z = [], [], [], []
-    with open(filepath, 'r') as f:
-        for line in f:
-            if line.startswith('#') or not line.strip():
-                continue
-            parts = line.replace('(', '').replace(')', '').split()
-            if len(parts) >= 4:
-                times.append(float(parts[0]))
-                x.append(float(parts[1]))
-                y.append(float(parts[2]))
-                z.append(float(parts[3]))
-    return times, x, y, z
+The \path{design_tool/} directory contains the application, model, plots, tests and input bundle. Python~3.13 is the tested runtime. On Windows, run \path{design_tool/run_windows.cmd}; dependencies are installed at \verb|%USERPROFILE%\.efv-tool\py313| to avoid long package paths. The application opens in a browser and requires Python plus its dependencies; it is not a standalone compiled executable.
 
-def parse_yplus(filepath):
-    data = {}
-    with open(filepath, 'r') as f:
-        for line in f:
-            if line.startswith('#') or not line.strip():
-                continue
-            parts = line.split()
-            if len(parts) >= 5:
-                t = float(parts[0])
-                patch = parts[1]
-                avg_yplus = float(parts[4])
-                if patch not in data:
-                    data[patch] = {'time': [], 'avg': []}
-                data[patch]['time'].append(t)
-                data[patch]['avg'].append(avg_yplus)
-    return data
+On macOS or Linux, run the following from \path{design_tool/}. Installation requires access to the packages; calculations subsequently use bundled data without OpenFOAM or ParaView.
+\begin{lstlisting}[language=bash,numbers=none]
+python3.13 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m streamlit run streamlit_app.py
+\end{lstlisting}
 
-def parse_forces(filepath):
-    times, fx, fy, fz = [], [], [], []
-    regex = re.compile(r"([0-9\.eE+-]+)\s+\(\(([^\)]+)\)\s+\(([^\)]+)\)\)")
-    with open(filepath, 'r') as f:
-        for line in f:
-            if line.startswith('#') or not line.strip():
-                continue
-            match = regex.search(line)
-            if match:
-                t = float(match.group(1))
-                p_force = [float(v) for v in match.group(2).split()]
-                v_force = [float(v) for v in match.group(3).split()]
-                times.append(t)
-                fx.append(p_force[0] + v_force[0])
-                fy.append(p_force[1] + v_force[1])
-                fz.append(p_force[2] + v_force[2])
-    return times, fx, fy, fz
+\paragraph{Interpreting the output.}
+Select the gas and threshold in g/s, then compare all four geometries. The plots and exported CSV distinguish:
+\begin{description}
+\item[Within the sampled range:] a regression estimate supported by the computed points, subject to their numerical limitations.
+\item[Extrapolation:] additional CFD is needed before spring selection, even if the estimated Mach number is below $0.3$.
+\item[Mach limit reached:] design force and pressure fields are blank. A separately labelled formal force projection is not a design load. This rule takes priority over the sampled-range classification.
+\end{description}
 
-local_base_dir = "DoE_Cases"
-sim_folders = [f for f in os.listdir(local_base_dir) 
-               if os.path.isdir(os.path.join(local_base_dir, f)) and f.startswith("Sim_")]
-dashboard_links = []
+The CSV retains the state, area, fit mismatch, variability, revision and force convention. Zero flow returns the imposed zero-load limit but is classified as extrapolation; negative or non-finite input is rejected. No output defines spring stiffness or certifies closure.
 
-for case in sorted(sim_folders):
-    case_path = os.path.join(local_base_dir, case)
-    pp_dir = os.path.join(case_path, "postProcessing")
-    if not os.path.exists(pp_dir):
-        continue
+\paragraph{Verification and future updates.}
+Install the development dependencies listed in \path{requirements-dev.txt}. From the application directory, run \texttt{python -m pytest tests -q}. The script \path{make_thesis_figures.py} regenerates the figures and model summary. Startup checks verify input hashes. For a new campaign, review units, state, geometry, averaging and field completeness before updating the bundle; new hashes alone do not validate predictions.
 
-    file_in_p   = os.path.join(pp_dir, "inlet_pressure_avg", "0", "surfaceFieldValue.dat")
-    file_out_p  = os.path.join(pp_dir, "outlet_pressure_avg", "0", "surfaceFieldValue.dat")
-    file_flux   = os.path.join(pp_dir, "inlet_volume_flux", "0", "surfaceFieldValue.dat")
-    file_yplus  = os.path.join(pp_dir, "yPlus1", "0", "yPlus.dat")
-    file_forces = os.path.join(pp_dir, "forceCoeffs_Obt", "0", "forces.dat")
-    
-    t_in_p, in_p = parse_scalar_data(file_in_p)
-    t_out_p, out_p = parse_scalar_data(file_out_p)
-    t_flux, f_x, f_y, f_z = parse_vector_data(file_flux)
-    yplus_data = parse_yplus(file_yplus)
-    t_forces, fx, fy, fz = parse_forces(file_forces)
-    # Figures generated and saved to CFD_Report_<case>.html (see Chapter 3)
-\end{lstlisting} %
+\paragraph{Source record.}
+The manifest \path{data/provenance.json} records the full source revision (abbreviated \texttt{d3778e3}) and SHA-256 hashes. Original integral means are in \path{analysis/final_high_pressure_responses.csv}; velocity and sound-speed records are under \path{Results/Chapter4/}. Their copies in \path{design_tool/data/} make the application independent of the simulation directories.
