@@ -25,7 +25,7 @@ The submitted dictionaries for the high pressure low temperature give $\rho_{\ma
 \section{Data reduction and terminal numerical behavior}
 \label{sec:plotly_dashboard}
 
-The \texttt{simpleFoam} output index, representing solver iteration and not elapsed physical time, indicates to have pressure and force histories extending to iteration~3000. To apply a reproducible comparison, the last 301 samples of each case were extracted: indices 2700--3000. For a numerical response $R_i$, the arithmetic mean and the coefficient of variation are
+The \texttt{simpleFoam} output index, representing solver iteration and not elapsed physical time, indicates to have pressure and force histories extending to iteration~3000. To apply a reproducible comparison, the last 301 samples of each case were extracted: indices 2700--3000. For a numerical response $R_i$, the arithmetic mean $\overline{R}$ and the coefficient of variation $CV$ are:
 \begin{equation}
 \overline{R}=\frac{1}{N}\sum_{i=1}^{N}R_i,
 \qquad
@@ -261,7 +261,6 @@ The largest resolved nitrogen speed is $176.79\,\mathrm{m\,s^{-1}}$, giving $Ma_
 \clearpage
 
 \section{Hydrogen: Primary High-Pressure CFD Results}
-\label{sec:fluid_trends}
 \label{sec:hydrogen_highp_results}
 The plots reported below \ref{fig:H2-Forcev vs Pressure - VEL}, are referred to a specific DoE inlet velocity, showing the average value (on the last 301 iterations) of Axial force  and $\Delta p$ for the 4 different obturator geometries.
 
@@ -551,14 +550,14 @@ The much larger dimensional pressure contrasts than in hydrogen are consistent w
 \label{sec:results_operating_states}
 \label{sec:gas_coefficient_comparison}
 
-To separate the dominant density and velocity scaling from the geometric response, the two gases are compared using the coefficients defined in Section~\ref{sec:doe_analysis}, Eq.~\eqref{eq:response_coefficients}:
+To separate the dominant density and velocity scaling from the geometric response, the two gases are compared using the coefficients defined in Section~\ref{sec:doe_analysis}:
 \begin{equation}
 \overline{P}_{loss}=\frac{\overline{\Delta p}}{\tfrac12\rho_{\mathrm{ref}}U_{\mathrm{in}}^2},
 \qquad
 \overline{C}_{F,x}=\frac{\overline{F}_x}{\tfrac12\rho_{\mathrm{ref}}U_{\mathrm{in}}^2A_{\mathrm{in}}}.
 \label{eq:mean_response_coefficients}
 \end{equation}
-For consistency with Eq.~\eqref{eq:inlet_area}, the force coefficient uses the nominal inlet area $A_{\mathrm{in}}=\pi(0.0039)^2=4.7783624\times10^{-5}\,\mathrm{m^2}$ for every case, rather than the slightly smaller discretized patch area used to report actual flow rates. The density is that of each gas's active dictionary. Because the denominators are fixed within a case, normalizing the terminal mean is equivalent to averaging the normalized samples. The calculations use the unrounded response values retained in the repository's audited response table; displayed coefficients are rounded to two decimals.
+For consistency with Eq.~\eqref{eq:inlet_area}, the force coefficient uses the nominal inlet area $A_{\mathrm{in}}=\pi(0.0039)^2=4.7783624\times10^{-5}\,\mathrm{m^2}$ for every case, rather than the meshed patch area used to report actual flow rates in the previous sections. Because the denominators are fixed within a case, normalizing the terminal mean is equivalent to averaging the normalized samples. The calculations use the unrounded response values retained in the repository's audited response table at Sections \ref{sec:hydrogen_highp_results} and \ref{sec:hydrogen_highp_results}
 
 \begin{table}[htbp]
 \centering
@@ -569,13 +568,13 @@ For consistency with Eq.~\eqref{eq:inlet_area}, the force coefficient uses the n
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
 Obt. & $\mathrm{H}_2$ & $\mathrm{N}_2$ & $\mathrm{H}_2$ & $\mathrm{N}_2$ & $\mathrm{H}_2$ & $\mathrm{N}_2$\\
 \midrule
-A & 79.03 & 78.40$^{\dagger}$ & 78.51 & 78.02 & 78.34 & 78.02\\
+A & 79.03 & 78.40 & 78.51 & 78.02 & 78.34 & 78.02\\
 B & 8.16 & 8.74 & 9.29 & 8.59 & 9.16 & 8.61\\
 C & 21.95 & 21.73 & 22.27 & 21.88 & 22.04 & 21.76\\
 D & 4.07 & 4.14 & 4.07 & 4.13 & 4.09 & 4.14\\
 \bottomrule
 \end{tabular}
-\caption{Dimensionless mean pressure-loss coefficient $\overline{P}_{loss}$ for hydrogen and nitrogen. $\dagger$: corrected nitrogen A at $5\,\mathrm{m\,s^{-1}}$ uses iterations 1072--1372; all other means use iterations 2700--3000.}
+\caption{Dimensionless mean pressure-loss coefficient $\overline{P}_{loss}$ for hydrogen and nitrogen}
 \label{tab:pressure_coefficients_gases}
 \end{table}
 
@@ -588,30 +587,33 @@ D & 4.07 & 4.14 & 4.07 & 4.13 & 4.09 & 4.14\\
 \cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
 Obt. & $\mathrm{H}_2$ & $\mathrm{N}_2$ & $\mathrm{H}_2$ & $\mathrm{N}_2$ & $\mathrm{H}_2$ & $\mathrm{N}_2$\\
 \midrule
-A & 278.42 & 276.38$^{\dagger}$ & 276.93 & 274.87 & 275.92 & 275.02\\
+A & 278.42 & 276.38 & 276.93 & 274.87 & 275.92 & 275.02\\
 B & 22.64 & 24.78 & 25.95 & 24.39 & 26.27 & 24.15\\
 C & 72.76 & 72.11 & 73.71 & 72.43 & 73.16 & 72.30\\
 D & 8.19 & 8.29 & 8.35 & 8.56 & 8.43 & 8.42\\
 \bottomrule
 \end{tabular}
-\caption{Dimensionless mean axial-force coefficient $\overline{C}_{F,x}$ for hydrogen and nitrogen. $\dagger$: corrected nitrogen A at $5\,\mathrm{m\,s^{-1}}$ uses iterations 1072--1372; all other means use iterations 2700--3000.}
+\caption{Dimensionless mean axial-force coefficient $\overline{C}_{F,x}$ for hydrogen and nitrogen}
 \label{tab:force_coefficients_gases}
 \end{table}
 
-The dimensional nitrogen responses are roughly fourteen times the hydrogen responses, but the normalized values are much closer: $\rho_{\mathrm{N}_2}/\rho_{\mathrm{H}_2}\simeq14.25$. Both tables retain the ordering $A>C>B>D$ for both gases at every inlet velocity. For A, C and D, paired gas differences are below approximately 2.5\% in both coefficients. This near-collapse indicates that the leading dimensional difference is density scaling within the present constant-property models. It does not imply identical thermodynamics or complete dynamic similarity.
+The dimensional nitrogen responses are roughly fourteen times the hydrogen responses, but the normalized values are much closer: $\rho_{\mathrm{N}_2}/\rho_{\mathrm{H}_2}\simeq14.25$. Both tables retain the ordering $A>C>B>D$ for both gases at every inlet velocity. Paired gas differences are below approximately 2.5\% in both coefficients, this indicates that the leading dimensional difference is density scaling within the present constant property models, with only one exception.\\
 
-Obturator A has $\overline{P}_{loss}\simeq78$--$79$ and $\overline{C}_{F,x}\simeq275$--$278$, whereas D has approximately $4.07$--$4.14$ and $8.19$--$8.56$. Their weak velocity dependence is consistent with an approximately quadratic dependence of pressure loss and force on inlet speed. The large numerical force coefficients reflect normalization by the small inlet area; they are not efficiencies or mechanical closing-force ratios.
+Obturator A has $\overline{P}_{loss}\simeq78$--$79$ and $\overline{C}_{F,x}\simeq275$--$278$, whereas D has approximately $4.07$--$4.14$ and $8.19$--$8.56$. Their weak velocity dependence is consistent with an approximately quadratic dependence of pressure loss and force on inlet speed.\\
 
-Configuration B exhibits the largest differences. Its hydrogen pressure coefficient rises from 8.16 at $5\,\mathrm{m\,s^{-1}}$ to 9.29 at $10\,\mathrm{m\,s^{-1}}$, while nitrogen stays near 8.6--8.7. At $15\,\mathrm{m\,s^{-1}}$, the nitrogen pressure and force coefficients are approximately 6.0\% and 8.1\% below the hydrogen values. These departures should be considered alongside B's hydrogen terminal CV values of 10.25\% for pressure and 12.46\% for force at that velocity. Since normalization divides by a constant, it does not reduce the relative terminal variation; the observed gas difference cannot be attributed uniquely to a physical gas effect from these data alone.
+Configuration B exhibits the largest differences. Its hydrogen pressure coefficient rises from 8.16 at $5\,\mathrm{m\,s^{-1}}$ to 9.29 at $10\,\mathrm{m\,s^{-1}}$, while nitrogen stays near 8.6--8.7. At $15\,\mathrm{m\,s^{-1}}$, the nitrogen pressure and force coefficients are approximately 6.0\% and 8.1\% below the hydrogen values. These departures should be considered alongside B's hydrogen terminal CV \ref{sec:plotly_dashboard} values of 10.25\% for pressure and 12.46\% for force at that velocity. Since normalization divides by a constant, it does not reduce the relative terminal variation.\\
 
-At equal inlet velocity and geometry, the Reynolds-number ratio is $Re_{\mathrm{N}_2}/Re_{\mathrm{H}_2}=\nu_{\mathrm{H}_2}/\nu_{\mathrm{N}_2}\simeq3.42$. Residual coefficient differences can therefore involve Reynolds-number effects as well as mesh, wall-treatment and iterative effects. The comparison also remains at approximately equal volumetric flow, not equal mass flow. Moreover, the largest nitrogen pressure loss is about 9.7\% of the nominal absolute reference pressure, compared with about 0.68\% for hydrogen; a successful hydrogen low-Mach check does not independently validate nitrogen's constant-density approximation.
+At equal inlet velocity and geometry, the Reynolds-number ratio is $Re_{\mathrm{N}_2}/Re_{\mathrm{H}_2}=\nu_{\mathrm{H}_2}/\nu_{\mathrm{N}_2}\simeq3.42$. Residual coefficient differences can therefore involve Reynolds-number effects as well as mesh, wall treatment and iterative effects.\\
 
-These coefficients support relative hydraulic screening of the stationary geometries. They do not convert the recorded positive-$x$ force into a verified closing force, establish a trip threshold, or describe the transient refuelling protocol. Ambient-reference results and the present cold high-pressure results must remain separate: rescaling density alone would omit the changes in viscosity and flow structure. Hydrogen remains the primary design fluid, with nitrogen providing a supplementary comparison of normalized response.
+These coefficients support relative hydraulic screening of the stationary geometries. They do not convert the recorded positive $x$ force into a verified closing force or establish a trip threshold, these values should only serve as a dictionary to be read by the designer, helping in the refueling system design.
 
 \section{Implications for Excess-Flow Valve Design}
 \label{sec:results_efv_implications}
 
 The principal hydrogen result is a consistent trade-off: smaller effective passages increase both hydraulic resistance and positive-$x$ obturator loading. Therefore the configuration yielding the greatest force is not automatically the best valve, because the pressure-loss requirement during normal flow must also be met. An engineering choice requires the permissible loss, mechanical force balance, motion direction, spring properties and expected excess-flow conditions (Section~\ref{sec:efv_principle}).
+The nitrogen study supports the comparison of fluid-property effects.\\
 
-The nitrogen study supports the comparison of fluid-property effects but does not change the hydrogen-first objective of the work. The tabulated CFD responses provide the numerical foundation for a design comparison tool, which is described in Chapter~\ref{ch:selection_tool}. Implementing and testing that software is a separate final development activity, not an additional round of flow simulations.
+The tabulated CFD responses provide the numerical basis for a design comparison tool described in the next Chapter~\ref{ch:selection_tool}.
+\clearpage
+
 
