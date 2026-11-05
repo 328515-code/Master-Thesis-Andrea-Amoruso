@@ -1,0 +1,21 @@
+{
+  "source_commit": "d3778e3dab528bd44a519829527a7bab17a0fc5d",
+  "repository": "328515-code/Master-Thesis-Andrea-Amoruso",
+  "reference_temperature_K": 233,
+  "reference_pressure_bar": 437,
+  "inlet_area_m2": 0.00004658925,
+  "sha256": {
+    "final_high_pressure_responses.csv": "f9fd736cef617a721746e1dd1bf0bba055b58a181af828679ff80fadfd3ccb81",
+    "mach_velocity_data.json": "799a8a6caf27d406ab79194be23c0e929948c397ffef578b07307ddfa2726c92",
+    "nitrogen_mach_velocity_data.json": "def5baf5cc6920edbbc6a1921b8884aa2d932f7f880e3c8963ddfd4765d3e214",
+    "nitrogen_sound_speed.json": "3c69ab456965ce6358ca5999b718214015469bbf35c122d7c88137ecb3e7ce84",
+    "sound_speed.json": "db681774b6430cf04669ab3d520401a7547ebee3e466edde120b28dc34e85d75"
+  },
+  "source_paths": {
+    "final_high_pressure_responses.csv": "analysis/final_high_pressure_responses.csv",
+    "mach_velocity_data.json": "Results/Chapter4/mach_velocity_data.json",
+    "sound_speed.json": "Results/Chapter4/sound_speed.json",
+    "nitrogen_mach_velocity_data.json": "Results/Chapter4/nitrogen_mach_velocity_data.json",
+    "nitrogen_sound_speed.json": "Results/Chapter4/nitrogen_sound_speed.json"
+  }
+}

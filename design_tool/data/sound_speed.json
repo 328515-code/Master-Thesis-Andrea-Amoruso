@@ -1,0 +1,13 @@
+{
+  "library": "CoolProp",
+  "version": "8.0.0",
+  "fluid": "HEOS::Hydrogen",
+  "temperature_K": 233.0,
+  "pressure_Pa": 43700000.0,
+  "eos_reference": "Leachman et al. (2009), DOI 10.1063/1.3160306",
+  "sound_speed_m_s": 1611.7774059916314,
+  "eos_density_kg_m3": 33.790256780579504,
+  "ideal_gamma": 1.4,
+  "specific_R_J_kg_K": 4124.482914733635,
+  "ideal_sound_speed_m_s": 1159.9165171623827
+}
