@@ -1,0 +1,98 @@
+[
+  {
+    "gas": "H2",
+    "obturator": "A",
+    "force_k_N_s2_m2": 0.22277128979591837,
+    "pressure_k_kPa_s2_m2": 1.3233062040816328,
+    "max_fit_error_pct": 0.8318688586545719,
+    "amplification": 11.585910510309734,
+    "mach_limit_g_s": 65.66182183187802,
+    "min_mass_g_s": 7.866594862500001,
+    "max_mass_g_s": 23.599784587500004,
+    "max_observed_mach": 0.10658259100821878
+  },
+  {
+    "gas": "H2",
+    "obturator": "B",
+    "force_k_N_s2_m2": 0.021120955102040814,
+    "pressure_k_kPa_s2_m2": 0.15486918367346938,
+    "max_fit_error_pct": 15.64508148470627,
+    "amplification": 4.081248256215584,
+    "mach_limit_g_s": 186.40179276755455,
+    "min_mass_g_s": 7.866594862500001,
+    "max_mass_g_s": 23.599784587500004,
+    "max_observed_mach": 0.03798212061768511
+  },
+  {
+    "gas": "H2",
+    "obturator": "C",
+    "force_k_N_s2_m2": 0.05909400816326531,
+    "pressure_k_kPa_s2_m2": 0.3727362857142857,
+    "max_fit_error_pct": 0.6684795018624845,
+    "amplification": 5.72519730504659,
+    "mach_limit_g_s": 132.8778644916675,
+    "min_mass_g_s": 7.866594862500001,
+    "max_mass_g_s": 23.599784587500004,
+    "max_observed_mach": 0.05313211772397037
+  },
+  {
+    "gas": "H2",
+    "obturator": "D",
+    "force_k_N_s2_m2": 0.006790163265306122,
+    "pressure_k_kPa_s2_m2": 0.06904477551020409,
+    "max_fit_error_pct": 2.8189470821641693,
+    "amplification": 3.761989766792974,
+    "mach_limit_g_s": 202.22064355495777,
+    "min_mass_g_s": 7.866594862500001,
+    "max_mass_g_s": 23.599784587500004,
+    "max_observed_mach": 0.0350109427592929
+  },
+  {
+    "gas": "N2",
+    "obturator": "A",
+    "force_k_N_s2_m2": 3.1627090163265303,
+    "pressure_k_kPa_s2_m2": 18.77905681632653,
+    "max_fit_error_pct": 0.49609239523472626,
+    "amplification": 11.913188213486217,
+    "mach_limit_g_s": 335.0933559410621,
+    "min_mass_g_s": 112.12914333,
+    "max_mass_g_s": 336.38742999,
+    "max_observed_mach": 0.2979451800743587
+  },
+  {
+    "gas": "N2",
+    "obturator": "B",
+    "force_k_N_s2_m2": 0.27826854693877556,
+    "pressure_k_kPa_s2_m2": 2.072030448979592,
+    "max_fit_error_pct": 2.3625985295627427,
+    "amplification": 4.371726847903521,
+    "mach_limit_g_s": 913.1472201491721,
+    "min_mass_g_s": 112.12914333,
+    "max_mass_g_s": 336.38742999,
+    "max_observed_mach": 0.1105147415117951
+  },
+  {
+    "gas": "N2",
+    "obturator": "C",
+    "force_k_N_s2_m2": 0.8317232612244899,
+    "pressure_k_kPa_s2_m2": 5.24220375510204,
+    "max_fit_error_pct": 0.29399550655069273,
+    "amplification": 5.7121558511092685,
+    "mach_limit_g_s": 698.8657737059771,
+    "min_mass_g_s": 112.12914333,
+    "max_mass_g_s": 336.38742999,
+    "max_observed_mach": 0.14440001613164835
+  },
+  {
+    "gas": "N2",
+    "obturator": "D",
+    "force_k_N_s2_m2": 0.09712325306122449,
+    "pressure_k_kPa_s2_m2": 0.9964204897959185,
+    "max_fit_error_pct": 1.8811004523491937,
+    "amplification": 4.184384475265452,
+    "mach_limit_g_s": 954.030453466242,
+    "min_mass_g_s": 112.12914333,
+    "max_mass_g_s": 336.38742999,
+    "max_observed_mach": 0.10416803055111243
+  }
+]
