@@ -136,7 +136,7 @@ The nitrogen A boundary is slightly below its largest sampled mass flow, even th
 
 For contour comparison, camera, planes and spatial scale are fixed. Within each gas, one common range covers all geometries and speeds: hydrogen uses $0$--$140.98\,\mathrm{m\,s^{-1}}$ and $-224.23$--$299.35\,\mathrm{kPa}$; nitrogen uses $0$--$140.61\,\mathrm{m\,s^{-1}}$ and $-3300.13$--$4272.71\,\mathrm{kPa}$. Equal colours across gases therefore need not represent equal values. The plotted pressure is outlet-referenced, not absolute pressure. Cells are interpolated before slicing, whereas the volume-maximum scan retains the original cell values. Processing one case at a time limits memory demand without changing these conventions.
 
-The archived sound-speed JSON files identify CoolProp 8.0.0 and its HEOS hydrogen and nitrogen models as the evaluation source. Their densities are approximately $33.7903$ and $481.6319\,\mathrm{kg\,m^{-3}}$; the prescribed CFD densities in Table~\ref{tab:app_properties}, rather than these independently evaluated densities, are used for pressure, force and mass-flow conversion.
+The archived sound-speed JSON files identify CoolProp 8.0.0 and its HEOS hydrogen and nitrogen models as the evaluation source~\cite{coolprop2014,leachman2009,span2000}. Their densities are approximately $33.7903$ and $481.6319\,\mathrm{kg\,m^{-3}}$; the prescribed CFD densities in Table~\ref{tab:app_properties}, rather than these independently evaluated densities, are used for pressure, force and mass-flow conversion.
 
 \clearpage
 \section[Reproducing the Response Fit]{Independent Reproduction of the Response Fit}
@@ -149,6 +149,41 @@ k_R=\frac{\sum_i U_i^2R_i}{\sum_i U_i^4},\qquad
 \]
 The same procedure is applied independently to each gas and obturator. It fits the available means with equal weights and does not force the parabola through all three points. The archived maximum relative force-fit mismatch is about $15.65\%$ for hydrogen B; for the other seven pairs it is below $2.82\%$.
 
+\subsection{Tabulated Fit Coefficients}
+\label{sec:app_fit_coefficients}
+
+Table~\ref{tab:app_fit_coefficients} provides the fitted coefficients for independent calculations. In this table, $\widehat F_x=k_F U_{\mathrm{in}}^2$ is in newtons and $\widehat{\Delta p}=k_{\Delta p} U_{\mathrm{in}}^2$ is in kilopascals when velocity is in $\mathrm{m\,s^{-1}}$. The coefficients are dimensional regression parameters, not the dimensionless pressure-loss and force coefficients introduced in Chapter~\ref{ch:doe}. A spreadsheet using pressure in pascals must multiply $k_{\Delta p}$ by $1000$.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{@{}ccrrr@{}}
+\toprule
+Gas & Obt. & $k_F$ & $k_{\Delta p}$ & $\varepsilon_{F,\max}$ [\%]\\
+ & & [N s$^2$ m$^{-2}$] & [kPa s$^2$ m$^{-2}$] & \\
+\midrule
+$\mathrm{H}_2$ & A & 0.22277129 & 1.32330620 & 0.832\\
+$\mathrm{H}_2$ & B & 0.02112096 & 0.15486918 & 15.645\\
+$\mathrm{H}_2$ & C & 0.05909401 & 0.37273629 & 0.668\\
+$\mathrm{H}_2$ & D & 0.00679016 & 0.06904478 & 2.819\\
+\midrule
+$\mathrm{N}_2$ & A & 3.16270902 & 18.77905682 & 0.496\\
+$\mathrm{N}_2$ & B & 0.27826855 & 2.07203045 & 2.363\\
+$\mathrm{N}_2$ & C & 0.83172326 & 5.24220376 & 0.294\\
+$\mathrm{N}_2$ & D & 0.09712325 & 0.99642049 & 1.881\\
+\bottomrule
+\end{tabular}
+\caption{Regression coefficients reproduced from the archived input bundle. Displayed values are rounded; the application retains full precision.}
+\label{tab:app_fit_coefficients}
+\end{table}
+
+The last column reports the largest pointwise relative force mismatch,
+\[
+\varepsilon_{F,\max}=100\max_i\left|\frac{k_F U_i^2-\overline F_{x,i}}{\overline F_{x,i}}\right|.
+\]
+It measures agreement with the three fitted means, rather than predictive uncertainty. The small residuals for most configurations do not independently validate a new mass flow, gas state or obturator position.
+
+\clearpage
+\subsection{Worked Reproduction Example}
 \begin{lstlisting}[language=Python,numbers=none,caption={Independent hydrogen A check, run from the repository root.}]
 import csv
 from pathlib import Path
@@ -174,6 +209,15 @@ At $15\,\mathrm{g\,s^{-1}}$ hydrogen, this gives $U_{\mathrm{in}}\simeq9.534\,\m
 
 For a reproducibility check, retain the original CSV precision, use the meshed inlet area and convert the input to kg/s before evaluation. A fit using rounded chapter tables, a nominal inlet area or an unconverted g/s input will produce a different result. The application tests additionally exercise boundary handling, invalid inputs, file integrity and exported status information.
 
+
+\paragraph{Numerical acceptance checks.}
+A reproduction should recover $20.249\,\mathrm{N}$ and $120.28\,\mathrm{kPa}$ for hydrogen A at $15\,\mathrm{g\,s^{-1}}$, within the rounding shown above. Classification checks should use the full-precision input data and boundary calculation:
+\begin{enumerate}
+\item At zero flow, the formal force and pressure loss are zero, but the status remains extrapolation because zero was not simulated.
+\item At the calculated $\dot m_{0.3}$ for any gas and geometry, the estimated Mach number is $0.3$ and both design outputs are withheld. The displayed two-decimal boundary in Table~\ref{tab:app_mach_envelopes} is not precise enough for an equality test.
+\item For nitrogen A at its upper sampled flow, $336.38743\,\mathrm{g\,s^{-1}}$, the projected Mach screen takes priority over coverage: the design outputs are withheld even though this flow corresponds to a simulated inlet velocity.
+\end{enumerate}
+These checks verify units and decision logic; they are not additional validation of the CFD model.
 \clearpage
 \section{Illustrative Case Preparation}
 \label{sec:app_doe_gen}
@@ -289,5 +333,12 @@ The CSV retains the state, area, fit mismatch, variability, revision and force c
 \paragraph{Verification and future updates.}
 Install the development dependencies listed in \path{requirements-dev.txt}. From the application directory, run \texttt{python -m pytest tests -q}. The script \path{make_thesis_figures.py} regenerates the figures and model summary. Startup checks verify input hashes. For a new campaign, review units, state, geometry, averaging and field completeness before updating the bundle; new hashes alone do not validate predictions.
 
-\paragraph{Source record.}
+\clearpage
+\subsection{Data Provenance and Evaluation Records}
+\label{sec:app_data_record}
+
 The manifest \path{data/provenance.json} records the full source revision (abbreviated \texttt{d3778e3}) and SHA-256 hashes. Original integral means are in \path{analysis/final_high_pressure_responses.csv}; velocity and sound-speed records are under \path{Results/Chapter4/}. Their copies in \path{design_tool/data/} make the application independent of the simulation directories.
+
+For exact reproduction, retain the archived sound speeds rather than silently recomputing them with a different library version or fluid backend. The prescribed CFD density and viscosity describe the simulated campaign; the equation-of-state density is a separate diagnostic. Replacing one with the other would change the mass-flow axis and dimensional response conversions. A change of reference state therefore requires a new, consistently documented data set rather than only replacing the property values in the interface.
+
+When archiving a design evaluation, retain the selected gas and mass flow, obturator identifier, assessment status and exported CSV together with the application revision and the data manifest. The manifest's source revision identifies the underlying CFD data, not necessarily the revision of the application that produced the export. Recording both revisions distinguishes a data update from a change to fitting, screening or presentation.
