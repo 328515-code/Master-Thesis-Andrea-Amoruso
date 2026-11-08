@@ -1,7 +1,7 @@
 \chapter{Interactive selection tool development}
 \label{ch:selection_tool}
 
-The CFD results are useful to a valve designer only if they can be related to an engineering requirement. For spring loaded excess flow valves such requirement is the mass flow threshold at which the hydrodynamic load should initiate motion towards closure. The application developed in this chapter converts that threshold into a comparison of the axial loads predicted for the four investigated obturators. To achieve so, it combines the integral responses with local velocity diagnostics of Chapter~\ref{ch:results}. The calculations are then shown through a \texttt{Streamlit} interface with interactive \texttt{Plotly} graphs \cite{streamlit_docs,plotly_docs}.
+The CFD results are useful to a valve designer only if they can be related to an engineering requirement. For spring loaded excess flow valves one such requirement is the mass flow threshold at which the hydrodynamic load should initiate motion towards closure. The application developed in this chapter converts that threshold into a comparison of the axial loads predicted for the four investigated obturators. To achieve this, it combines the integral responses with local velocity diagnostics of Chapter~\ref{ch:results}. The calculations are then shown through a \texttt{Streamlit} interface with interactive \texttt{Plotly} graphs \cite{streamlit_docs,plotly_docs}.
 
 \section{Aim, Inputs and Mechanical Interpretation}
 \label{sec:recommendation_logic}
@@ -16,15 +16,15 @@ F_{\mathrm{fluid,close}}(x_0,\dot m_{\mathrm{thr}})
 \end{equation}
 where $F_0$ is the spring preload, $x_0$ is the reference position and $k$ is its stiffness. The recorded force is the positive CFD $x$-component, including both pressure and viscous contributions.
 
-The single threshold force only will not determine $k$ since the tool retrieves only data related to fluid dynamics, the designer will also need mechanical details of the obturator preload, available stroke, friction and other eventual mechanical loads. Moreover, the CFD campaign contains one fixed obturator position, so it does not provide the displacement dependent fluid load during closure.
+The single threshold force only will not determine $k$ since the tool retrieves only data related to fluid dynamics, the designer will also need mechanical details of the obturator preload, available stroke, friction and other relevant mechanical loads. Moreover, the CFD campaign contains one fixed obturator position, so it does not provide the displacement dependent fluid load during closure.
 
-The tool therefore supports the selection of a preliminary opposing spring force, does not calculate a unique spring stiffness.
+The tool therefore supports the selection of a preliminary opposing spring force, but does not calculate a unique spring stiffness.
 
 \section{Reference Dataset and Mass-Flow Conversion}
 \label{sec:tool_dataset_priority}
 \label{sec:tool_430bar}
 
-The data bundle contains the 24 DoE combinatios: two gases, four obturator geometries and three inlet velocities at the reference state of $437\,\mathrm{bar}$ absolute and $233\,\mathrm{K}$. 
+The data bundle contains the 24 DoE combinations: two gases, four obturator geometries and three inlet velocities at the reference state of $437\,\mathrm{bar}$ absolute and $233\,\mathrm{K}$. 
 Temperature and pressure are displayed to recall the user which is the simulations thermodynamic condition.
 
 The fitted responses are the terminal mean (last 301 iterations) of axial force and inlet to outlet pressure loss, computed at Sections \ref{sec:hydrogen_highp_results} and \ref{sec:nitrogen_comparison}.\\
@@ -36,14 +36,14 @@ For each selected gas, the input mass flow is converted using
 U_{\mathrm{in}}=\frac{\dot m}{\rho_{\mathrm{ref}}A_{\mathrm{in,mesh}}},
 \label{eq:tool_mass_conversion}
 \end{equation}
-with $A_{\mathrm{in,mesh}}=4.658925\times10^{-5}\,\mathrm{m^2}$. This is the discretized inlet area used for actual flow reporting in Chapter~\ref{ch:results}. The prescribed densities are $33.77\,\mathrm{kg\,m^{-3}}$ for hydrogen and $481.352\,\mathrm{kg\,m^{-3}}$ for nitrogen which then produce a corresponding sampled mass-flow intervals are approximately $7.87$--$23.60\,\mathrm{g\,s^{-1}}$ and $112.13$--$336.39\,\mathrm{g\,s^{-1}}$, respectively.
+with $A_{\mathrm{in,mesh}}=4.658925\times10^{-5}\,\mathrm{m^2}$. This is the discretized inlet area used for actual flow reporting in Chapter~\ref{ch:results}. The prescribed densities are $33.77\,\mathrm{kg\,m^{-3}}$ for hydrogen and $481.352\,\mathrm{kg\,m^{-3}}$ for nitrogen which produce corresponding sampled mass-flow intervals of approximately $7.87$--$23.60\,\mathrm{g\,s^{-1}}$ and $112.13$--$336.39\,\mathrm{g\,s^{-1}}$, respectively.
 
 Each gas has its own fitted curves and the four geometries remain discrete candidates. The tool does not interpolate between hole counts or diameters. 
 
 \section{Quadratic Response Fits}
 \label{sec:selection_coverage}
 
-At a fixed gas state and geometry, a nearly constant force coefficient $k_F$ gives $F_x\propto\rho U_{\mathrm{in}}^2$, creating so a one-parameter parabola function:
+At a fixed gas state and geometry, a nearly constant force coefficient $k_F$ gives $F_x\propto\rho U_{\mathrm{in}}^2$, creating so a one-parameter quadratic function:
 \begin{equation}
 \widehat F_x(U)=k_F U^2,
 \qquad
@@ -53,7 +53,7 @@ k_F=\frac{\sum_{i=1}^{3}U_i^2\overline F_{x,i}}
 \end{equation}
 which minimizes $\sum_i(\overline F_{x,i}-k_FU_i^2)^2$. A separate coefficient is calculated for each gas--geometry pair, with equal weights on the three terminal means. Constraining the curve through the origin expresses zero flow-induced load at zero flow within the present model. Also a free three coefficient quadratic function could pass exactly through three points, but would have no remaining residual information and could predict a non-zero flow-induced load at zero flow.\\
 
-Using Eq.~\eqref{eq:tool_mass_conversion}, the same curve can be written  in the designer input variable:
+Using Eq.~\eqref{eq:tool_mass_conversion}, the same curve can be written in terms of the designer’s input variable:
 \begin{equation}
 \widehat F_x(\dot m)=
 \frac{k_F}{(\rho_{\mathrm{ref}}A_{\mathrm{in,mesh}})^2}\dot m^2.
@@ -84,9 +84,9 @@ $\mathrm{N}_2$ & D & 0.0971233 & 1.88\\
 \end{table}
 
 Table~\ref{tab:tool_fit_quality} makes departures from the idealized trend visible.
-Hydrogen with obturator B has the largest mismatch, approximately $15.65\%$, and also exhibits relatively large terminal force variations, reaching a CV of approximately $12.46\%$ at $15\,\mathrm{m\,s^{-1}}$ \ref{eq:terminal_average}. \\
+Hydrogen with obturator B has the largest mismatch, approximately $15.65\%$, and also exhibits relatively large terminal force variations, reaching a CV of approximately $12.46\%$ at $15\,\mathrm{m\,s^{-1}}$, using the definition in Eq.\ref{eq:terminal_average}. \\
 
-The displayed CFD error bars are the temporal standard deviations reconstructed as $\sigma_F=\overline F_x\,CV_F/100$; they are not confidence intervals or prediction uncertainties.
+The displayed CFD error bars are the standard deviations over the terminal iteration window reconstructed as $\sigma_F=\overline F_x\,CV_F/100$; they are not confidence intervals or prediction uncertainties.
 
 \section{Local Mach screening and additional CFD requirements}
 \label{sec:tool_mach_screen}
@@ -107,7 +107,7 @@ Solving the screening relation for $\widehat{Ma}=0.3$ gives
 \dot m_{0.3}=\frac{0.3\,a_{\mathrm{ref}}\rho_{\mathrm{ref}}A_{\mathrm{in,mesh}}}{\alpha}.
 \label{eq:tool_mach_flow_limit}
 \end{equation}
-The corresponding flow is drawn as a labeled vertical line on every force plot, showing the user the limit over which an incompressible fluid cannot simulate the flow condition. Table~\ref{tab:tool_mach_limits} lists the values used by the application. These are estimated screening boundaries and not CFD measured transition points. In particular, the distant hydrogen boundaries require extrapolating the observed amplification well beyond the sampled mass-flow range.
+The corresponding flow is drawn as a labeled vertical line on every force plot, showing the user the limit over which an incompressible fluid model cannot simulate the flow condition. Table~\ref{tab:tool_mach_limits} lists the values used by the application. These are estimated screening boundaries and not CFD measured transition points. In particular, the distant hydrogen boundaries require extrapolating the observed amplification well beyond the sampled mass-flow range.
 
 \begin{table}[htbp]
 \centering
@@ -127,7 +127,7 @@ D & 3.7620 & 202.22 & 4.1844 & 954.03\\
 \label{tab:tool_mach_limits}
 \end{table}
 
-Two separate checks govern the user shown output. A point outside the sampled flow interval is labelled as an unvalidated extrapolation even when its estimated Mach number is below 0.3. Instead, a point at or above the projected Mach boundary is flagged as requiring further CFD with an appropriate compressibility assessment with the numerical force and pressure design outputs withheld. A dotted mathematical extension remains on the plot to locate the requested point, but is explicitly labelled as a formal projection. 
+Two separate checks govern the displayed output. A point outside the sampled flow interval is labelled as an unvalidated extrapolation even when its estimated Mach number is below 0.3. Instead, a point at or above the projected Mach boundary is flagged as requiring further CFD with an appropriate compressibility assessment with the numerical force and pressure design outputs withheld. A dotted mathematical extension remains on the plot to locate the requested point, but is explicitly labelled as a formal projection. 
 
 It is important to remember that Mach 0.3 is a screening criterion, not a physical discontinuity at which a real force ceases to exist. Below it, changes in density, pressure, temperature, flow structure and obturator position can still limit the model \cite{anderson2017}.
 
@@ -136,7 +136,7 @@ It is important to remember that Mach 0.3 is a screening criterion, not a physic
 
 The results table places the four geometries side by side in a fixed A--D order. It reports fitted axial force, pressure loss, estimated local Mach number, projected boundary flow and assessment status. No automatic ranking is imposed.\\
 
-Each geometry has its own interactive force plot. The original CFD means remain visible, with temporal standard-deviation bars, while an orange diamond marks the selected mass flow. Solid curves and blue shading identify the sampled interval; dashed curves indicate extrapolation. Red shading begins at the projected Mach boundary, and a red cross replaces the selected marker when it represents only a formal extension beyond that boundary. \\
+Each geometry has its own interactive force plot. The original CFD means remain visible, with standard deviations over the terminal iteration window bars, while an orange diamond marks the selected mass flow. Solid curves and blue shading identify the sampled interval; dashed curves indicate extrapolation. Red shading begins at the projected Mach boundary, and a red cross replaces the selected marker when it represents only a formal extension beyond that boundary. \\
 
 At a Hydrogen threshold of $15\,\mathrm{g\,s^{-1}}$ all four points are generated within the sampled interval and below their Mach screening boundaries. Figure~\ref{fig:tool_hydrogen_example} shows their comparison over the sampled flow interval. It makes the geometry-dependent load differences visible while retaining the CFD evidence supporting the curves.
 
@@ -147,7 +147,7 @@ At a Hydrogen threshold of $15\,\mathrm{g\,s^{-1}}$ all four points are generate
 \label{fig:tool_hydrogen_example}
 \end{figure}
 
-For Nitrogen with obturator A at $400\,\mathrm{g\,s^{-1}}$, the input exceeds both the sampled range and its projected Mach boundary. Figure~\ref{fig:tool_nitrogen_screen} shows how the selected flow can still be located geometrically on the formal parabola, while the application withholds the design force. The distinction prevents a low Mach estimate from being mistaken for validation of an arbitrary extrapolation.
+For Nitrogen with obturator A at $400\,\mathrm{g\,s^{-1}}$, the input exceeds both the sampled range and its projected Mach boundary. Figure~\ref{fig:tool_nitrogen_screen} shows how the selected flow can still be located geometrically on the formal parabola, while the application retains the design force. The distinction prevents a low Mach estimate from being mistaken for validation of an arbitrary extrapolation.
 
 \begin{figure}[H]
 \centering
@@ -156,16 +156,16 @@ For Nitrogen with obturator A at $400\,\mathrm{g\,s^{-1}}$, the input exceeds bo
 \label{fig:tool_nitrogen_screen}
 \end{figure}
 
-The comparison retains inputs, units, assessment states, source revision and numerical parameters. When the Mach screen is exceeded, the design-force field is empty preventing the result to be transferred to a design worksheet.
+The comparison retains inputs, units, assessment states, source revision and numerical parameters. When the Mach screen is exceeded, the design-force field is empty preventing the result from being transferred to a design worksheet.
 
 \section{Streamlit implementation and portability}
 \label{sec:software_architecture}
 
-The tool created separates numerical calculations, plotting and interface presentation. The numerical layer loads the audited tables, converts mass flow, computes the fitted coefficients and applies the coverage and Mach checks, then the displays those results without loading any CFD mesh, making repeated evaluations immediate and avoiding to obligate the user to use OpenFOAM or ParaView.\\
+The tool created separates numerical calculations, plotting and interface presentation. The numerical layer loads the audited tables, converts mass flow, computes the fitted coefficients and applies the coverage and Mach checks, then the interface displays those results without loading any CFD mesh, making repeated evaluations immediate and requiring the user to use OpenFOAM or ParaView.\\
 
 \texttt{Streamlit} was selected because it exposes Python calculations through standard browser controls and updates the results when an input changes. \texttt{Plotly} supplies interactive curves, hover values and zoom \cite{streamlit_docs,plotly_docs}. The same application can be launched locally with \texttt{python -m streamlit run streamlit\_app.py} or hosted on a compatible server. A hosted instance makes the interface accessible from other devices through a browser while that server is available.\\
 
-The final result, is an executable Python web application. A Windows launcher creates an isolated Python environment and starts the application; documented commands provide the equivalent workflow on macOS and Linux. The tested environment uses Python 3.13, Streamlit 1.66.1 and Plotly 7.1.0.
+The final result is an executable Python web application. A Windows launcher creates an isolated Python environment and starts the application; documented commands provide the equivalent workflow on macOS and Linux. The tested environment uses Python 3.13, Streamlit 1.66.1 and Plotly 7.1.0.
 
 % \section{Verification, Traceability and Intended Use}
 % \label{sec:industrial_traceability}

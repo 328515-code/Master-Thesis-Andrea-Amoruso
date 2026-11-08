@@ -14,10 +14,10 @@ The design of an excess-flow valve (EFV) needs to be considered in the context o
 \label{fig:station_efv_location}
 \end{figure}
 
-For normal duty vehicles refueling, SAE~J2601 specifies fueling protocols for the H35 and H70 nominal pressure classes, corresponding to $35$ and $70\,\mathrm{MPa}$, and identifies fuel delivery temperature categories T20, T30 and T40. The T40 designation refers to a nominal fuel-delivery temperature of $-40\,^{\circ}\mathrm{C}$. The fueling protocol constrains also quantities such as mass-flow rate, pressure-rise rate, delivery temperature and end pressure, these values will be used as references for the successive CFD simulation \cite{sae_j2601}. Gas pressure and temperature change during a filling event, this requires to specify which system section is studied.
+For light duty vehicles refueling, SAE~J2601 specifies fueling protocols for the H35 and H70 nominal pressure classes, corresponding to $35$ and $70\,\mathrm{MPa}$, and identifies fuel delivery temperature categories T20, T30 and T40. The T40 designation refers to a nominal fuel-delivery temperature of $-40\,^{\circ}\mathrm{C}$. The fueling protocol also constrains quantities such as mass-flow rate, pressure-rise rate, delivery temperature and end pressure, these values will be used as references for the successive CFD simulation \cite{sae_j2601}. Gas pressure and temperature change during a filling event, this requires to specify which system section is studied.
 
 An EFV is just one element of a wider protective arrangement, alongside check valves, flow-control valves, breakaway devices, pressure safety valves and actuated shut-off valves \cite{iso19880_3}. 
-In particular the purpose of an EFV is limiting abnormal \emph{forward} flow; while check valves prevent reverse flow and emergency shut-off, instead an hose breakaway addresses the specific mechanical separation of the dispenser connection. These functions are complementary and should not be represented as interchangeable \cite{iso19880_1,iso19880_3,h2tools_valves}.
+In particular the purpose of an EFV is limiting abnormal \emph{forward} flow; while check valves prevent reverse flow, emergency shut-off valves isolate flow, instead a hose breakaway addresses the specific mechanical separation of the dispenser connection. These functions are complementary and should not be represented as interchangeable \cite{iso19880_1,iso19880_3,h2tools_valves}.
 
 From a component design perspective, the relevant questions are not limited to whether a valve can shut off flow. The designer must also consider the pressure loss in normal service, the repeatability of its response, the influence of gas properties, and whether the required hydrodynamic force can be generated at the intended excess-flow condition. These competing requirements motivate the geometrical and fluid-dynamic comparisons developed in the following chapters.
 
@@ -42,7 +42,7 @@ This $437\,\mathrm{bar}$ state corresponds to the reference setting adopted in t
 
 So, the reference values in the final OpenFOAM dictionaries are $\rho_{\mathrm{H}_2}=33.77\,\mathrm{kg\,m^{-3}}$ and $\nu_{\mathrm{H}_2}=2.709\times10^{-7}\,\mathrm{m^2\,s^{-1}}$, with the corresponding secondary nitrogen settings documented in Chapter~\ref{ch:doe}.
 
-At this state, Hydrogen is a dense, high-pressure gas and its density cannot reliably be inferred from the ideal-gas equation alone. Both $\rho(p,T)$ and the dynamic viscosity $\mu(p,T)$ should be determined using a consistent real-fluid database or correlation, such as NIST REFPROP, before assigning the constant kinematic viscosity $\nu=\mu/\rho$ and the reference density used by OpenFOAM's force calculation \cite{nist_refprop,nist_refprop_online}. It is important ot underline that the reference pressure is \emph{not} imposed by setting the kinematic outlet pressure to zero in the incompressible solver but is represented indirectly by selecting the fluid properties $\rho(p,T)$ $\And$ $\mu(p,T)$.
+At this state, Hydrogen is a dense, high-pressure gas and its density cannot reliably be inferred from the ideal-gas equation alone. Both $\rho(p,T)$ and the dynamic viscosity $\mu(p,T)$ should be determined using a consistent real-fluid database or correlation, such as NIST REFPROP, before assigning the constant kinematic viscosity $\nu=\mu/\rho$ and the reference density used by OpenFOAM's force calculation \cite{nist_refprop,nist_refprop_online}. It is important to underline that the reference pressure is \emph{not} imposed by setting the kinematic outlet pressure to zero in the incompressible solver but is represented indirectly by selecting the fluid properties $\rho(p,T)$ $\And$ $\mu(p,T)$.
 
 \section{Operating Principle of a Passive Excess-Flow Valve}
 \label{sec:efv_principle}
@@ -67,18 +67,18 @@ During normal operation, the movable element remains away from its shut-off seat
 \end{equation}
 where $\mathbf{n}$ is the outward surface normal of the solid into the fluid, $p$ is static pressure and $\boldsymbol{\tau}$ is the viscous stress tensor; the pressure-force sign depends on the chosen normal orientation \cite{white2016,moukalled2016}. Since the obturator will move along the valve axis, the axial component of the applied forces will be the quantity most directly related to the tendency to close or open the valve.
 
-A well designed EFV should exhibit an acceptable pressure loss in this state, since a restrictive geometry may produce greater fluid load, but also increase pumping or compression demand, interfering with the flow control margin of the refueling system. In the work executed, to account for these physical concepts both the pressure difference and obturator load rather are evaluated and compared.
+A well designed EFV should exhibit an acceptable pressure loss in this state, since a restrictive geometry may produce greater fluid load, but also increase pumping or compression demand, interfering with the flow control margin of the refueling system. In the work executed, to account for these physical concepts both the pressure difference and obturator load are evaluated and compared.
 
 \subsection{Excess-flow condition and motion towards closure}
 
-Inside the valve an increased flow demand, rises the velocity in the open passages. The distribution of pressure and shear over the obturator cosequently changes, potentially increasing the hydrodynamic force directed towards the seat. To assess this phenomena, a simplified one-dimensional dynamic balance may be written as:
+Inside the valve an increased flow demand raises the velocity in the open passages. The distribution of pressure and shear over the obturator consequently changes, potentially increasing the hydrodynamic force directed towards the seat. To assess this phenomenon, a simplified one-dimensional dynamic balance may be written as:
 \begin{equation}
 m\ddot{x}=
 F_{\mathrm{fluid},x}(x,\dot{x},Q)
 -F_0-kx-F_{\mathrm{friction}}-F_{\mathrm{other}},
 \label{eq:efv_force_balance}
 \end{equation}
-where positive displacement $x$ is defined here as the direction of closure, $\dot{x}$ is the displacement time derivative, $F_0$ is the preload acting on the spring, $k$ is the spring stiffness, $F_{\mathrm{friction}}$ is the fricion force and the remaining term represent any additional relevant mechanical load. This expression is a conceptual balance, not a calibrated motion model for the present valve along the direction that will be used as the streamwise $x$ axis used to report CFD results.
+where positive displacement $x$ is defined here as the direction of closure, $\dot{x}$ is the displacement time derivative, $F_0$ is the preload acting on the spring, $k$ is the spring stiffness, $F_{\mathrm{friction}}$ is the friction force and the remaining term represents any additional relevant mechanical load. This expression is a conceptual balance, not a calibrated motion model for the present valve along the direction that will be used as the streamwise $x$ axis used to report CFD results.
 
 
 \begin{figure}[htbp]
@@ -89,7 +89,7 @@ where positive displacement $x$ is defined here as the direction of closure, $\d
 \end{figure}
 
 Closure becomes mechanically possible when the flow-induced load overcomes the effective opposing spring forces at the relevant position. Once the element approaches its seat, the effective passage area, local flow field and pressure distribution change. Consequently, the actual trip point is coupled to obturator displacement \cite{white2016,moukalled2016}.
-A single CFD obturator position doesn't fully evaluates the behavior of the valve during closure but it is useful for the evaluation of the operational behavior at regime. 
+A single CFD obturator position does not fully evaluate the behavior of the valve during closure but it is useful for the evaluation of the operational behavior at regime. 
 
 \subsection{Shut-off, residual flow and resetting}
 
@@ -103,7 +103,7 @@ For an obturator with $n$ nominally circular holes of diameter $d$, the total ge
 A_{\mathrm{holes}}=n\frac{\pi d^2}{4}.
 \label{eq:efv_open_area}
 \end{equation}
-At a prescribed flow rate, changing $n$ or $d$ alters the average velocity required through the passages but is important to underline that contraction and local separation can raise velocities above a simple estimation. Accordingly, the pressure field and the axial hydrodynamic force depend not only on the total area but also on hole distribution, surrounding wall shape and local flow structure \cite{crane410,white2016}. This implies that studying hole count and hole diameter should be separate.
+At a prescribed flow rate, changing $n$ or $d$ alters the average velocity required through the passages but is important to note that contraction and local separation can raise velocities above a simple estimation. Accordingly, the pressure field and the axial hydrodynamic force depend not only on the total area but also on hole distribution, surrounding wall shape and local flow structure \cite{crane410,white2016}. This implies that studying hole count and hole diameter should be separate.
 
 A convenient nominal description of the pressure loss is
 \begin{equation}
@@ -125,7 +125,7 @@ These coefficients help distinguish geometric effects from changes in operating 
 \textbf{Design point} & \textbf{Fluid dynamic implication} & \textbf{Engineering implication}\\
 \midrule
 Holes number $\And$ size & Changes local restriction, velocity and force  & Balances normal-flow loss with available actuation load\\
-Spring $K$ $\And$ $F_0$ & Determines opposing mechanical load & Sets response threshold and reset capability\\
+Spring $k$ $\And$ $F_0$ & Determines opposing mechanical load & Sets response threshold and reset capability\\
 Upstream gas state & Sets density, viscosity and compression possibility & Changes pressure drop and force scaling\\
 Obturator $x$ position & Alters effective passage area and pressure distribution & Couples steady forces to the closing phase\\
 \bottomrule
@@ -141,6 +141,6 @@ The present numerical investigation isolates a fixed obturator in a three-dimens
 
 These outputs are directly relevant to the fluid dynamic part of an EFV design assessment and can inform selection among candidate hole configurations.\\
 
-The work does \emph{not} simulate a complete Refueling-station filling sequence. In particular, SAE~J2601 fuel-delivery temperatures and nominal pressure classes define an \emph{application context}, since there's no proof that a steady, constant density calculation reproduces every refueling condition, even if the fluid initial properties are the same \cite{sae_j2601}. To complete the design choices on a EFV inside these cùkind of system  would also require to address the pressure and temperature rating, sealing behaviour, materials compatibility, transient response and the applicable test procedures of ISO~19880-3 \cite{iso19880_3}. \\
+The work does \emph{not} simulate a complete Refueling-station filling sequence. In particular, SAE~J2601 fuel-delivery temperatures and nominal pressure classes define an \emph{application context}, since there's no proof that a steady, constant density calculation reproduces every refueling condition, even if the fluid initial properties are the same \cite{sae_j2601}. To complete the design choices on a EFV inside these type of system  would also require to address the pressure and temperature rating, sealing behaviour, materials compatibility, transient response and the applicable test procedures of ISO~19880-3 \cite{iso19880_3}. \\
 
 The following results of this study so, will be only one of the many elements needed to make the system designer able to choose properly the valve to be installed.

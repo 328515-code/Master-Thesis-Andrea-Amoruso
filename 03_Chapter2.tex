@@ -53,7 +53,7 @@ $\mathrm{N}_2$ & $1.165$ & $1.76\times10^{-5}$ & $1.51\times10^{-5}$\\
 \end{table}
 
 The incompressible momentum solution depends on kinematic viscosity, and thus on the Reynolds number $Re=U_{\mathrm{in}}D_{\mathrm{in}}/\nu$. At equal inlet velocity and geometry, a comparison of the two gases changes this Reynolds number. Dimensional pressure losses and forces also depend on density, so a cross-fluid comparison must distinguish the kinematic flow response from its dimensional scaling. The atmospheric reference state is a modeling convention: the CFD case configurations use the high-pressure reference properties documented in Table~\ref{tab:fluid_properties_highp}.
-The gas property set, is the only parameter that defines the reference state approximation, since the \texttt{0/p} outlet reference value is relative and not absolute as said in Chapter \ref{ch:numerical_setup}. The distinction is important because both Reynolds number and dimensional force scaling depend on the chosen state \cite{sae_j2601,nist_refprop}.
+The gas property set is the only parameter that defines the reference state approximation, since the \texttt{0/p} outlet reference value is relative and not absolute as said in Chapter \ref{ch:numerical_setup}. The distinction is important because both Reynolds number and dimensional force scaling depend on the chosen state \cite{sae_j2601,nist_refprop}.
 
 \subsection{High-Pressure, Low-Temperature reference}
 \label{sec:doe_highpressure_state}
@@ -71,7 +71,7 @@ For an incompressible \texttt{simpleFoam} case, $\nu_{\mathrm{ref}}$ enters the 
 
 Because the comparison here is velocity-controlled, the volumetric flow rate at a given inlet area is approximately $Q=U_{\mathrm{in}}A_{\mathrm{in}}$, while the mass flow rate is $\dot m=\rho_{\mathrm{ref}}Q$. Comparisons intended to use a fixed dispenser mass flow demand should instead match $\dot m$ and adjust the inlet velocity for the selected density.
 
-The ambient reference data in Table~\ref{tab:fluid_properties} was useful as a separate baseline for sensitivity analysis. Their densities, viscosities and dimensional forces are not transferred unchanged to the $437\,\mathrm{bar}$, $233\,\mathrm{K}$ cases. Any extension to strongly nonuniform pressure and temperature fields would require reconsideration of the constant-density approximation.
+The ambient reference data in Table~\ref{tab:fluid_properties} were useful as a separate baseline for sensitivity analysis, not reported here. Their densities, viscosities and dimensional forces are not transferred unchanged to the $437\,\mathrm{bar}$, $233\,\mathrm{K}$ cases. Any extension to strongly nonuniform pressure and temperature fields would require reconsideration of the constant-density approximation.
 
 \begin{table}[htbp]
 \centering
@@ -91,7 +91,7 @@ $\mathrm{N}_2$ & 481.352 & $3.818\times10^{-5}$ & $7.932\times10^{-8}$ \\
 
 \subsection{Inlet Velocity Levels and Reference Flow Rates}
 \label{sec:inlet velocities}
-The three inlet velocities selected for both the Hydrogen and Nitrogen cases are $5$, $10$ and $15\,\mathrm{m\,s^{-1}}$. These levels provide three distinct flow-demand conditions with a common reference geometry, enabling sensitivity to velocity to be assessed without changing the valve geometry. They are numerical factors rather than direct assignments to particular SAE~J2601 refuelling event, since such assignment would require the station flow requirement and a valve spring force specification \cite{sae_j2601}. 
+The three inlet velocities selected for both the Hydrogen and Nitrogen cases are $5$, $10$ and $15\,\mathrm{m\,s^{-1}}$. These levels provide three distinct flow-demand conditions with a common reference geometry, enabling sensitivity to velocity to be assessed without changing the valve geometry. They are numerical factors rather than direct assignments to particular SAE~J2601 refueling event, since such assignment would require the station flow requirement and a valve spring force specification \cite{sae_j2601}. 
 
 The nominal circular inlet diameter is $D_{\mathrm{in}}=7.8\,\mathrm{mm}$, giving
 \begin{equation}
@@ -130,9 +130,9 @@ $Re_{\mathrm{H}_2}$\\
 
 \end{table}
 
-The choice behind these three values was to have an equally spaced values for the inlet velocity while staying near the average nominal mass flow of fuel for this kind of systems and below the maximum mass flow of $0,06$ $kg\,s^{-1}$ defined by the SAE~J2601 \cite{sae_j2601}.  
+The choice behind these three values was to have equally spaced values for the inlet velocity while staying near the average nominal mass flow of fuel for this kind of systems and below the maximum mass flow of $0.06$ $kg\,s^{-1}$ defined by the SAE~J2601 \cite{sae_j2601}.  
 
-The corresponding approximate inlet Reynolds numbers for the two gases are reported in the Table \ref{tab:flow_regimes}. These are inlet scale values and do not establish whether the separated flow around the obturator is everywhere laminar or turbulent. Likewise, the inlet Mach number is insufficient to certify incompressibility within the more restrictive passages Section~\ref{sec:governing_equations}), that will be checked in the next chapter.
+The corresponding approximate inlet Reynolds numbers for the two gases are reported in the Table \ref{tab:flow_regimes}. These are inlet scale values and do not establish whether the separated flow around the obturator is everywhere laminar or turbulent. Likewise, the inlet Mach number is insufficient to certify incompressibility within the more restrictive passages (Section~\ref{sec:governing_equations}), that will be checked in the next chapter.
 
 \subsection{Obturator Geometries (\texttt{wallObt})}
 Two levels of hole count and two levels of hole diameter define the four CAD variants. With the nominal total hole area
@@ -174,13 +174,13 @@ D & 6 & 3.0 & 42.41 & 0.888\\
 \label{fig:obturator_variants}
 \end{figure}
 
-The area ratio $\beta$ is useful for preliminary geometric comparison, but it is not by itself a loss or force coefficient: local contraction, the obturator shape and downstream recirculation also influence the pressure distribution and integral loading \cite{white2016,crane410}. For an EFV installed in a refuelling line, the objective is to compare the compromise between hydraulic resistance during normal filling and fluid induced actuation load. Neither the smallest nor the largest opening should be declared optimal without the associated mechanical requirements.
+The area ratio $\beta$ is useful for preliminary geometric comparison, but it is not by itself a loss or force coefficient: local contraction, the obturator shape and downstream recirculation also influence the pressure distribution and integral loading \cite{white2016,crane410}. For an EFV installed in a refueling line, the objective is to compare the compromise between hydraulic resistance during normal filling and fluid induced actuation load. Neither the smallest nor the largest opening should be declared optimal without the associated mechanical requirements.
 
 
 \section{Factorial comparison and interaction analysis}
 \label{sec:factorial_analysis}
 
-The experimental design may be viewed as a set of twelve gas--velocity conditions, each evaluated on the four combinations of hole number and diameter. This arrangement permits paired geometric comparisons at fixed gas and inlet velocity. For example, the difference $R(n=6,d)-R(n=3,d)$ estimates the influence of hole count at the chosen diameter, while $R(n,d=3.0\,\mathrm{mm})-R(n,d=1.5\,\mathrm{mm})$ estimates the effect of hole size. Here $R$ can represent pressure loss, axial force or a dimensionless response coefficient.
+The experimental design may be viewed as a set of six gas--velocity conditions, each evaluated on the four combinations of hole number and diameter. This arrangement permits paired geometric comparisons at fixed gas and inlet velocity. For example, the difference $R(n=6,d)-R(n=3,d)$ estimates the influence of hole count at the chosen diameter, while $R(n,d=3.0\,\mathrm{mm})-R(n,d=1.5\,\mathrm{mm})$ estimates the effect of hole size. Here $R$ can represent pressure loss, axial force or a dimensionless response coefficient.
 
 A hole-count--diameter interaction occurs when the effect of increasing hole count depends on which diameter is selected. A convenient two-level interaction contrast for each gas and velocity is
 \begin{equation}
@@ -209,7 +209,7 @@ The automation process is organized into a sequence of controlled transformation
 \item \textbf{Output extraction}: collect the pressure, inlet-flow, wall-distance and force histories, retaining each case identifier.
 \item \textbf{Data reduction}: use the same averaging interval and physical reference quantities for each comparable output.
 \end{enumerate}
-The sequence has been designed to reduce manual editing errors and making it possible to compare computational cases generated under equivalent numerical settings. The CFD dictionaries are the authoritative description of each case, while the Python and Bash scripts automate their repeated application.\\
+The sequence has been designed to reduce manual editing errors and make it possible to compare computational cases generated under equivalent numerical settings. The CFD dictionaries are the authoritative description of each case, while the Python and Bash scripts automate their repeated application.\\
 
 For refueling system design, this traceability is particularly valuable because a change in operating pressure or temperature is not merely a label change: the associated density and viscosity may change, affecting Reynolds number and dimensional force scaling. A change in the pressure application therefore requires a deliberately specified thermodynamic state, rather than applying a post-processing multiplier to a result obtained with an unrelated kinematic viscosity \cite{nist_refprop,white2016}.
 
@@ -227,7 +227,7 @@ A complete case record associates the selected gas and its viscosity and density
 
 The OpenFOAM run directories include processor meshes and field files that are substantially larger than the reduced \texttt{postProcessing/} outputs used for preliminary response screening. A local Python script can retrieve each case \texttt{postProcessing/} directory using \texttt{scp} while preserving the simulation's directory identifier, thereby reducing unnecessary transfer and the risk of mixing cases.
 
-The example in Appendix~\ref{sec:app_scp_script} uses configurable paths, to retrieve, the output files associated with their case factors before any pressure or force statistics are computed. 
+The example in Appendix~\ref{sec:app_scp_script} uses configurable paths to retrieve the output files associated with their case factors before any pressure or force statistics are computed. 
 %The numerical checks described in Section~\ref{sec:numerical_verification} help prevent an apparently complete output table from being mistaken for an independently validated result.
 
 \section{Response variables and planned DoE analysis}
