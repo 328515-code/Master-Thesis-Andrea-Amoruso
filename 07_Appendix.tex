@@ -3,14 +3,14 @@
 
 This appendix records the data and conventions needed to reproduce Chapter~\ref{ch:selection_tool}. Its numerical tables derive from the archived application inputs. The automation examples document the workflow; they are illustrative reconstructions, not original submission scripts.
 
-\section{Case Definitions and Unit Conventions}
+\section{Case definitions and unit conventions}
 \label{sec:app_case_catalogue}
 
 The 24 cases combine two gases, inlet velocities of $5$, $10$ and $15\,\mathrm{m\,s^{-1}}$, and the four geometries below, all at one fixed obturator position. Total hole area denotes the nominal CAD passages, not the inlet area or an effective discharge area.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{@{}crrr@{}}
+\begin{tabular}{@{}cccc@{}}
 \toprule
 Obt. & Hole count & Diameter [mm] & Total hole area [mm$^2$]\\
 \midrule
@@ -20,7 +20,7 @@ C & 6 & 1.5 & 10.603\\
 D & 6 & 3.0 & 42.412\\
 \bottomrule
 \end{tabular}
-\caption{Geometry identifiers used in the data bundle and application.}
+\caption{Geometry identifiers used in the data elaboration}
 \label{tab:app_geometries}
 \end{table}
 
@@ -49,17 +49,17 @@ $A_{\mathrm{in}}=4.7783624\times10^{-5}\,\mathrm{m^2}$. These areas must not be 
 
 
 \clearpage
-\section{Audited Integral Responses}
+\section{Audited integral responses}
 \label{sec:app_response_data}
 
-OpenFOAM pressure $P$ is kinematic pressure [m$^2$/s$^2$]; $\Delta p=\rho_{\mathrm{ref}}(P_{\mathrm{in}}-P_{\mathrm{out}})$ gives pascals, divided by $1000$ for the stored kPa values. Force [N] sums pressure and viscous contributions along positive $x$. Input g/s is converted to kg/s. Solver iteration is not physical time.
+OpenFOAM pressure $P$ is kinematic pressure [m$^2$/s$^2$]; $\Delta p=\rho_{\mathrm{ref}}(P_{\mathrm{in}}-P_{\mathrm{out}})$ gives pascals, divided by $1000$ for the stored kPa values. Force [N] sums pressure and viscous contributions along positive $x$. Input g/s is converted to kg/s. 
 
-Table~\ref{tab:app_responses} pairs all 24 means with their terminal variability; the application uses the archived CSV precision.
+Table~\ref{tab:app_responses} pairs all 24 means with their terminal variability; the application uses the archived CSV file precision.
 
 \begin{table}[H]
 \centering\small
 \setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}ccrrrrr@{}}
+\begin{tabular}{@{}cccrrrr@{}}
 \toprule
 Gas & Obt. & $U_{\mathrm{in}}$ & $\overline{\Delta p}$ & $CV_p$ & $\overline F_x$ & $CV_F$\\
  & & [m/s] & [kPa] & [\%] & [N] & [\%]\\
@@ -91,11 +91,11 @@ $\mathrm{N}_2$ & C & 15 & 1178.5172 & 0.750 & 187.09046 & 0.804\\
 $\mathrm{N}_2$ & D & 15 & 224.3500 & 1.979 & 21.79912 & 1.960\\
 \bottomrule
 \end{tabular}
-\caption{Terminal integral responses and population-based coefficients of variation.}
+\caption{Terminal integral responses and coefficients of variation}
 \label{tab:app_responses}
 \end{table}
 
-The standard window is iterations 2700--3000 inclusive ($N=301$). Nitrogen A at $5\,\mathrm{m\,s^{-1}}$ instead uses iterations 1072--1372, also with $N=301$. For a response $R$, the reported statistic is
+The standard window is iterations 2700--3000 inclusive ($N=301$). Nitrogen A at $5\,\mathrm{m\,s^{-1}}$ instead uses iterations 1072--1372, also with $N=301$. For a response $R$, the statistic reported is
 \[
 CV_R=\frac{100}{|\overline R|}
 \sqrt{\frac{1}{N}\sum_{i=1}^{N}(R_i-\overline R)^2}.
@@ -106,13 +106,11 @@ These iterative variations are not uncertainty bounds. The tool recovers force e
 \section{Field Diagnostics and Contour Conventions}
 \label{sec:app_field_diagnostics}
 
-Integral means and saved-volume diagnostics have different sampling histories. All hydrogen fields and all nitrogen fields except A at $5\,\mathrm{m\,s^{-1}}$ are evaluated at iteration 3000. For that exception, the latest complete velocity volume is iteration 1000, the integral history ends at 1372 and the archived wall diagnostic is at 1300. These three indices must remain distinct.
-
 The velocity maximum used by the tool is obtained from the original cell-centred field across all processor subdomains. A maximum from an interpolated longitudinal slice is a different quantity. The channel-region slice diagnostic is restricted to $0.035\leq x\leq0.046\,\mathrm{m}$ on $y=0$ and $z=0$; neither plane intersects every channel.
 
 \begin{table}[H]
 \centering\small
-\begin{tabular}{@{}ccrrr@{}}
+\begin{tabular}{@{}ccccc@{}}
 \toprule
 Gas & Obt. & $\alpha=\max(U_{\max,3D}/U_{\mathrm{in}})$ & $\dot m_{0.3}$ [g/s] & Max. observed $Ma$\\
 \midrule
@@ -127,36 +125,35 @@ $\mathrm{N}_2$ & C & 5.71216 & 698.87 & 0.1444\\
 $\mathrm{N}_2$ & D & 4.18438 & 954.03 & 0.1042\\
 \bottomrule
 \end{tabular}
-\caption{Velocity-amplification envelopes and projected Mach boundaries. The last column is the largest observed value across the three saved volumes.}
+\caption{Velocity-amplification envelopes and projected Mach boundaries}
 \label{tab:app_mach_envelopes}
 \end{table}
 
 The projection is $Ma_{\mathrm{est}}=\alpha\dot m/(\rho A_{\mathrm{in,mesh}}a_{\mathrm{ref}})$.
-The nitrogen A boundary is slightly below its largest sampled mass flow, even though its observed maximum is $0.2979$: the largest amplification ratio comes from the lower-velocity case. This envelope is more restrictive than using only the final high-velocity point, but is not a guaranteed bound at uncomputed conditions.
 
-For contour comparison, camera, planes and spatial scale are fixed. Within each gas, one common range covers all geometries and speeds: hydrogen uses $0$--$140.98\,\mathrm{m\,s^{-1}}$ and $-224.23$--$299.35\,\mathrm{kPa}$; nitrogen uses $0$--$140.61\,\mathrm{m\,s^{-1}}$ and $-3300.13$--$4272.71\,\mathrm{kPa}$. Equal colours across gases therefore need not represent equal values. The plotted pressure is outlet-referenced, not absolute pressure. Cells are interpolated before slicing, whereas the volume-maximum scan retains the original cell values. Processing one case at a time limits memory demand without changing these conventions.
+For contour comparison, camera, planes and spatial scale are fixed. Within each gas, one common range covers all geometries and speeds: hydrogen uses $0$--$140.98\,\mathrm{m\,s^{-1}}$ and $-224.23$--$299.35\,\mathrm{kPa}$; nitrogen uses $0$--$140.61\,\mathrm{m\,s^{-1}}$ and $-3300.13$--$4272.71\,\mathrm{kPa}$.  The plotted pressure is outlet referenced, not absolute pressure.
 
-The archived sound-speed JSON files identify CoolProp 8.0.0 and its HEOS hydrogen and nitrogen models as the evaluation source~\cite{coolprop2014,leachman2009,span2000}. Their densities are approximately $33.7903$ and $481.6319\,\mathrm{kg\,m^{-3}}$; the prescribed CFD densities in Table~\ref{tab:app_properties}, rather than these independently evaluated densities, are used for pressure, force and mass-flow conversion.
+The archived sound speed files identify CoolProp 8.0.0 and its HEOS hydrogen and nitrogen models as the evaluation source~\cite{coolprop2014,leachman2009,span2000}. Their densities are approximately $33.7903$ and $481.6319\,\mathrm{kg\,m^{-3}}$; the prescribed CFD densities in Table~\ref{tab:app_properties}, rather than these independently evaluated densities, are used for pressure, force and mass flow conversion.
 
 \clearpage
 \section[Reproducing the Response Fit]{Independent Reproduction of the Response Fit}
 \label{sec:app_plotly_script}
 
-The executable implementation is provided in \path{design_tool/model.py}, with plotting separated into \path{design_tool/charts.py}. A compact independent check is more useful here than a duplicate listing of the complete interface. For either force or pressure loss, let $R_i$ be the three terminal means. Minimizing $\sum_i(R_i-k_RU_i^2)^2$ gives
+The executable implementation is provided in \path{design_tool/model.py}, with plotting separated into \path{design_tool/charts.py}. For either force or pressure loss, let $R_i$ be the three terminal means. Minimizing $\sum_i(R_i-k_RU_i^2)^2$ gives
 \[
 k_R=\frac{\sum_i U_i^2R_i}{\sum_i U_i^4},\qquad
 \widehat R(\dot m)=k_R\left(\frac{\dot m}{\rho A_{\mathrm{in,mesh}}}\right)^2.
 \]
-The same procedure is applied independently to each gas and obturator. It fits the available means with equal weights and does not force the parabola through all three points. The archived maximum relative force-fit mismatch is about $15.65\%$ for hydrogen B; for the other seven pairs it is below $2.82\%$.
+The same procedure is applied independently to each gas and obturator. It fits the available means with equal weights and does not force the quadratic function through all three points.
 
 \subsection{Tabulated Fit Coefficients}
 \label{sec:app_fit_coefficients}
 
-Table~\ref{tab:app_fit_coefficients} provides the fitted coefficients for independent calculations. In this table, $\widehat F_x=k_F U_{\mathrm{in}}^2$ is in newtons and $\widehat{\Delta p}=k_{\Delta p} U_{\mathrm{in}}^2$ is in kilopascals when velocity is in $\mathrm{m\,s^{-1}}$. The coefficients are dimensional regression parameters, not the dimensionless pressure-loss and force coefficients introduced in Chapter~\ref{ch:doe}. A spreadsheet using pressure in pascals must multiply $k_{\Delta p}$ by $1000$.
+Table~\ref{tab:app_fit_coefficients} provides the fitted coefficients for independent calculations. In this table, $\widehat F_x=k_F U_{\mathrm{in}}^2$ is in newtons and $\widehat{\Delta p}=k_{\Delta p} U_{\mathrm{in}}^2$ is in kilopascals when velocity is in $\mathrm{m\,s^{-1}}$. The coefficients are dimensional regression parameters, not the dimensionless pressure loss and force coefficients introduced in Chapter~\ref{ch:doe}. A spreadsheet using pressure in pascals must multiply $k_{\Delta p}$ by $1000$.
 
 \begin{table}[H]
 \centering\small
-\begin{tabular}{@{}ccrrr@{}}
+\begin{tabular}{@{}ccccc@{}}
 \toprule
 Gas & Obt. & $k_F$ & $k_{\Delta p}$ & $\varepsilon_{F,\max}$ [\%]\\
  & & [N s$^2$ m$^{-2}$] & [kPa s$^2$ m$^{-2}$] & \\
@@ -172,7 +169,7 @@ $\mathrm{N}_2$ & C & 0.83172326 & 5.24220376 & 0.294\\
 $\mathrm{N}_2$ & D & 0.09712325 & 0.99642049 & 1.881\\
 \bottomrule
 \end{tabular}
-\caption{Regression coefficients reproduced from the archived input bundle. Displayed values are rounded; the application retains full precision.}
+\caption{Regression coefficients reproduced from the archived input data. Displayed values are rounded; the application retains full precision.}
 \label{tab:app_fit_coefficients}
 \end{table}
 
@@ -180,10 +177,9 @@ The last column reports the largest pointwise relative force mismatch,
 \[
 \varepsilon_{F,\max}=100\max_i\left|\frac{k_F U_i^2-\overline F_{x,i}}{\overline F_{x,i}}\right|.
 \]
-It measures agreement with the three fitted means, rather than predictive uncertainty. The small residuals for most configurations do not independently validate a new mass flow, gas state or obturator position.
 
 \clearpage
-\subsection{Worked Reproduction Example}
+\subsection{Reproduction example}
 \begin{lstlisting}[language=Python,numbers=none,caption={Independent hydrogen A check, run from the repository root.}]
 import csv
 from pathlib import Path
@@ -205,26 +201,28 @@ print("Force [N]:", fit(force) * speed**2)
 print("Pressure loss [kPa]:", fit(drop) * speed**2)
 \end{lstlisting}
 
-At $15\,\mathrm{g\,s^{-1}}$ hydrogen, this gives $U_{\mathrm{in}}\simeq9.534\,\mathrm{m\,s^{-1}}$, $\widehat F_x\simeq20.249\,\mathrm{N}$ and $\widehat{\Delta p}\simeq120.28\,\mathrm{kPa}$ for A. Its projected Mach number is approximately $0.0685$, below $0.3$, and the selected mass flow lies within the sampled interval. The calculation reproduces a fitted CFD load; interpreting it as a spring requirement still requires the mechanical closing direction and the remaining force balance.
+% At $15\,\mathrm{g\,s^{-1}}$ hydrogen, this gives $U_{\mathrm{in}}\simeq9.534\,\mathrm{m\,s^{-1}}$, $\widehat F_x\simeq20.249\,\mathrm{N}$ and $\widehat{\Delta p}\simeq120.28\,\mathrm{kPa}$ for A. Its projected Mach number is approximately $0.0685$, below $0.3$, and the selected mass flow lies within the sampled interval.
+
+The calculation reproduces a fitted CFD load; interpreting it as a spring requirement still requires the mechanical closing direction and the remaining force balance.
 
 For a reproducibility check, retain the original CSV precision, use the meshed inlet area and convert the input to kg/s before evaluation. A fit using rounded chapter tables, a nominal inlet area or an unconverted g/s input will produce a different result. The application tests additionally exercise boundary handling, invalid inputs, file integrity and exported status information.
 
 
-\paragraph{Numerical acceptance checks.}
+\paragraph{Numerical checks example}
 A reproduction should recover $20.249\,\mathrm{N}$ and $120.28\,\mathrm{kPa}$ for hydrogen A at $15\,\mathrm{g\,s^{-1}}$, within the rounding shown above. Classification checks should use the full-precision input data and boundary calculation:
 \begin{enumerate}
-\item At zero flow, the formal force and pressure loss are zero, but the status remains extrapolation because zero was not simulated.
-\item At the calculated $\dot m_{0.3}$ for any gas and geometry, the estimated Mach number is $0.3$ and both design outputs are withheld. The displayed two-decimal boundary in Table~\ref{tab:app_mach_envelopes} is not precise enough for an equality test.
+\item At zero flow, the formal force and pressure loss are zero.
+\item At the calculated $\dot m_{0.3}$ for any gas and geometry, the estimated Mach number is $0.3$ and both design outputs are withheld.
 \item For nitrogen A at its upper sampled flow, $336.38743\,\mathrm{g\,s^{-1}}$, the projected Mach screen takes priority over coverage: the design outputs are withheld even though this flow corresponds to a simulated inlet velocity.
 \end{enumerate}
-These checks verify units and decision logic; they are not additional validation of the CFD model.
+These checks verify units and decision logic, it is not additional validation of the CFD model.
 \clearpage
-\section{Illustrative Case Preparation}
+\section{Case preparation}
 \label{sec:app_doe_gen}
 
-The following generator documents the 24-case factor combinations and preserves the template. It is an illustrative reconstruction, not the original submitted script. The clean template must contain the tokens \texttt{FLUX\_VALUE}, \texttt{NU\_VALUE} and \texttt{RHO\_VALUE} in the indicated files. The density token must replace the active force-function \texttt{rhoInf} value, not a commented entry. The geometry names below follow the documented A--D mapping and must match the supplied STL files.
+The following code lines, document the 24-case factor combinations and preserves the starting template. It is an illustrative reconstruction, not the original submitted script. The clean template contains the tokens \texttt{FLUX\_VALUE}, \texttt{NU\_VALUE} and \texttt{RHO\_VALUE} in the indicated files. The geometry names below follow the documented A-B-C-D mapping and must match the supplied STL files.
 
-\begin{lstlisting}[language=Python,numbers=none,basicstyle=\ttfamily\footnotesize,caption={Illustrative case generation with explicit template checks.}]
+\begin{lstlisting}[language=Python,numbers=none,basicstyle=\ttfamily\footnotesize,caption={DoE case generation with explicit template checks.}]
 from itertools import product
 from pathlib import Path
 import shutil
@@ -242,7 +240,7 @@ for gas, speed, obt in product(fluids, (5, 10, 15), shapes):
         "constant/physicalProperties": ("NU_VALUE", nu),
         "system/forces": ("RHO_VALUE", rho),
     }
-    # Validate inputs before creating this case.
+    
     texts = {}
     for name, (token, value) in edits.items():
         text = (base / name).read_text()
@@ -261,13 +259,13 @@ for gas, speed, obt in product(fluids, (5, 10, 15), shapes):
     shutil.copyfile(shape, case / "constant/geometry/wallObt.stl")
 \end{lstlisting}
 
-Case creation alone does not establish a valid mesh or solution. Before submission, inspect patch names, the active force density and the geometry assignment; retain the meshing log and mesh-quality checks for each generated case. The executable design tool uses audited results from the completed campaign and does not invoke this illustrative generator.
+Case creation alone does not establish a valid mesh or solution. Before submission, an inspection of patch names, active force density and geometry assignment needs to be performed.
 
 \clearpage
-\section{Execution and Result Retrieval}
+\section{Case execution and data retrieval}
 \label{sec:app_slurm_scripts}
 
-The sequence below summarizes the meshing and solving stages for a fresh OpenFOAM~10 case. It is an execution outline, not a portable SLURM submission file: the account, partition, modules, memory and wall-time requests depend on the cluster configuration. Here \texttt{NPROCS} must match \texttt{numberOfSubdomains} in the case's decomposition configuration. Run it only inside a generated case, retaining each log separately.
+The sequence below summarizes the meshing and solving stages for an OpenFOAM~10 case. It is an execution outline: the account, partition, modules, memory and wall-time requests depend on the cluster configuration, these in particular are specific for the ARIES cluster \cite{hpc_aries}. Here \texttt{NPROCS} must match \texttt{numberOfSubdomains} in the case's decomposition configuration. It has to run only inside a generated case.
 
 \begin{lstlisting}[language=bash,numbers=none,caption={Illustrative parallel execution sequence after environment setup.}]
 set -euo pipefail
@@ -282,63 +280,62 @@ mpirun -np "$NPROCS" checkMesh -parallel > log.checkMesh 2>&1
 mpirun -np "$NPROCS" simpleFoam -parallel > log.simpleFoam 2>&1
 \end{lstlisting}
 
-\subsection{Directory-Preserving Retrieval}
-\label{sec:app_scp_script}
+Each simulation run folder, for the successive elaboration, has been downloaded locally using the \texttt{scp protocol}. The full result folder has been downloaded to get full access to all the simulation data and run the tool. 
 
-The example below reads a configured remote case root from the environment and copies integral histories into a separate local archive. It uses the same illustrative naming convention as the generator. Actual remote directories must be verified before running it. Retrieval is sequential and an existing local case directory causes the example to stop, avoiding an accidental mixture of two transfers.
+% \subsection{Directory-Preserving Retrieval}
+% \label{sec:app_scp_script}
 
-\begin{lstlisting}[language=Python,numbers=none,caption={Illustrative retrieval of integral histories.}]
-from itertools import product
-from pathlib import Path
-import os
-import subprocess
+% The example below reads a configured remote case root from the environment and copies integral histories into a separate local archive. It uses the same illustrative naming convention as the generator. Actual remote directories must be verified before running it. Retrieval is sequential and an existing local case directory causes the example to stop, avoiding an accidental mixture of two transfers.
 
-# Example format: user@host:/absolute/path/DoE_Cases
-remote = os.environ["EFV_REMOTE_ROOT"].rstrip("/")
-archive = Path("Retrieved_Results")
-for gas, speed, obt in product(("H2", "N2"), (5, 10, 15), "ABCD"):
-    name = f"Sim_{gas}_Flux{speed:02d}_Obt_{obt}"
-    case = archive / gas / name
-    case.mkdir(parents=True, exist_ok=False)
-    source = f"{remote}/{gas}/{name}/postProcessing"
-    subprocess.run(["scp", "-r", source, str(case)], check=True)
-\end{lstlisting}
+% \begin{lstlisting}[language=Python,numbers=none,caption={Illustrative retrieval of integral histories.}]
+% from itertools import product
+% from pathlib import Path
+% import os
+% import subprocess
 
-Integral histories alone are insufficient for contours or a volume-wide velocity maximum. Those operations also require the complete mesh and the selected velocity and pressure fields for every processor subdomain. Complete and verify the transfer before post-processing; missing subdomains can invalidate a maximum or prevent the mesh from loading. Preserve source simulations and write all derived outputs to a separate directory.
+% # Example format: user@host:/absolute/path/DoE_Cases
+% remote = os.environ["EFV_REMOTE_ROOT"].rstrip("/")
+% archive = Path("Retrieved_Results")
+% for gas, speed, obt in product(("H2", "N2"), (5, 10, 15), "ABCD"):
+%     name = f"Sim_{gas}_Flux{speed:02d}_Obt_{obt}"
+%     case = archive / gas / name
+%     case.mkdir(parents=True, exist_ok=False)
+%     source = f"{remote}/{gas}/{name}/postProcessing"
+%     subprocess.run(["scp", "-r", source, str(case)], check=True)
+% \end{lstlisting}
 
-\clearpage
+% Integral histories alone are insufficient for contours or a volume-wide velocity maximum. Those operations also require the complete mesh and the selected velocity and pressure fields for every processor subdomain. Complete and verify the transfer before post-processing; missing subdomains can invalidate a maximum or prevent the mesh from loading. Preserve source simulations and write all derived outputs to a separate directory.
+
 \section{Running and Auditing the Design Tool}
 \label{sec:app_tool_operation}
 
-The \path{design_tool/} directory contains the application, model, plots, tests and input bundle. Python~3.13 is the tested runtime. On Windows, run \path{design_tool/run_windows.cmd}; dependencies are installed at \verb|%USERPROFILE%\.efv-tool\py313| to avoid long package paths. The application opens in a browser and requires Python plus its dependencies; it is not a standalone compiled executable.
+The \path{design_tool} directory contains the application, model, plots, tests and input bundle. Python~3.13 is the tested runtime, on Windows. To run it, it only needs the opening of \path{run_windows.cmd}. The application opens in a browser and requires Python plus its dependencies; it is not a standalone compiled executable.
 
-On macOS or Linux, run the following from \path{design_tool/}. Installation requires access to the packages; calculations subsequently use bundled data without OpenFOAM or ParaView.
-\begin{lstlisting}[language=bash,numbers=none]
-python3.13 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-python -m streamlit run streamlit_app.py
-\end{lstlisting}
+On macOS or Linux, a different procedure needs to be performed to start the tool.
 
-\paragraph{Interpreting the output.}
+% run the following from \path{design_tool/}. Installation requires access to the packages; calculations subsequently use bundled data without OpenFOAM or ParaView.
+% \begin{lstlisting}[language=bash,numbers=none]
+% python3.13 -m venv .venv
+% source .venv/bin/activate
+% python -m pip install -r requirements.txt
+% python -m streamlit run streamlit_app.py
+% \end{lstlisting}
+
+\subsection{Interpreting the output}
 Select the gas and threshold in g/s, then compare all four geometries. The plots and exported CSV distinguish:
 \begin{description}
 \item[Within the sampled range:] a regression estimate supported by the computed points, subject to their numerical limitations.
 \item[Extrapolation:] additional CFD is needed before spring selection, even if the estimated Mach number is below $0.3$.
-\item[Mach limit reached:] design force and pressure fields are blank. A separately labelled formal force projection is not a design load. This rule takes priority over the sampled-range classification.
+\item[Mach limit reached:] design force and pressure fields are blank. A separately labelled formal force projection is not a design load. This rule takes priority over the sampled range classification.
 \end{description}
 
 The CSV retains the state, area, fit mismatch, variability, revision and force convention. Zero flow returns the imposed zero-load limit but is classified as extrapolation; negative or non-finite input is rejected. No output defines spring stiffness or certifies closure.
 
-\paragraph{Verification and future updates.}
-Install the development dependencies listed in \path{requirements-dev.txt}. From the application directory, run \texttt{python -m pytest tests -q}. The script \path{make_thesis_figures.py} regenerates the figures and model summary. Startup checks verify input hashes. For a new campaign, review units, state, geometry, averaging and field completeness before updating the bundle; new hashes alone do not validate predictions.
-
-\clearpage
-\subsection{Data Provenance and Evaluation Records}
+\subsection{Data provenance}
 \label{sec:app_data_record}
 
 The manifest \path{data/provenance.json} records the full source revision (abbreviated \texttt{d3778e3}) and SHA-256 hashes. Original integral means are in \path{analysis/final_high_pressure_responses.csv}; velocity and sound-speed records are under \path{Results/Chapter4/}. Their copies in \path{design_tool/data/} make the application independent of the simulation directories.
 
-For exact reproduction, retain the archived sound speeds rather than silently recomputing them with a different library version or fluid backend. The prescribed CFD density and viscosity describe the simulated campaign; the equation-of-state density is a separate diagnostic. Replacing one with the other would change the mass-flow axis and dimensional response conversions. A change of reference state therefore requires a new, consistently documented data set rather than only replacing the property values in the interface.
+% For exact reproduction, retain the archived sound speeds rather than silently recomputing them with a different library version or fluid backend. The prescribed CFD density and viscosity describe the simulated campaign; the equation-of-state density is a separate diagnostic. Replacing one with the other would change the mass-flow axis and dimensional response conversions. A change of reference state therefore requires a new, consistently documented data set rather than only replacing the property values in the interface.
 
-When archiving a design evaluation, retain the selected gas and mass flow, obturator identifier, assessment status and exported CSV together with the application revision and the data manifest. The manifest's source revision identifies the underlying CFD data, not necessarily the revision of the application that produced the export. Recording both revisions distinguishes a data update from a change to fitting, screening or presentation.
+% When archiving a design evaluation, retain the selected gas and mass flow, obturator identifier, assessment status and exported CSV together with the application revision and the data manifest. The manifest's source revision identifies the underlying CFD data, not necessarily the revision of the application that produced the export. Recording both revisions distinguishes a data update from a change to fitting, screening or presentation.
